@@ -37,3 +37,9 @@ export type RootTabScreenProps<
     BottomTabScreenProps<RootTabParamList, Screen>,
     NativeStackScreenProps<RootStackParamList>
 >;
+
+export type TBook = {
+    id: number;
+    title: string;
+    author: string;
+};

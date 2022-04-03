@@ -1,21 +1,38 @@
 import { StyleSheet } from "react-native";
+import { Book } from "../components/Book";
+import { View } from "../components/Themed";
+import { RootTabScreenProps, TBook } from "../types";
 
-import EditScreenInfo from "../components/EditScreenInfo";
-import { Text, View } from "../components/Themed";
-import { RootTabScreenProps } from "../types";
-
+const books: Array<TBook> = [
+    {
+        id: 1,
+        title: "Bitcoin is Venice",
+        author: "Allen Farrington & Sacha Meyers",
+    },
+    {
+        id: 2,
+        title: "Human Action",
+        author: "Ludwig von Mises",
+    },
+    {
+        id: 3,
+        title: "Discourses, Fragments, Handbook",
+        author: "Epictetus",
+    },
+    {
+        id: 4,
+        title: "Ghost in the Shell",
+        author: "Masamune Shirow",
+    },
+];
 export default function ReadingScreen({
     navigation,
 }: RootTabScreenProps<"Reading">) {
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>Reading</Text>
-            <View
-                style={styles.separator}
-                lightColor="#eee"
-                darkColor="rgba(255,255,255,0.1)"
-            />
-            <EditScreenInfo path="/screens/ReadingScreen.tsx" />
+            {books.map((book) => (
+                <Book key={book.id} book={book} />
+            ))}
         </View>
     );
 }
@@ -23,12 +40,6 @@ export default function ReadingScreen({
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        alignItems: "center",
-        justifyContent: "center",
-    },
-    title: {
-        fontSize: 20,
-        fontWeight: "bold",
     },
     separator: {
         marginVertical: 30,
