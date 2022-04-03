@@ -24,7 +24,13 @@ const books: Array<TBook> = [
         title: "Ghost in the Shell",
         author: "Masamune Shirow",
     },
+    {
+        id: 5,
+        title: "Nausicaa of the Valley of the Wind: Complete Edition",
+        author: "Hiyao Miyazaki",
+    },
 ];
+
 export default function ReadingScreen({
     navigation,
 }: RootTabScreenProps<"Reading">) {
