@@ -39,7 +39,7 @@ export type RootTabScreenProps<
 >;
 
 export type TBook = {
-    id: number;
+    id: string;
     title: string;
     author: string;
 };

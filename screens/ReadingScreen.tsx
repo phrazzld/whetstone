@@ -1,39 +1,48 @@
+import { useEffect, useState } from "react";
 import { StyleSheet } from "react-native";
 import { Book } from "../components/Book";
 import { View } from "../components/Themed";
 import { RootTabScreenProps, TBook } from "../types";
-
-const books: Array<TBook> = [
-    {
-        id: 1,
-        title: "Bitcoin is Venice",
-        author: "Allen Farrington & Sacha Meyers",
-    },
-    {
-        id: 2,
-        title: "Human Action",
-        author: "Ludwig von Mises",
-    },
-    {
-        id: 3,
-        title: "Discourses, Fragments, Handbook",
-        author: "Epictetus",
-    },
-    {
-        id: 4,
-        title: "Ghost in the Shell",
-        author: "Masamune Shirow",
-    },
-    {
-        id: 5,
-        title: "Nausicaa of the Valley of the Wind: Complete Edition",
-        author: "Hiyao Miyazaki",
-    },
-];
+import {
+    collection,
+    query,
+    getDocs,
+    addDoc,
+    setDoc,
+    doc,
+    getDoc,
+} from "firebase/firestore";
+import { db } from "../firebase";
 
 export default function ReadingScreen({
     navigation,
 }: RootTabScreenProps<"Reading">) {
+    const [books, setBooks] = useState<Array<TBook>>([]);
+
+    const getBooks = async () => {
+        let localBooks: Array<TBook> = [];
+        const booksQuery = query(collection(db, "books"));
+        const querySnapshot = await getDocs(booksQuery);
+        querySnapshot.forEach((snap) => {
+            console.log(
+                "snap.id:",
+                snap.id,
+                ":: snap.data:",
+                JSON.stringify(snap.data())
+            );
+            localBooks.push({ id: snap.id, ...snap.data() });
+        });
+        setBooks(localBooks);
+    };
+
+    useEffect(() => {
+        getBooks();
+    }, []);
+
+    if (!books) {
+        return <></>;
+    }
+
     return (
         <View style={styles.container}>
             {books.map((book) => (
