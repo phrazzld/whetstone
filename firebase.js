@@ -29,7 +29,7 @@ export const db = getFirestore();
 
 console.log("firebase.js loaded");
 
-const createNewBook = async (newBook) => {
+export const createBook = async (newBook) => {
   addDoc(collection(db, "books"), newBook);
 };
 
