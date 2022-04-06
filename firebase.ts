@@ -6,6 +6,7 @@ import {
   getDocs,
   query,
   collection,
+  where,
   addDoc,
   getFirestore,
   setDoc,
@@ -32,21 +33,49 @@ export const db = getFirestore();
 
 // API functions
 
-export const createBook = async (newBook) => {
+export const createBook = (newBook: any): void => {
   addDoc(collection(db, "books"), newBook);
 };
 
-export const getBooks = async () => {
-  let books = [];
-  const booksQuery = query(collection(db, "books"));
-  const querySnapshot = await getDocs(booksQuery);
-  querySnapshot.forEach((snap) => {
-    books.push({ id: snap.id, ...snap.data() });
-  });
+export const getFinishedBooks = async (): Promise<Array<any>> => {
+  console.log("getFinishedBooks");
+  let books: Array<any> = [];
+  const booksQuery = query(
+    collection(db, "books"),
+    where("finished", "!=", null)
+  );
+  const snapshot = await getDocs(booksQuery);
+  if (snapshot.empty) {
+    console.log("No books found.");
+  } else {
+    snapshot.forEach((snap) => {
+      books.push({ id: snap.id, ...snap.data() });
+    });
+  }
+  console.log("finished books:", books);
   return books;
 };
 
-export const getBook = async (bookRef) => {
+export const getUnfinishedBooks = async (): Promise<Array<any>> => {
+  console.log("getUnfinishedBooks");
+  let books: Array<any> = [];
+  const booksQuery = query(
+    collection(db, "books"),
+    where("finished", "==", null)
+  );
+  const snapshot = await getDocs(booksQuery);
+  if (snapshot.empty) {
+    console.log("No books found.");
+  } else {
+    snapshot.forEach((snap) => {
+      books.push({ id: snap.id, ...snap.data() });
+    });
+  }
+  console.log("unfinished books:", books);
+  return books;
+};
+
+export const getBook = async (bookRef: any): Promise<void> => {
   const bookSnap = await getDoc(bookRef);
   if (bookSnap.exists()) {
     const bookData = bookSnap.data();
@@ -56,7 +85,7 @@ export const getBook = async (bookRef) => {
   }
 };
 
-export const deleteBook = async (bookId: string) => {
+export const deleteBook = async (bookId: string): Promise<void> => {
   try {
     const bookRef = doc(collection(db, "books"), bookId);
     await deleteDoc(bookRef);

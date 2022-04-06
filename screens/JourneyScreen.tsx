@@ -1,32 +1,49 @@
-import { StyleSheet } from "react-native";
-import { Text, View } from "../components/Themed";
+import { useEffect, useState } from "react";
+import { StyleSheet, SafeAreaView } from "react-native";
+import { Book } from "../components/Book";
+import { View } from "../components/Themed";
+import { TBook } from "../types";
+import { getFinishedBooks } from "../firebase";
+import { useRoute } from "@react-navigation/native";
 
 export default function JourneyScreen() {
-    return (
-        <View style={styles.container}>
-            <Text style={styles.title}>Journey</Text>
-            <View
-                style={styles.separator}
-                lightColor="#eee"
-                darkColor="rgba(255,255,255,0.1)"
-            />
-        </View>
-    );
+  const [books, setBooks] = useState<Array<TBook>>([]);
+  const route = useRoute();
+
+  const fetchAndSetBooks = async () => {
+    const localBooks = await getFinishedBooks();
+    setBooks(localBooks);
+  };
+
+  useEffect(() => {
+    fetchAndSetBooks();
+  }, [route.params]);
+
+  if (!books) {
+    return <></>;
+  }
+
+  return (
+    <SafeAreaView style={styles.container}>
+      {books.map((book) => (
+        <Book key={book.id} book={book} />
+      ))}
+    </SafeAreaView>
+  );
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        alignItems: "center",
-        justifyContent: "center",
-    },
-    title: {
-        fontSize: 20,
-        fontWeight: "bold",
-    },
-    separator: {
-        marginVertical: 30,
-        height: 1,
-        width: "80%",
-    },
+  container: {
+    flex: 1,
+    backgroundColor: "#fff",
+  },
+  title: {
+    fontSize: 20,
+    fontWeight: "bold",
+  },
+  separator: {
+    marginVertical: 30,
+    height: 1,
+    width: "80%",
+  },
 });

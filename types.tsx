@@ -5,41 +5,42 @@
 
 import { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
 import {
-    CompositeScreenProps,
-    NavigatorScreenParams,
+  CompositeScreenProps,
+  NavigatorScreenParams,
 } from "@react-navigation/native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 
 declare global {
-    namespace ReactNavigation {
-        interface RootParamList extends RootStackParamList {}
-    }
+  namespace ReactNavigation {
+    interface RootParamList extends RootStackParamList {}
+  }
 }
 
 export type RootStackParamList = {
-    Root: NavigatorScreenParams<RootTabParamList> | undefined;
-    AddBook: undefined;
-    NotFound: undefined;
+  Root: NavigatorScreenParams<RootTabParamList> | undefined;
+  AddBook: undefined;
+  NotFound: undefined;
 };
 
 export type RootStackScreenProps<
-    Screen extends keyof RootStackParamList
+  Screen extends keyof RootStackParamList
 > = NativeStackScreenProps<RootStackParamList, Screen>;
 
 export type RootTabParamList = {
-    Reading: undefined;
-    Journey: undefined;
+  Reading: undefined;
+  Journey: undefined;
 };
 
 export type RootTabScreenProps<
-    Screen extends keyof RootTabParamList
+  Screen extends keyof RootTabParamList
 > = CompositeScreenProps<
-    BottomTabScreenProps<RootTabParamList, Screen>,
-    NativeStackScreenProps<RootStackParamList>
+  BottomTabScreenProps<RootTabParamList, Screen>,
+  NativeStackScreenProps<RootStackParamList>
 >;
 
 export type TBook = {
-    id: string;
-    title: string;
-    author: string;
+  id: string;
+  title: string;
+  author: string;
+  finished: any;
 };

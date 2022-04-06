@@ -17,7 +17,7 @@ export const AddBookScreen = () => {
   const navigation = useNavigation();
 
   const addBook = () => {
-    const book = { title, author };
+    const book = { title, author, finished: null };
     createBook(book);
     navigation.navigate("Reading", { refetchBooks: true });
   };

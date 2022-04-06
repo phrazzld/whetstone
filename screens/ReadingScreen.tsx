@@ -3,7 +3,7 @@ import { StyleSheet } from "react-native";
 import { Book } from "../components/Book";
 import { View } from "../components/Themed";
 import { RootTabScreenProps, TBook } from "../types";
-import { getBooks } from "../firebase";
+import { getUnfinishedBooks } from "../firebase";
 import { useRoute } from "@react-navigation/native";
 
 export default function ReadingScreen({
@@ -13,7 +13,7 @@ export default function ReadingScreen({
   const route = useRoute();
 
   const fetchAndSetBooks = async () => {
-    const localBooks = await getBooks();
+    const localBooks = await getUnfinishedBooks();
     setBooks(localBooks);
   };
 

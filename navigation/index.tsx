@@ -99,8 +99,8 @@ function BottomTabNavigator() {
         }}
       />
       <BottomTab.Screen
-        name="Journey"
-        component={JourneyScreen}
+        name="JourneyStack"
+        component={JourneyStackScreen}
         options={{
           title: "Journey",
           tabBarIcon: ({ color }) => <TabBarIcon name="map-o" color={color} />,
@@ -141,6 +141,23 @@ function ReadingStackScreen({ navigation }) {
         name="BookDetails"
         component={BookDetailsScreen}
         options={({ route }) => ({ title: route.params.book.title })}
+      />
+    </ReadingStack.Navigator>
+  );
+}
+
+const JourneyStack = createNativeStackNavigator();
+
+function JourneyStackScreen({ navigation }) {
+  return (
+    <ReadingStack.Navigator>
+      <ReadingStack.Screen
+        name="Journey"
+        component={JourneyScreen}
+        options={{
+          title: "Journey",
+          headerRight: () => <></>,
+        }}
       />
     </ReadingStack.Navigator>
   );
