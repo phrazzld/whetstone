@@ -27,6 +27,7 @@ import {
 } from "../types";
 import LinkingConfiguration from "./LinkingConfiguration";
 import { BookDetailsScreen } from "../screens/BookDetailsScreen";
+import { AddBookScreen } from "../screens/AddBookScreen";
 
 export default function Navigation({
     colorScheme,
@@ -63,7 +64,11 @@ function RootNavigator() {
                 options={{ title: "Oops!" }}
             />
             <Stack.Group screenOptions={{ presentation: "modal" }}>
-                <Stack.Screen name="Modal" component={ModalScreen} />
+                <Stack.Screen
+                    name="AddBook"
+                    component={AddBookScreen}
+                    options={{ title: "Add Book" }}
+                />
             </Stack.Group>
         </Stack.Navigator>
     );
@@ -122,13 +127,13 @@ function ReadingStackScreen({ navigation }) {
                     title: "Reading",
                     headerRight: () => (
                         <Pressable
-                            onPress={() => navigation.navigate("Modal")}
+                            onPress={() => navigation.navigate("AddBook")}
                             style={({ pressed }) => ({
                                 opacity: pressed ? 0.5 : 1,
                             })}
                         >
                             <FontAwesome
-                                name="info-circle"
+                                name="plus-square-o"
                                 size={25}
                                 color={Colors.text}
                                 style={{ marginRight: 15 }}
