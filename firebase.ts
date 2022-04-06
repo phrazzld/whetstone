@@ -94,5 +94,17 @@ export const deleteBook = async (bookId: string): Promise<void> => {
   }
 };
 
+export const updateBook = async (
+  bookId: string,
+  payload: any
+): Promise<void> => {
+  try {
+    const bookRef = doc(collection(db, "books"), bookId);
+    await setDoc(bookRef, payload, { merge: true });
+  } catch (err) {
+    console.error("error finishing book:", err);
+  }
+};
+
 //const lotrRef = doc(db, "books/lotr");
 //getBook(lotrRef);

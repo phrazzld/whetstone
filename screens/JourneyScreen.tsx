@@ -1,23 +1,31 @@
 import { useEffect, useState } from "react";
 import { StyleSheet, SafeAreaView } from "react-native";
 import { Book } from "../components/Book";
-import { View } from "../components/Themed";
 import { TBook } from "../types";
-import { getFinishedBooks } from "../firebase";
-import { useRoute } from "@react-navigation/native";
+import { collection, where, query, onSnapshot } from "firebase/firestore";
+import { db } from "../firebase";
 
 export default function JourneyScreen() {
   const [books, setBooks] = useState<Array<TBook>>([]);
-  const route = useRoute();
-
-  const fetchAndSetBooks = async () => {
-    const localBooks = await getFinishedBooks();
-    setBooks(localBooks);
-  };
 
   useEffect(() => {
-    fetchAndSetBooks();
-  }, [route.params]);
+    const booksQuery = query(
+      collection(db, "books"),
+      where("finished", "!=", null)
+    );
+    const observer = onSnapshot(booksQuery, (snapshot) => {
+      let localBooks: Array<TBook> = [];
+      snapshot.forEach((s) => {
+        console.log(s.id, JSON.stringify(s.data()));
+        localBooks.push({ id: s.id, ...s.data() });
+      });
+      setBooks(localBooks);
+    });
+
+    return () => {
+      observer();
+    };
+  }, []);
 
   if (!books) {
     return <></>;
