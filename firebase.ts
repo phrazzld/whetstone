@@ -2,6 +2,9 @@
 import { initializeApp } from "firebase/app";
 import {
   getDoc,
+  deleteDoc,
+  getDocs,
+  query,
   collection,
   addDoc,
   getFirestore,
@@ -27,15 +30,23 @@ const firebaseConfig = {
 export const app = initializeApp(firebaseConfig);
 export const db = getFirestore();
 
-console.log("firebase.js loaded");
+// API functions
 
 export const createBook = async (newBook) => {
   addDoc(collection(db, "books"), newBook);
 };
 
-//createNewBook({ title: "Bone", author: "Jeff Smith" });
+export const getBooks = async () => {
+  let books = [];
+  const booksQuery = query(collection(db, "books"));
+  const querySnapshot = await getDocs(booksQuery);
+  querySnapshot.forEach((snap) => {
+    books.push({ id: snap.id, ...snap.data() });
+  });
+  return books;
+};
 
-const getBook = async (bookRef) => {
+export const getBook = async (bookRef) => {
   const bookSnap = await getDoc(bookRef);
   if (bookSnap.exists()) {
     const bookData = bookSnap.data();
@@ -45,5 +56,14 @@ const getBook = async (bookRef) => {
   }
 };
 
-const lotrRef = doc(db, "books/lotr");
-getBook(lotrRef);
+export const deleteBook = async (bookId: string) => {
+  try {
+    const bookRef = doc(collection(db, "books"), bookId);
+    await deleteDoc(bookRef);
+  } catch (err) {
+    console.error("error deleting book:", err);
+  }
+};
+
+//const lotrRef = doc(db, "books/lotr");
+//getBook(lotrRef);

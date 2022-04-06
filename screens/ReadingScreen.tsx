@@ -3,16 +3,7 @@ import { StyleSheet } from "react-native";
 import { Book } from "../components/Book";
 import { View } from "../components/Themed";
 import { RootTabScreenProps, TBook } from "../types";
-import {
-  collection,
-  query,
-  getDocs,
-  addDoc,
-  setDoc,
-  doc,
-  getDoc,
-} from "firebase/firestore";
-import { db } from "../firebase";
+import { getBooks } from "../firebase";
 import { useRoute } from "@react-navigation/native";
 
 export default function ReadingScreen({
@@ -21,24 +12,13 @@ export default function ReadingScreen({
   const [books, setBooks] = useState<Array<TBook>>([]);
   const route = useRoute();
 
-  const getBooks = async () => {
-    let localBooks: Array<TBook> = [];
-    const booksQuery = query(collection(db, "books"));
-    const querySnapshot = await getDocs(booksQuery);
-    querySnapshot.forEach((snap) => {
-      console.log(
-        "snap.id:",
-        snap.id,
-        ":: snap.data:",
-        JSON.stringify(snap.data())
-      );
-      localBooks.push({ id: snap.id, ...snap.data() });
-    });
+  const fetchAndSetBooks = async () => {
+    const localBooks = await getBooks();
     setBooks(localBooks);
   };
 
   useEffect(() => {
-    getBooks();
+    fetchAndSetBooks();
   }, [route.params]);
 
   if (!books) {

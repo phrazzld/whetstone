@@ -5,7 +5,6 @@ import {
   Button,
   TextInput,
   Platform,
-  Pressable,
   StyleSheet,
 } from "react-native";
 import { View } from "../components/Themed";
