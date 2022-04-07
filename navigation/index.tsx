@@ -19,26 +19,37 @@ import useColorScheme from "../hooks/useColorScheme";
 import NotFoundScreen from "../screens/NotFoundScreen";
 import ReadingScreen from "../screens/ReadingScreen";
 import JourneyScreen from "../screens/JourneyScreen";
-import {
-  RootStackParamList,
-  RootTabParamList,
-  RootTabScreenProps,
-} from "../types";
+import { RootStackParamList, RootTabParamList } from "../types";
 import LinkingConfiguration from "./LinkingConfiguration";
 import { BookDetailsScreen } from "../screens/BookDetailsScreen";
 import { AddBookScreen } from "../screens/AddBookScreen";
+import { SignInScreen } from "../screens/SignInScreen";
+import { SignUpScreen } from "../screens/SignUpScreen";
+import { auth } from "../firebase";
+import { onAuthStateChanged } from "firebase/auth";
 
 export default function Navigation({
   colorScheme,
 }: {
   colorScheme: ColorSchemeName;
 }) {
+  const [user, setUser] = React.useState<any>();
+
+  onAuthStateChanged(auth, (u) => {
+    if (u) {
+      console.log("user is signed in, TODO set in app state", u);
+      setUser(u);
+    } else {
+      console.log("user is signed out");
+    }
+  });
+
   return (
     <NavigationContainer
       linking={LinkingConfiguration}
       theme={colorScheme === "dark" ? DarkTheme : DefaultTheme}
     >
-      <RootNavigator />
+      {user ? <RootNavigator /> : <AuthNavigator />}
     </NavigationContainer>
   );
 }
@@ -72,6 +83,25 @@ function RootNavigator() {
     </Stack.Navigator>
   );
 }
+
+const AuthStack = createNativeStackNavigator();
+
+const AuthNavigator = () => {
+  return (
+    <AuthStack.Navigator>
+      <AuthStack.Screen
+        name="SignUp"
+        component={SignUpScreen}
+        options={{ headerShown: false }}
+      />
+      <AuthStack.Screen
+        name="SignIn"
+        component={SignInScreen}
+        options={{ headerShown: false }}
+      />
+    </AuthStack.Navigator>
+  );
+};
 
 /**
  * A bottom tab navigator displays tab buttons on the bottom of the display to switch screens.
