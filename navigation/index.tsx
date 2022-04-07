@@ -143,6 +143,7 @@ function BottomTabNavigator() {
         options={{
           title: "Profile",
           tabBarIcon: ({ color }) => <TabBarIcon name="user" color={color} />,
+          headerShown: true,
         }}
       />
     </BottomTab.Navigator>
@@ -189,8 +190,8 @@ const JourneyStack = createNativeStackNavigator();
 
 function JourneyStackScreen({ navigation }) {
   return (
-    <ReadingStack.Navigator>
-      <ReadingStack.Screen
+    <JourneyStack.Navigator>
+      <JourneyStack.Screen
         name="Journey"
         component={JourneyScreen}
         options={{
@@ -198,7 +199,7 @@ function JourneyStackScreen({ navigation }) {
           headerRight: () => <></>,
         }}
       />
-    </ReadingStack.Navigator>
+    </JourneyStack.Navigator>
   );
 }
 

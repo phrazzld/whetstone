@@ -20,9 +20,13 @@ export const Book = (props: BookProps) => {
     >
       <Text style={styles.title}>{book.title}</Text>
       <Text style={styles.author}>{book.author}</Text>
-      {book.finished && (
+      {book.finished ? (
         <Text style={styles.author}>
-          {book.finished.toDate().toDateString()}
+          Finished on {book.finished.toDate().toDateString()}
+        </Text>
+      ) : (
+        <Text style={styles.author}>
+          Started on {book.started.toDate().toDateString()}
         </Text>
       )}
     </TouchableOpacity>

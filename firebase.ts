@@ -1,6 +1,7 @@
 import { initializeApp } from "firebase/app";
 import {
   getDoc,
+  orderBy,
   deleteDoc,
   getDocs,
   query,
@@ -41,7 +42,8 @@ export const getFinishedBooks = async (): Promise<Array<any>> => {
   let books: Array<any> = [];
   const booksQuery = query(
     collection(db, "books"),
-    where("finished", "!=", null)
+    where("finished", "!=", null),
+    orderBy("finished")
   );
   const snapshot = await getDocs(booksQuery);
   if (snapshot.empty) {
@@ -60,7 +62,8 @@ export const getUnfinishedBooks = async (): Promise<Array<any>> => {
   let books: Array<any> = [];
   const booksQuery = query(
     collection(db, "books"),
-    where("finished", "==", null)
+    where("finished", "==", null),
+    orderBy("started")
   );
   const snapshot = await getDocs(booksQuery);
   if (snapshot.empty) {

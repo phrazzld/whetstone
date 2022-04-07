@@ -16,7 +16,7 @@ export const BookDetailsScreen = (props: BookDetailsScreenProps) => {
     setLoading(true);
     await updateBook(book.id, { finished: new Date() });
     setLoading(false);
-    navigation.navigate("Journey");
+    navigation.navigate("JourneyStack");
   };
 
   const removeBook = async () => {
@@ -36,10 +36,14 @@ export const BookDetailsScreen = (props: BookDetailsScreenProps) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>{book.title}</Text>
-      <Text style={styles.author}>{book.author}</Text>
-      {!book.finished && <Button title="Finish" onPress={finishBook} />}
-      <Button title="Delete" onPress={removeBook} color="#cc0000" />
+      <View>
+        <Text style={styles.title}>{book.title}</Text>
+        <Text style={styles.author}>{book.author}</Text>
+      </View>
+      <View style={{ flexDirection: "row", justifyContent: "space-around" }}>
+        {!book.finished && <Button title="Finish" onPress={finishBook} />}
+        <Button title="Delete" onPress={removeBook} color="#cc0000" />
+      </View>
     </View>
   );
 };
@@ -48,6 +52,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 15,
+    justifyContent: "space-between",
   },
   author: {
     fontSize: 16,

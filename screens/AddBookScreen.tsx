@@ -25,6 +25,7 @@ export const AddBookScreen = () => {
       title,
       author,
       finished: null,
+      started: new Date(),
       userId: auth.currentUser.uid,
     };
     createBook(book);

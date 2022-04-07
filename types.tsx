@@ -42,5 +42,6 @@ export type TBook = {
   id: string;
   title: string;
   author: string;
+  started: any;
   finished: any;
 };
