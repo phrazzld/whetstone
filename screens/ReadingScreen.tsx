@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Button, StyleSheet } from "react-native";
+import { StyleSheet } from "react-native";
 import { Book } from "../components/Book";
 import { View } from "../components/Themed";
 import { RootTabScreenProps, TBook } from "../types";
@@ -24,7 +24,6 @@ export default function ReadingScreen({
     const observer = onSnapshot(booksQuery, (snapshot) => {
       let localBooks: Array<TBook> = [];
       snapshot.forEach((s) => {
-        console.log(s.id, JSON.stringify(s.data()));
         localBooks.push({ id: s.id, ...s.data() });
       });
       setBooks(localBooks);

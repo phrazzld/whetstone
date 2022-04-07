@@ -11,8 +11,6 @@ export const Book = (props: BookProps) => {
   const { book } = props;
   const navigation = useNavigation();
 
-  console.log("book:", book);
-
   return (
     <TouchableOpacity
       style={styles.book}

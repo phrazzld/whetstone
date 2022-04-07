@@ -23,6 +23,7 @@ import { RootStackParamList, RootTabParamList } from "../types";
 import LinkingConfiguration from "./LinkingConfiguration";
 import { BookDetailsScreen } from "../screens/BookDetailsScreen";
 import { AddBookScreen } from "../screens/AddBookScreen";
+import { AddNoteScreen } from "../screens/AddNoteScreen";
 import { SignInScreen } from "../screens/SignInScreen";
 import { SignUpScreen } from "../screens/SignUpScreen";
 import { auth } from "../firebase";
@@ -53,8 +54,6 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 function RootNavigator() {
   const [user, setUser] = React.useState<any>();
 
-  console.log("user:", user);
-
   onAuthStateChanged(auth, (u) => {
     if (u) {
       console.log("user is signed in, TODO set in app state", u);
@@ -83,6 +82,11 @@ function RootNavigator() {
               name="AddBook"
               component={AddBookScreen}
               options={{ title: "Add Book" }}
+            />
+            <Stack.Screen
+              name="AddNote"
+              component={AddNoteScreen}
+              options={{ title: "Add Note" }}
             />
           </Stack.Group>
         </>

@@ -33,6 +33,8 @@ export const auth = getAuth(app);
 
 // API functions
 
+// Books
+
 export const createBook = (newBook: any): void => {
   addDoc(collection(db, "books"), newBook);
 };
@@ -53,12 +55,10 @@ export const getFinishedBooks = async (): Promise<Array<any>> => {
       books.push({ id: snap.id, ...snap.data() });
     });
   }
-  console.log("finished books:", books);
   return books;
 };
 
 export const getUnfinishedBooks = async (): Promise<Array<any>> => {
-  console.log("getUnfinishedBooks");
   let books: Array<any> = [];
   const booksQuery = query(
     collection(db, "books"),
@@ -73,18 +73,18 @@ export const getUnfinishedBooks = async (): Promise<Array<any>> => {
       books.push({ id: snap.id, ...snap.data() });
     });
   }
-  console.log("unfinished books:", books);
   return books;
 };
 
-export const getBook = async (bookRef: any): Promise<void> => {
+export const getBook = async (bookRef: any): Promise<any> => {
+  let bookData;
   const bookSnap = await getDoc(bookRef);
   if (bookSnap.exists()) {
-    const bookData = bookSnap.data();
-    console.log("bookData:", JSON.stringify(bookData));
+    bookData = bookSnap.data();
   } else {
     console.log("book does not exist");
   }
+  return bookData;
 };
 
 export const deleteBook = async (bookId: string): Promise<void> => {
@@ -108,5 +108,26 @@ export const updateBook = async (
   }
 };
 
-//const lotrRef = doc(db, "books/lotr");
-//getBook(lotrRef);
+// Notes
+
+export const createNote = (newNote: any): void => {
+  addDoc(collection(db, "notes"), newNote);
+};
+
+export const getBookNotes = async (bookId: string): Promise<Array<any>> => {
+  let notes: Array<any> = [];
+  const notesQuery = query(
+    collection(db, "notes"),
+    where("bookId", "==", bookId),
+    orderBy("createdAt")
+  );
+  const snapshot = await getDocs(notesQuery);
+  if (snapshot.empty) {
+    console.log("No notes found.");
+  } else {
+    snapshot.forEach((snap) => {
+      notes.push({ id: snap.id, ...snap.data() });
+    });
+  }
+  return notes;
+};

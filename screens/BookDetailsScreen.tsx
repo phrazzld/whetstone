@@ -1,16 +1,42 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ActivityIndicator, StyleSheet, Button } from "react-native";
 import { Text, View } from "../components/Themed";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import { updateBook, deleteBook } from "../firebase";
+import { getBookNotes, updateBook, deleteBook, db } from "../firebase";
+import {
+  orderBy,
+  query,
+  collection,
+  where,
+  onSnapshot,
+} from "firebase/firestore";
 
 interface BookDetailsScreenProps {}
 
 export const BookDetailsScreen = (props: BookDetailsScreenProps) => {
   const { book } = useRoute().params;
   const [loading, setLoading] = useState(false);
+  const [notes, setNotes] = useState<Array<any>>([]);
   const navigation = useNavigation();
-  console.log("BookDetails :: book:", book);
+
+  useEffect(() => {
+    const notesQuery = query(
+      collection(db, "notes"),
+      where("bookId", "==", book.id),
+      orderBy("createdAt", "desc")
+    );
+    const observer = onSnapshot(notesQuery, (snapshot) => {
+      let localNotes: Array<any> = [];
+      snapshot.forEach((s) => {
+        localNotes.push({ id: s.id, ...s.data() });
+      });
+      setNotes(localNotes);
+    });
+
+    return () => {
+      observer();
+    };
+  }, []);
 
   const finishBook = async () => {
     setLoading(true);
@@ -39,6 +65,18 @@ export const BookDetailsScreen = (props: BookDetailsScreenProps) => {
       <View>
         <Text style={styles.title}>{book.title}</Text>
         <Text style={styles.author}>{book.author}</Text>
+        {notes.map((note) => (
+          <View key={note.id}>
+            <Text key={note.id} style={styles.note}>
+              {note.content}
+            </Text>
+            <Text>{note.createdAt.toDate().toLocaleString()}</Text>
+          </View>
+        ))}
+        <Button
+          title="Add Note"
+          onPress={() => navigation.navigate("AddNote", { bookId: book.id })}
+        />
       </View>
       <View style={{ flexDirection: "row", justifyContent: "space-around" }}>
         {!book.finished && <Button title="Finish" onPress={finishBook} />}
@@ -56,6 +94,10 @@ const styles = StyleSheet.create({
   },
   author: {
     fontSize: 16,
+    color: "grey",
+  },
+  note: {
+    fontSize: 14,
     color: "grey",
   },
   title: {
