@@ -3,15 +3,20 @@ import { StyleSheet, SafeAreaView } from "react-native";
 import { Book } from "../components/Book";
 import { TBook } from "../types";
 import { collection, where, query, onSnapshot } from "firebase/firestore";
-import { db } from "../firebase";
+import { auth, db } from "../firebase";
 
 export default function JourneyScreen() {
   const [books, setBooks] = useState<Array<TBook>>([]);
 
   useEffect(() => {
+    if (!auth.currentUser) {
+      throw new Error("Cannot get books, user not logged in");
+    }
+
     const booksQuery = query(
       collection(db, "books"),
-      where("finished", "!=", null)
+      where("finished", "!=", null),
+      where("userId", "==", auth.currentUser.uid)
     );
     const observer = onSnapshot(booksQuery, (snapshot) => {
       let localBooks: Array<TBook> = [];

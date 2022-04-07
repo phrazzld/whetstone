@@ -8,7 +8,7 @@ import {
   StyleSheet,
 } from "react-native";
 import { View } from "../components/Themed";
-import { createBook } from "../firebase";
+import { createBook, auth } from "../firebase";
 import { useNavigation } from "@react-navigation/native";
 
 export const AddBookScreen = () => {
@@ -17,9 +17,18 @@ export const AddBookScreen = () => {
   const navigation = useNavigation();
 
   const addBook = () => {
-    const book = { title, author, finished: null };
+    if (!auth.currentUser) {
+      throw new Error("Cannot add book, user is not logged in.");
+    }
+
+    const book = {
+      title,
+      author,
+      finished: null,
+      userId: auth.currentUser.uid,
+    };
     createBook(book);
-    navigation.navigate("Reading", { refetchBooks: true });
+    navigation.navigate("Reading");
   };
 
   const cancel = () => {

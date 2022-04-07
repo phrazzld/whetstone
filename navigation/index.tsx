@@ -27,29 +27,19 @@ import { SignInScreen } from "../screens/SignInScreen";
 import { SignUpScreen } from "../screens/SignUpScreen";
 import { auth } from "../firebase";
 import { onAuthStateChanged } from "firebase/auth";
+import { ProfileScreen } from "../screens/ProfileScreen";
 
 export default function Navigation({
   colorScheme,
 }: {
   colorScheme: ColorSchemeName;
 }) {
-  const [user, setUser] = React.useState<any>();
-
-  onAuthStateChanged(auth, (u) => {
-    if (u) {
-      console.log("user is signed in, TODO set in app state", u);
-      setUser(u);
-    } else {
-      console.log("user is signed out");
-    }
-  });
-
   return (
     <NavigationContainer
       linking={LinkingConfiguration}
       theme={colorScheme === "dark" ? DarkTheme : DefaultTheme}
     >
-      {user ? <RootNavigator /> : <AuthNavigator />}
+      <RootNavigator />
     </NavigationContainer>
   );
 }
@@ -61,47 +51,58 @@ export default function Navigation({
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 function RootNavigator() {
+  const [user, setUser] = React.useState<any>();
+
+  console.log("user:", user);
+
+  onAuthStateChanged(auth, (u) => {
+    if (u) {
+      console.log("user is signed in, TODO set in app state", u);
+    } else {
+      console.log("user is signed out");
+    }
+    setUser(u);
+  });
+
   return (
     <Stack.Navigator>
-      <Stack.Screen
-        name="Root"
-        component={BottomTabNavigator}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="NotFound"
-        component={NotFoundScreen}
-        options={{ title: "Oops!" }}
-      />
-      <Stack.Group screenOptions={{ presentation: "modal" }}>
-        <Stack.Screen
-          name="AddBook"
-          component={AddBookScreen}
-          options={{ title: "Add Book" }}
-        />
-      </Stack.Group>
+      {user ? (
+        <>
+          <Stack.Screen
+            name="Root"
+            component={BottomTabNavigator}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="NotFound"
+            component={NotFoundScreen}
+            options={{ title: "Oops!" }}
+          />
+          <Stack.Group screenOptions={{ presentation: "modal" }}>
+            <Stack.Screen
+              name="AddBook"
+              component={AddBookScreen}
+              options={{ title: "Add Book" }}
+            />
+          </Stack.Group>
+        </>
+      ) : (
+        <>
+          <Stack.Screen
+            name="SignUp"
+            component={SignUpScreen}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="SignIn"
+            component={SignInScreen}
+            options={{ headerShown: false }}
+          />
+        </>
+      )}
     </Stack.Navigator>
   );
 }
-
-const AuthStack = createNativeStackNavigator();
-
-const AuthNavigator = () => {
-  return (
-    <AuthStack.Navigator>
-      <AuthStack.Screen
-        name="SignUp"
-        component={SignUpScreen}
-        options={{ headerShown: false }}
-      />
-      <AuthStack.Screen
-        name="SignIn"
-        component={SignInScreen}
-        options={{ headerShown: false }}
-      />
-    </AuthStack.Navigator>
-  );
-};
 
 /**
  * A bottom tab navigator displays tab buttons on the bottom of the display to switch screens.
@@ -134,6 +135,14 @@ function BottomTabNavigator() {
         options={{
           title: "Journey",
           tabBarIcon: ({ color }) => <TabBarIcon name="map-o" color={color} />,
+        }}
+      />
+      <BottomTab.Screen
+        name="Profile"
+        component={ProfileScreen}
+        options={{
+          title: "Profile",
+          tabBarIcon: ({ color }) => <TabBarIcon name="user" color={color} />,
         }}
       />
     </BottomTab.Navigator>
