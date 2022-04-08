@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { ActivityIndicator, StyleSheet, Button } from "react-native";
 import { Text, View } from "../components/Themed";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import { getBookNotes, updateBook, deleteBook, db } from "../firebase";
+import { updateBook, deleteBook, db } from "../firebase";
 import {
   orderBy,
   query,
@@ -10,6 +10,7 @@ import {
   where,
   onSnapshot,
 } from "firebase/firestore";
+import { Note } from "../components/Note";
 
 interface BookDetailsScreenProps {}
 
@@ -65,14 +66,11 @@ export const BookDetailsScreen = (props: BookDetailsScreenProps) => {
       <View>
         <Text style={styles.title}>{book.title}</Text>
         <Text style={styles.author}>{book.author}</Text>
-        {notes.map((note) => (
-          <View key={note.id}>
-            <Text key={note.id} style={styles.note}>
-              {note.content}
-            </Text>
-            <Text>{note.createdAt.toDate().toLocaleString()}</Text>
-          </View>
-        ))}
+        <View style={{ marginTop: 20 }}>
+          {notes.map((note) => (
+            <Note key={note.id} note={note} />
+          ))}
+        </View>
         <Button
           title="Add Note"
           onPress={() => navigation.navigate("AddNote", { bookId: book.id })}
@@ -94,10 +92,6 @@ const styles = StyleSheet.create({
   },
   author: {
     fontSize: 16,
-    color: "grey",
-  },
-  note: {
-    fontSize: 14,
     color: "grey",
   },
   title: {
