@@ -1,7 +1,13 @@
 import { useEffect, useState } from "react";
 import { TBook } from "../types";
 import { auth, db } from "../firebase";
-import { collection, where, query, onSnapshot } from "firebase/firestore";
+import {
+  collection,
+  where,
+  query,
+  orderBy,
+  onSnapshot,
+} from "firebase/firestore";
 
 export const useUnfinishedBooks = () => {
   const [books, setBooks] = useState<Array<TBook>>([]);
@@ -14,7 +20,8 @@ export const useUnfinishedBooks = () => {
     const booksQuery = query(
       collection(db, "books"),
       where("finished", "==", null),
-      where("userId", "==", auth.currentUser.uid)
+      where("userId", "==", auth.currentUser.uid),
+      orderBy("started", "desc")
     );
 
     const unsubscribe = onSnapshot(booksQuery, (snapshot) => {

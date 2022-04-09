@@ -1,5 +1,6 @@
 import { useState } from "react";
 import {
+  Alert,
   ScrollView,
   ActivityIndicator,
   StyleSheet,
@@ -31,10 +32,27 @@ export const BookDetailsScreen = () => {
   };
 
   const removeBook = async () => {
-    setLoading(true);
-    await deleteBook(book.id);
-    setLoading(false);
-    navigation.goBack();
+    Alert.alert(
+      "Delete Book",
+      "Are you sure you want to delete this book?",
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: async () => {
+            setLoading(true);
+            await deleteBook(book.id);
+            setLoading(false);
+            navigation.goBack();
+          },
+        },
+      ],
+      { cancelable: false }
+    );
   };
 
   const editBook = () => {
