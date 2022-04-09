@@ -8,8 +8,10 @@ import {
   StyleSheet,
 } from "react-native";
 import { View } from "../components/Themed";
-import { updateBook, auth } from "../firebase";
+import { storage, updateBook, auth } from "../firebase";
 import { useNavigation, useRoute } from "@react-navigation/native";
+import * as ImagePicker from "expo-image-picker";
+import { ref, uploadBytes } from "firebase/storage";
 
 export const EditBookScreen = () => {
   const navigation = useNavigation();
@@ -35,6 +37,30 @@ export const EditBookScreen = () => {
     navigation.goBack();
   };
 
+  const pickImage = async () => {
+    if (!auth.currentUser) {
+      throw new Error("Cannot edit book image, user is not logged in.");
+    }
+
+    try {
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.All,
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 1,
+      });
+      if (!result.cancelled) {
+        const filename = `${auth.currentUser.uid}/${book.id}/cover.jpg`;
+        const imgRef = ref(storage, filename);
+        const img = await fetch(result.uri);
+        const bytes = await img.blob();
+        await uploadBytes(imgRef, bytes);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <View
@@ -43,6 +69,7 @@ export const EditBookScreen = () => {
         darkColor="rgba(255,255,255,0.1)"
       />
 
+      <Button title="Edit image" onPress={pickImage} />
       <TextInput
         placeholder="Title"
         style={styles.input}
