@@ -1,6 +1,7 @@
 import { useState } from "react";
 import {
   Alert,
+  Image,
   ScrollView,
   ActivityIndicator,
   StyleSheet,
@@ -8,7 +9,7 @@ import {
 } from "react-native";
 import { Text, View } from "../components/Themed";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import { updateBook, deleteBook, db } from "../firebase";
+import { updateBook, deleteBook } from "../firebase";
 import { Note } from "../components/Note";
 import { useNotes } from "../hooks/useNotes";
 
@@ -79,11 +80,23 @@ export const BookDetailsScreen = () => {
     <ScrollView>
       <View style={styles.container}>
         <View>
-          <Text style={styles.title}>{book.title}</Text>
-          <Text style={styles.author}>{book.author}</Text>
-          <Text style={[styles.author, { fontSize: 14, marginTop: 10 }]}>
-            {timeline}
-          </Text>
+          <View style={{ flex: 1, flexDirection: "row" }}>
+            <View style={{ marginRight: 10 }}>
+              <Image
+                style={styles.image}
+                source={{
+                  uri: book.image ?? "https://picsum.photos/200/300.jpg",
+                }}
+              />
+            </View>
+            <View>
+              <Text style={styles.title}>{book.title}</Text>
+              <Text style={styles.author}>{book.author}</Text>
+              <Text style={[styles.author, { fontSize: 14, marginTop: 10 }]}>
+                {timeline}
+              </Text>
+            </View>
+          </View>
 
           <View
             style={{
@@ -140,6 +153,10 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 20,
     fontWeight: "bold",
-    marginBottom: 10,
+  },
+  image: {
+    height: 80,
+    width: 60,
+    borderRadius: 10,
   },
 });
