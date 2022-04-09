@@ -32,21 +32,30 @@ export const Note = (props: NoteProps) => {
 
   return (
     <TouchableOpacity onPress={() => onPress(note.id)} style={styles.note}>
-      <View style={styles.main}>
-        <Text style={styles.content}>{note.content}</Text>
-        <Text style={styles.timestamp}>
-          {note.createdAt.toDate().toLocaleString()}
-        </Text>
+      <View style={{ flex: 1, flexDirection: "row", alignItems: "center" }}>
+        <View
+          style={{
+            marginRight: 10,
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <FontAwesome name="bookmark-o" size={24} color="#555" />
+          <Text>{note.page}</Text>
+        </View>
+        <View style={styles.main}>
+          <Text style={styles.content}>{note.content}</Text>
+          <Text style={styles.timestamp}>
+            {note.createdAt.toDate().toLocaleString()}
+          </Text>
+        </View>
       </View>
+
       <View style={styles.actions}>
         {selected && (
-          <FontAwesome.Button
-            name="trash"
-            onPress={removeNote}
-            color="#cc0000"
-            backgroundColor="transparent"
-            style={{ alignItems: "center" }}
-          />
+          <TouchableOpacity onPress={removeNote}>
+            <FontAwesome name="trash" size={24} color="#cc0000" />
+          </TouchableOpacity>
         )}
       </View>
     </TouchableOpacity>
@@ -57,6 +66,7 @@ const styles = StyleSheet.create({
   actions: {
     width: "12%",
     alignItems: "center",
+    justifyContent: "center",
   },
   main: {
     width: "80%",

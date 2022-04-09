@@ -1,5 +1,10 @@
 import { useState } from "react";
-import { ActivityIndicator, StyleSheet, Button } from "react-native";
+import {
+  ScrollView,
+  ActivityIndicator,
+  StyleSheet,
+  Button,
+} from "react-native";
 import { Text, View } from "../components/Themed";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { updateBook, deleteBook, db } from "../firebase";
@@ -49,43 +54,52 @@ export const BookDetailsScreen = () => {
   }
 
   return (
-    <View style={styles.container}>
-      <View>
-        <Text style={styles.title}>{book.title}</Text>
-        <Text style={styles.author}>{book.author}</Text>
-        <Text style={[styles.author, { fontSize: 14, marginTop: 10 }]}>
-          {timeline}
-        </Text>
+    <ScrollView>
+      <View style={styles.container}>
+        <View>
+          <Text style={styles.title}>{book.title}</Text>
+          <Text style={styles.author}>{book.author}</Text>
+          <Text style={[styles.author, { fontSize: 14, marginTop: 10 }]}>
+            {timeline}
+          </Text>
 
-        <View style={{ marginTop: 20 }}>
-          {notes.map((note) => (
-            <Note
-              key={note.id}
-              note={note}
-              selected={selectedNote === note.id}
-              onPress={selectNote}
-            />
-          ))}
-        </View>
-        {notes.length === 0 && (
-          <View>
-            <Text style={{ marginVertical: 20, textAlign: "center" }}>
-              No notes yet.
-            </Text>
-            <Button
-              title="Add Note"
-              onPress={() =>
-                navigation.navigate("AddNote", { bookId: book.id })
-              }
-            />
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-around",
+              marginVertical: 10,
+            }}
+          >
+            {!book.finished && <Button title="Finish" onPress={finishBook} />}
+            <Button title="Delete" onPress={removeBook} color="#cc0000" />
           </View>
-        )}
+
+          <View>
+            {notes.map((note) => (
+              <Note
+                key={note.id}
+                note={note}
+                selected={selectedNote === note.id}
+                onPress={selectNote}
+              />
+            ))}
+          </View>
+          {notes.length === 0 && (
+            <View>
+              <Text style={{ marginVertical: 20, textAlign: "center" }}>
+                No notes yet.
+              </Text>
+              <Button
+                title="Add Note"
+                onPress={() =>
+                  navigation.navigate("AddNote", { bookId: book.id })
+                }
+              />
+            </View>
+          )}
+        </View>
       </View>
-      <View style={{ flexDirection: "row", justifyContent: "space-around" }}>
-        {!book.finished && <Button title="Finish" onPress={finishBook} />}
-        <Button title="Delete" onPress={removeBook} color="#cc0000" />
-      </View>
-    </View>
+    </ScrollView>
   );
 };
 
@@ -94,6 +108,7 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 15,
     justifyContent: "space-between",
+    backgroundColor: "#fff",
   },
   author: {
     fontSize: 16,

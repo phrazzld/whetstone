@@ -13,6 +13,7 @@ import { useRoute, useNavigation } from "@react-navigation/native";
 
 export const AddNoteScreen = () => {
   const [content, setContent] = useState("");
+  const [page, setPage] = useState("");
   const { bookId } = useRoute().params;
   const navigation = useNavigation();
 
@@ -21,7 +22,7 @@ export const AddNoteScreen = () => {
       throw new Error("Cannot add note, user is not logged in.");
     }
 
-    const note = { content, bookId, createdAt: new Date() };
+    const note = { content, bookId, page, createdAt: new Date() };
     createNote(note);
     navigation.goBack();
   };
@@ -41,9 +42,16 @@ export const AddNoteScreen = () => {
       <TextInput
         placeholder="Content"
         multiline={true}
-        style={styles.input}
+        style={styles.multilineInput}
         value={content}
         onChangeText={setContent}
+      />
+      <TextInput
+        placeholder="Page number"
+        style={styles.input}
+        value={page}
+        onChangeText={setPage}
+        keyboardType="numeric"
       />
       <View style={styles.buttonContainer}>
         <Button onPress={addNote} title="Add Note" />
@@ -69,6 +77,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   input: {
+    padding: 10,
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 6,
+    width: "90%",
+    margin: 10,
+  },
+  multilineInput: {
     padding: 10,
     borderWidth: 1,
     borderColor: "#ccc",

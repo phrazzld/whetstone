@@ -1,4 +1,4 @@
-import { StyleSheet } from "react-native";
+import { ScrollView, StyleSheet } from "react-native";
 import { Book } from "../components/Book";
 import { Text, View } from "../components/Themed";
 import { useUnfinishedBooks } from "../hooks/useUnfinishedBooks";
@@ -9,7 +9,7 @@ const BooksScreen = () => {
   const finishedBooks = useFinishedBooks();
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
       <View style={styles.sectionContainer}>
         <Text style={styles.sectionHeader}>Reading</Text>
         {unfinishedBooks.map((unfinishedBook) => (
@@ -23,7 +23,7 @@ const BooksScreen = () => {
           <Book key={finishedBook.id} book={finishedBook} />
         ))}
       </View>
-    </View>
+    </ScrollView>
   );
 };
 
@@ -31,6 +31,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingTop: 20,
+    backgroundColor: "#fff",
   },
   sectionContainer: {
     marginBottom: 32,
