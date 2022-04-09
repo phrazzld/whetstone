@@ -33,9 +33,9 @@ export const Book = (props: BookProps) => {
 
 const styles = StyleSheet.create({
   book: {
-    margin: 10,
-    padding: 10,
-    borderRadius: 10,
+    marginHorizontal: 10,
+    marginBottom: 10,
+    paddingHorizontal: 10,
     backgroundColor: "white",
   },
   author: {
@@ -44,6 +44,6 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 20,
-    fontWeight: "bold",
+    fontWeight: "400",
   },
 });

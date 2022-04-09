@@ -10,15 +10,19 @@ const BooksScreen = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.sectionHeader}>Reading</Text>
-      {unfinishedBooks.map((unfinishedBook) => (
-        <Book key={unfinishedBook.id} book={unfinishedBook} />
-      ))}
+      <View style={styles.sectionContainer}>
+        <Text style={styles.sectionHeader}>Reading</Text>
+        {unfinishedBooks.map((unfinishedBook) => (
+          <Book key={unfinishedBook.id} book={unfinishedBook} />
+        ))}
+      </View>
 
-      <Text style={styles.sectionHeader}>Read</Text>
-      {finishedBooks.map((finishedBook) => (
-        <Book key={finishedBook.id} book={finishedBook} />
-      ))}
+      <View style={styles.sectionContainer}>
+        <Text style={styles.sectionHeader}>Finished</Text>
+        {finishedBooks.map((finishedBook) => (
+          <Book key={finishedBook.id} book={finishedBook} />
+        ))}
+      </View>
     </View>
   );
 };
@@ -26,17 +30,17 @@ const BooksScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    paddingTop: 20,
+  },
+  sectionContainer: {
+    marginBottom: 32,
   },
   sectionHeader: {
-    fontSize: 24,
+    fontSize: 20,
     fontWeight: "600",
-    marginVertical: 8,
-    marginHorizontal: 16,
-  },
-  separator: {
-    marginVertical: 30,
-    height: 1,
-    width: "80%",
+    marginHorizontal: 10,
+    marginBottom: 10,
+    paddingHorizontal: 10,
   },
 });
 
