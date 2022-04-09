@@ -131,3 +131,12 @@ export const getBookNotes = async (bookId: string): Promise<Array<any>> => {
   }
   return notes;
 };
+
+export const deleteNote = async (noteId: string): Promise<void> => {
+  try {
+    const noteRef = doc(collection(db, "notes"), noteId);
+    await deleteDoc(noteRef);
+  } catch (err) {
+    console.error("error deleting note:", err);
+  }
+};

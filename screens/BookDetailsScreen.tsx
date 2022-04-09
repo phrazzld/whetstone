@@ -53,11 +53,6 @@ export const BookDetailsScreen = () => {
             <Note key={note.id} note={note} />
           ))}
         </View>
-
-        <Button
-          title="Add Note"
-          onPress={() => navigation.navigate("AddNote", { bookId: book.id })}
-        />
       </View>
       <View style={{ flexDirection: "row", justifyContent: "space-around" }}>
         {!book.finished && <Button title="Finish" onPress={finishBook} />}

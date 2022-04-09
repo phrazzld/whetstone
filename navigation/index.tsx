@@ -175,7 +175,26 @@ function BookStackScreen({ navigation }) {
       <BookStack.Screen
         name="BookDetails"
         component={BookDetailsScreen}
-        options={({ route }) => ({ title: route.params.book.title })}
+        options={({ route }) => ({
+          title: route.params.book.title,
+          headerRight: () => (
+            <Pressable
+              onPress={() =>
+                navigation.navigate("AddNote", { bookId: route.params.book.id })
+              }
+              style={({ pressed }) => ({
+                opacity: pressed ? 0.5 : 1,
+              })}
+            >
+              <FontAwesome
+                name="plus-square-o"
+                size={25}
+                color={Colors.text}
+                style={{ marginRight: 15 }}
+              />
+            </Pressable>
+          ),
+        })}
       />
     </BookStack.Navigator>
   );
