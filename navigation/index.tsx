@@ -22,6 +22,7 @@ import { RootStackParamList, RootTabParamList } from "../types";
 import LinkingConfiguration from "./LinkingConfiguration";
 import { BookDetailsScreen } from "../screens/BookDetailsScreen";
 import { AddBookScreen } from "../screens/AddBookScreen";
+import { EditBookScreen } from "../screens/EditBookScreen";
 import { AddNoteScreen } from "../screens/AddNoteScreen";
 import { SignInScreen } from "../screens/SignInScreen";
 import { SignUpScreen } from "../screens/SignUpScreen";
@@ -81,6 +82,11 @@ function RootNavigator() {
               name="AddBook"
               component={AddBookScreen}
               options={{ title: "Add Book" }}
+            />
+            <Stack.Screen
+              name="EditBook"
+              component={EditBookScreen}
+              options={{ title: "Edit Book" }}
             />
             <Stack.Screen
               name="AddNote"

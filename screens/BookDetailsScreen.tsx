@@ -37,6 +37,10 @@ export const BookDetailsScreen = () => {
     navigation.goBack();
   };
 
+  const editBook = () => {
+    navigation.navigate("EditBook", { book });
+  };
+
   const selectNote = (id: string): void => {
     if (selectedNote === id) {
       setSelectedNote("");
@@ -71,6 +75,7 @@ export const BookDetailsScreen = () => {
             }}
           >
             {!book.finished && <Button title="Finish" onPress={finishBook} />}
+            <Button title="Edit" onPress={editBook} />
             <Button title="Delete" onPress={removeBook} color="#cc0000" />
           </View>
 
