@@ -67,6 +67,19 @@ export const BookDetailsScreen = () => {
             />
           ))}
         </View>
+        {notes.length === 0 && (
+          <View>
+            <Text style={{ marginVertical: 20, textAlign: "center" }}>
+              No notes yet.
+            </Text>
+            <Button
+              title="Add Note"
+              onPress={() =>
+                navigation.navigate("AddNote", { bookId: book.id })
+              }
+            />
+          </View>
+        )}
       </View>
       <View style={{ flexDirection: "row", justifyContent: "space-around" }}>
         {!book.finished && <Button title="Finish" onPress={finishBook} />}
