@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Alert,
   Image,
@@ -9,9 +9,10 @@ import {
 } from "react-native";
 import { Text, View } from "../components/Themed";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import { updateBook, deleteBook } from "../firebase";
+import { auth, storage, updateBook, deleteBook } from "../firebase";
 import { Note } from "../components/Note";
 import { useNotes } from "../hooks/useNotes";
+import { ref, getDownloadURL } from "firebase/storage";
 
 export const BookDetailsScreen = () => {
   const { book } = useRoute().params;
@@ -19,11 +20,32 @@ export const BookDetailsScreen = () => {
   const [selectedNote, setSelectedNote] = useState("");
   const navigation = useNavigation();
   const notes = useNotes(book.id);
+  const [image, setImage] = useState("https://picsum.photos/200/300.jpg");
 
   let timeline = `Started: ${book.started.toDate().toLocaleString()}`;
   if (book.finished) {
     timeline += `\nFinished: ${book.finished.toDate().toLocaleString()}`;
   }
+
+  const getImage = async () => {
+    if (!auth.currentUser) {
+      throw new Error("Not logged in");
+    }
+
+    const coverRef = ref(
+      storage,
+      `${auth.currentUser.uid}/${book.id}/cover.jpg`
+    );
+    const coverUrl = await getDownloadURL(coverRef);
+    console.log("coverUrl:", coverUrl);
+    if (coverUrl) {
+      setImage(coverUrl);
+    }
+  };
+
+  useEffect(() => {
+    getImage();
+  }, []);
 
   const finishBook = async () => {
     setLoading(true);
@@ -82,12 +104,7 @@ export const BookDetailsScreen = () => {
         <View>
           <View style={{ flex: 1, flexDirection: "row" }}>
             <View style={{ marginRight: 10 }}>
-              <Image
-                style={styles.image}
-                source={{
-                  uri: book.image ?? "https://picsum.photos/200/300.jpg",
-                }}
-              />
+              <Image style={styles.image} source={{ uri: image }} />
             </View>
             <View>
               <Text style={styles.title}>{book.title}</Text>

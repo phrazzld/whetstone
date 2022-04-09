@@ -1,7 +1,10 @@
+import { useState, useEffect } from "react";
 import { Image, StyleSheet, TouchableOpacity } from "react-native";
 import { TBook } from "../types";
 import { View, Text } from "./Themed";
 import { useNavigation } from "@react-navigation/native";
+import { ref, getDownloadURL } from "firebase/storage";
+import { auth, storage } from "../firebase";
 
 interface BookProps {
   book: TBook;
@@ -10,6 +13,27 @@ interface BookProps {
 export const Book = (props: BookProps) => {
   const { book } = props;
   const navigation = useNavigation();
+  const [image, setImage] = useState("https://picsum.photos/200/300.jpg");
+
+  const getImage = async () => {
+    if (!auth.currentUser) {
+      throw new Error("Not logged in");
+    }
+
+    const coverRef = ref(
+      storage,
+      `${auth.currentUser.uid}/${book.id}/cover.jpg`
+    );
+    const coverUrl = await getDownloadURL(coverRef);
+    console.log("coverUrl:", coverUrl);
+    if (coverUrl) {
+      setImage(coverUrl);
+    }
+  };
+
+  useEffect(() => {
+    getImage();
+  }, []);
 
   return (
     <TouchableOpacity
@@ -17,10 +41,7 @@ export const Book = (props: BookProps) => {
       onPress={() => navigation.navigate("BookDetails", { book })}
     >
       <View style={{ marginRight: 10 }}>
-        <Image
-          style={styles.image}
-          source={{ uri: book.image ?? "https://picsum.photos/200/300.jpg" }}
-        />
+        <Image style={styles.image} source={{ uri: image }} />
       </View>
       <View>
         <Text style={styles.title}>{book.title}</Text>
@@ -52,7 +73,7 @@ const styles = StyleSheet.create({
   image: {
     height: 75,
     width: 50,
-    resizeMode: "contain",
+    resizeMode: "cover",
     borderRadius: 10,
   },
   author: {
