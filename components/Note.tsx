@@ -1,14 +1,16 @@
 import { FontAwesome } from "@expo/vector-icons";
-import { Alert, StyleSheet } from "react-native";
+import { Alert, StyleSheet, TouchableOpacity } from "react-native";
 import { View, Text } from "./Themed";
 import { deleteNote } from "../firebase";
 
 interface NoteProps {
   note: any;
+  selected: boolean;
+  onPress: (id: string) => void;
 }
 
 export const Note = (props: NoteProps) => {
-  const { note } = props;
+  const { note, selected, onPress } = props;
 
   const removeNote = async () => {
     // Ask user to confirm deletion
@@ -29,7 +31,7 @@ export const Note = (props: NoteProps) => {
   };
 
   return (
-    <View style={styles.note}>
+    <TouchableOpacity onPress={() => onPress(note.id)} style={styles.note}>
       <View style={styles.main}>
         <Text style={styles.content}>{note.content}</Text>
         <Text style={styles.timestamp}>
@@ -37,15 +39,17 @@ export const Note = (props: NoteProps) => {
         </Text>
       </View>
       <View style={styles.actions}>
-        <FontAwesome.Button
-          name="trash"
-          onPress={removeNote}
-          color="#cc0000"
-          backgroundColor="transparent"
-          style={{ alignItems: "center" }}
-        />
+        {selected && (
+          <FontAwesome.Button
+            name="trash"
+            onPress={removeNote}
+            color="#cc0000"
+            backgroundColor="transparent"
+            style={{ alignItems: "center" }}
+          />
+        )}
       </View>
-    </View>
+    </TouchableOpacity>
   );
 };
 

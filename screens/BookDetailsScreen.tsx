@@ -9,6 +9,7 @@ import { useNotes } from "../hooks/useNotes";
 export const BookDetailsScreen = () => {
   const { book } = useRoute().params;
   const [loading, setLoading] = useState(false);
+  const [selectedNote, setSelectedNote] = useState("");
   const navigation = useNavigation();
   const notes = useNotes(book.id);
 
@@ -31,6 +32,14 @@ export const BookDetailsScreen = () => {
     navigation.goBack();
   };
 
+  const selectNote = (id: string): void => {
+    if (selectedNote === id) {
+      setSelectedNote("");
+    } else {
+      setSelectedNote(id);
+    }
+  };
+
   if (loading) {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
@@ -50,7 +59,12 @@ export const BookDetailsScreen = () => {
 
         <View style={{ marginTop: 20 }}>
           {notes.map((note) => (
-            <Note key={note.id} note={note} />
+            <Note
+              key={note.id}
+              note={note}
+              selected={selectedNote === note.id}
+              onPress={selectNote}
+            />
           ))}
         </View>
       </View>
