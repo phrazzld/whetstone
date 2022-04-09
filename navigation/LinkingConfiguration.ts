@@ -20,11 +20,6 @@ const linking: LinkingOptions<RootStackParamList> = {
               ReadingScreen: "one",
             },
           },
-          Journey: {
-            screens: {
-              JourneyScreen: "two",
-            },
-          },
         },
       },
       Modal: "modal",

@@ -28,7 +28,6 @@ export type RootStackScreenProps<
 
 export type RootTabParamList = {
   Reading: undefined;
-  Journey: undefined;
 };
 
 export type RootTabScreenProps<

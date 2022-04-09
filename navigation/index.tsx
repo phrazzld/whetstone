@@ -17,8 +17,7 @@ import { ColorSchemeName, Pressable } from "react-native";
 import Colors from "../constants/Colors";
 import useColorScheme from "../hooks/useColorScheme";
 import NotFoundScreen from "../screens/NotFoundScreen";
-import ReadingScreen from "../screens/ReadingScreen";
-import JourneyScreen from "../screens/JourneyScreen";
+import BooksScreen from "../screens/BooksScreen";
 import { RootStackParamList, RootTabParamList } from "../types";
 import LinkingConfiguration from "./LinkingConfiguration";
 import { BookDetailsScreen } from "../screens/BookDetailsScreen";
@@ -119,26 +118,18 @@ function BottomTabNavigator() {
 
   return (
     <BottomTab.Navigator
-      initialRouteName="ReadingStack"
+      initialRouteName="BookStack"
       screenOptions={{
         tabBarActiveTintColor: Colors[colorScheme].tint,
         headerShown: false,
       }}
     >
       <BottomTab.Screen
-        name="ReadingStack"
-        component={ReadingStackScreen}
+        name="BookStack"
+        component={BookStackScreen}
         options={{
-          title: "Reading",
+          title: "Books",
           tabBarIcon: ({ color }) => <TabBarIcon name="book" color={color} />,
-        }}
-      />
-      <BottomTab.Screen
-        name="JourneyStack"
-        component={JourneyStackScreen}
-        options={{
-          title: "Journey",
-          tabBarIcon: ({ color }) => <TabBarIcon name="map-o" color={color} />,
         }}
       />
       <BottomTab.Screen
@@ -154,16 +145,16 @@ function BottomTabNavigator() {
   );
 }
 
-const ReadingStack = createNativeStackNavigator();
+const BookStack = createNativeStackNavigator();
 
-function ReadingStackScreen({ navigation }) {
+function BookStackScreen({ navigation }) {
   return (
-    <ReadingStack.Navigator>
-      <ReadingStack.Screen
-        name="Reading"
-        component={ReadingScreen}
+    <BookStack.Navigator>
+      <BookStack.Screen
+        name="Books"
+        component={BooksScreen}
         options={{
-          title: "Reading",
+          title: "Books",
           headerRight: () => (
             <Pressable
               onPress={() => navigation.navigate("AddBook")}
@@ -181,29 +172,12 @@ function ReadingStackScreen({ navigation }) {
           ),
         }}
       />
-      <ReadingStack.Screen
+      <BookStack.Screen
         name="BookDetails"
         component={BookDetailsScreen}
         options={({ route }) => ({ title: route.params.book.title })}
       />
-    </ReadingStack.Navigator>
-  );
-}
-
-const JourneyStack = createNativeStackNavigator();
-
-function JourneyStackScreen({ navigation }) {
-  return (
-    <JourneyStack.Navigator>
-      <JourneyStack.Screen
-        name="Journey"
-        component={JourneyScreen}
-        options={{
-          title: "Journey",
-          headerRight: () => <></>,
-        }}
-      />
-    </JourneyStack.Navigator>
+    </BookStack.Navigator>
   );
 }
 

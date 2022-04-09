@@ -43,7 +43,7 @@ export const BookDetailsScreen = (props: BookDetailsScreenProps) => {
     setLoading(true);
     await updateBook(book.id, { finished: new Date() });
     setLoading(false);
-    navigation.navigate("JourneyStack");
+    navigation.navigate("Reading");
   };
 
   const removeBook = async () => {
