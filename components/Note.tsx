@@ -5,7 +5,7 @@ interface NoteProps {
   note: any;
 }
 
-export const Note = (props: BookProps) => {
+export const Note = (props: NoteProps) => {
   const { note } = props;
 
   return (

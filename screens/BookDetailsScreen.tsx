@@ -1,62 +1,40 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { ActivityIndicator, StyleSheet, Button } from "react-native";
 import { Text, View } from "../components/Themed";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { updateBook, deleteBook, db } from "../firebase";
-import {
-  orderBy,
-  query,
-  collection,
-  where,
-  onSnapshot,
-} from "firebase/firestore";
 import { Note } from "../components/Note";
+import { useNotes } from "../hooks/useNotes";
 
-interface BookDetailsScreenProps {}
-
-export const BookDetailsScreen = (props: BookDetailsScreenProps) => {
+export const BookDetailsScreen = () => {
   const { book } = useRoute().params;
   const [loading, setLoading] = useState(false);
-  const [notes, setNotes] = useState<Array<any>>([]);
   const navigation = useNavigation();
+  const notes = useNotes(book.id);
 
-  useEffect(() => {
-    const notesQuery = query(
-      collection(db, "notes"),
-      where("bookId", "==", book.id),
-      orderBy("createdAt", "desc")
-    );
-    const observer = onSnapshot(notesQuery, (snapshot) => {
-      let localNotes: Array<any> = [];
-      snapshot.forEach((s) => {
-        localNotes.push({ id: s.id, ...s.data() });
-      });
-      setNotes(localNotes);
-    });
-
-    return () => {
-      observer();
-    };
-  }, []);
+  let timeline = `Started: ${book.started.toDate().toLocaleString()}`;
+  if (book.finished) {
+    timeline += `\nFinished: ${book.finished.toDate().toLocaleString()}`;
+  }
 
   const finishBook = async () => {
     setLoading(true);
     await updateBook(book.id, { finished: new Date() });
     setLoading(false);
-    navigation.navigate("Reading");
+    navigation.goBack();
   };
 
   const removeBook = async () => {
     setLoading(true);
     await deleteBook(book.id);
     setLoading(false);
-    navigation.navigate("Reading");
+    navigation.goBack();
   };
 
   if (loading) {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <ActivityIndicator size="large" color="#cc0000" />
+        <ActivityIndicator size="large" />
       </View>
     );
   }
@@ -66,11 +44,16 @@ export const BookDetailsScreen = (props: BookDetailsScreenProps) => {
       <View>
         <Text style={styles.title}>{book.title}</Text>
         <Text style={styles.author}>{book.author}</Text>
+        <Text style={[styles.author, { fontSize: 14, marginTop: 10 }]}>
+          {timeline}
+        </Text>
+
         <View style={{ marginTop: 20 }}>
           {notes.map((note) => (
             <Note key={note.id} note={note} />
           ))}
         </View>
+
         <Button
           title="Add Note"
           onPress={() => navigation.navigate("AddNote", { bookId: book.id })}

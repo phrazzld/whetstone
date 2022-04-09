@@ -29,11 +29,11 @@ export const AddBookScreen = () => {
       userId: auth.currentUser.uid,
     };
     createBook(book);
-    navigation.navigate("Reading");
+    navigation.navigate("Books");
   };
 
   const cancel = () => {
-    navigation.navigate("Reading");
+    navigation.navigate("Books");
   };
 
   return (

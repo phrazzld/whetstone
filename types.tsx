@@ -44,3 +44,10 @@ export type TBook = {
   started: any;
   finished: any;
 };
+
+export type TNote = {
+  id: string;
+  bookId: string;
+  content: string;
+  createdAt: any;
+};
