@@ -2,22 +2,29 @@ import { useState } from "react";
 import { StatusBar } from "expo-status-bar";
 import {
   SafeAreaView,
+  Dimensions,
   Button,
   TextInput,
   Platform,
   StyleSheet,
 } from "react-native";
-import { View } from "../components/Themed";
+import { View, Text } from "../components/Themed";
 import { storage, updateBook, auth } from "../firebase";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import * as ImagePicker from "expo-image-picker";
 import { ref, getDownloadURL, uploadBytesResumable } from "firebase/storage";
+import { ProgressBar } from "react-native-paper";
+
+const windowWidth = Dimensions.get("window").width;
 
 export const EditBookScreen = () => {
   const navigation = useNavigation();
   const { book } = useRoute().params;
   const [title, setTitle] = useState(book.title);
   const [author, setAuthor] = useState(book.author);
+  const [refreshImage, setRefreshImage] = useState(false);
+  const [imageUploadProgress, setImageUploadProgress] = useState(0);
+  const [showImageUploadProgress, setShowImageUploadProgress] = useState(false);
 
   const editBook = () => {
     if (!auth.currentUser) {
@@ -29,11 +36,14 @@ export const EditBookScreen = () => {
       author,
     };
     updateBook(book.id, payload);
-    navigation.navigate("BookDetails", { book: { ...book, ...payload } });
+    navigation.navigate("BookDetails", {
+      book: { ...book, ...payload },
+      refreshImage,
+    });
   };
 
   const cancel = () => {
-    navigation.goBack();
+    navigation.navigate("BookDetails", { book, refreshImage });
   };
 
   const pickImage = async () => {
@@ -49,6 +59,7 @@ export const EditBookScreen = () => {
         quality: 1,
       });
       if (!result.cancelled) {
+        setShowImageUploadProgress(true);
         const filename = `${auth.currentUser.uid}/${book.id}/cover.jpg`;
         const metadata = { contentType: "image/jpeg" };
         const imgRef = ref(storage, filename);
@@ -64,6 +75,7 @@ export const EditBookScreen = () => {
             const progress = Math.round(
               (snapshot.bytesTransferred / snapshot.totalBytes) * 100
             );
+            setImageUploadProgress(progress * 0.01);
             console.log("Upload is " + progress + "% done");
             switch (snapshot.state) {
               case "paused": // or 'paused'
@@ -84,6 +96,7 @@ export const EditBookScreen = () => {
             getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
               console.log("downloadURL:", downloadURL);
             });
+            setRefreshImage(true);
           }
         );
       }
@@ -101,6 +114,14 @@ export const EditBookScreen = () => {
       />
 
       <Button title="Edit image" onPress={pickImage} />
+      <ProgressBar
+        visible={showImageUploadProgress}
+        progress={imageUploadProgress}
+        style={[styles.progressBar, { width: windowWidth * 0.9 }]}
+      />
+      <View>
+        {imageUploadProgress === 1 && <Text>Image successfully uploaded!</Text>}
+      </View>
       <TextInput
         placeholder="Title"
         style={styles.input}
@@ -114,7 +135,7 @@ export const EditBookScreen = () => {
         onChangeText={setAuthor}
       />
       <View style={styles.buttonContainer}>
-        <Button onPress={editBook} title="Edit Book" />
+        <Button onPress={editBook} title="Save" />
         <Button onPress={cancel} title="Cancel" color="gray" />
       </View>
 
@@ -144,6 +165,11 @@ const styles = StyleSheet.create({
     height: 40,
     width: "90%",
     margin: 10,
+  },
+  progressBar: {
+    margin: 10,
+    height: 10,
+    borderRadius: 10,
   },
   separator: {
     marginVertical: 30,

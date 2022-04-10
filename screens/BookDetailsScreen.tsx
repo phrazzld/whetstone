@@ -15,7 +15,7 @@ import { useNotes } from "../hooks/useNotes";
 import { ref, getDownloadURL } from "firebase/storage";
 
 export const BookDetailsScreen = () => {
-  const { book } = useRoute().params;
+  const { book, refreshImage } = useRoute().params;
   const [loading, setLoading] = useState(false);
   const [selectedNote, setSelectedNote] = useState("");
   const navigation = useNavigation();
@@ -45,7 +45,7 @@ export const BookDetailsScreen = () => {
 
   useEffect(() => {
     getImage();
-  }, []);
+  }, [refreshImage]);
 
   const finishBook = async () => {
     setLoading(true);
