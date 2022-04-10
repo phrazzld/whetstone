@@ -12,7 +12,7 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import { auth, storage, updateBook, deleteBook } from "../firebase";
 import { Note } from "../components/Note";
 import { useNotes } from "../hooks/useNotes";
-import { ref, getDownloadURL } from "firebase/storage";
+import { ref, getDownloadURL, deleteObject } from "firebase/storage";
 import { useStore } from "../zstore";
 
 export const BookDetailsScreen = () => {
@@ -40,7 +40,6 @@ export const BookDetailsScreen = () => {
       `${auth.currentUser.uid}/${book.id}/cover.jpg`
     );
     const coverUrl = await getDownloadURL(coverRef);
-    console.log("coverUrl:", coverUrl);
     if (coverUrl) {
       setImage(coverUrl);
     }
@@ -76,10 +75,26 @@ export const BookDetailsScreen = () => {
           text: "Delete",
           style: "destructive",
           onPress: async () => {
+            if (!auth.currentUser) {
+              throw new Error("Can't delete this book, no user is logged in.");
+            }
+
             setLoading(true);
             await deleteBook(book.id);
-            setLoading(false);
-            navigation.goBack();
+            const bookImageRef = ref(
+              storage,
+              `${auth.currentUser.uid}/${book.id}/cover.jpg`
+            );
+            deleteObject(bookImageRef)
+              .then(() => {
+                setLoading(false);
+                navigation.goBack();
+              })
+              .catch((err) => {
+                console.log("Error deleting book image:", err);
+                setLoading(false);
+                navigation.goBack();
+              });
           },
         },
       ],

@@ -56,7 +56,7 @@ function RootNavigator() {
 
   onAuthStateChanged(auth, (u) => {
     if (u) {
-      console.log("user is signed in, TODO set in app state", u);
+      console.log("user is signed in");
     } else {
       console.log("user is signed out");
     }

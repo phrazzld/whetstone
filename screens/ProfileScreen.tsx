@@ -3,8 +3,6 @@ import { Text, View } from "../components/Themed";
 import { auth } from "../firebase";
 
 export const ProfileScreen = () => {
-  console.log("auth.currentUser:", auth.currentUser);
-
   return (
     <SafeAreaView style={styles.container}>
       <View style={{ margin: 20 }}>

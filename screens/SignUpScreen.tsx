@@ -9,15 +9,9 @@ export const SignUpScreen = () => {
   const [password, setPassword] = useState("");
   const navigation = useNavigation();
 
-  const signUp = async () => {
+  const signUp = () => {
     try {
-      const userCredential = await createUserWithEmailAndPassword(
-        auth,
-        email,
-        password
-      );
-      console.log("userCredential:", userCredential);
-      console.log("userCredential.user:", userCredential.user);
+      createUserWithEmailAndPassword(auth, email, password);
     } catch (error) {
       console.log(error);
     }
