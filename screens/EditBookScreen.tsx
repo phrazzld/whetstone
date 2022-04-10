@@ -14,6 +14,7 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import * as ImagePicker from "expo-image-picker";
 import { ref, getDownloadURL, uploadBytesResumable } from "firebase/storage";
 import { ProgressBar } from "react-native-paper";
+import { useStore } from "../zstore";
 
 const windowWidth = Dimensions.get("window").width;
 
@@ -25,6 +26,7 @@ export const EditBookScreen = () => {
   const [refreshImage, setRefreshImage] = useState(false);
   const [imageUploadProgress, setImageUploadProgress] = useState(0);
   const [showImageUploadProgress, setShowImageUploadProgress] = useState(false);
+  const setStaleBookImage = useStore((state) => state.setStaleBookImage);
 
   const editBook = () => {
     if (!auth.currentUser) {
@@ -38,12 +40,11 @@ export const EditBookScreen = () => {
     updateBook(book.id, payload);
     navigation.navigate("BookDetails", {
       book: { ...book, ...payload },
-      refreshImage,
     });
   };
 
   const cancel = () => {
-    navigation.navigate("BookDetails", { book, refreshImage });
+    navigation.navigate("BookDetails", { book });
   };
 
   const pickImage = async () => {
@@ -96,7 +97,7 @@ export const EditBookScreen = () => {
             getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
               console.log("downloadURL:", downloadURL);
             });
-            setRefreshImage(true);
+            setStaleBookImage(book.id);
           }
         );
       }

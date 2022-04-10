@@ -13,6 +13,7 @@ import { auth, storage, updateBook, deleteBook } from "../firebase";
 import { Note } from "../components/Note";
 import { useNotes } from "../hooks/useNotes";
 import { ref, getDownloadURL } from "firebase/storage";
+import { useStore } from "../zstore";
 
 export const BookDetailsScreen = () => {
   const { book, refreshImage } = useRoute().params;
@@ -21,6 +22,8 @@ export const BookDetailsScreen = () => {
   const navigation = useNavigation();
   const notes = useNotes(book.id);
   const [image, setImage] = useState("https://picsum.photos/200/300.jpg");
+  const staleBookImage = useStore((state) => state.staleBookImage);
+  const setStaleBookImage = useStore((state) => state.setStaleBookImage);
 
   let timeline = `Started: ${book.started.toDate().toLocaleString()}`;
   if (book.finished) {
@@ -45,7 +48,13 @@ export const BookDetailsScreen = () => {
 
   useEffect(() => {
     getImage();
-  }, [refreshImage]);
+  }, []);
+
+  useEffect(() => {
+    if (staleBookImage) {
+      getImage().then(() => setStaleBookImage(""));
+    }
+  }, [staleBookImage]);
 
   const finishBook = async () => {
     setLoading(true);

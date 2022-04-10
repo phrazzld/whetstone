@@ -5,6 +5,7 @@ import { View, Text } from "./Themed";
 import { useNavigation } from "@react-navigation/native";
 import { ref, getDownloadURL } from "firebase/storage";
 import { auth, storage } from "../firebase";
+import { useStore } from "../zstore";
 
 interface BookProps {
   book: TBook;
@@ -14,6 +15,8 @@ export const Book = (props: BookProps) => {
   const { book } = props;
   const navigation = useNavigation();
   const [image, setImage] = useState("https://picsum.photos/200/300.jpg");
+  const staleBookImage = useStore((state) => state.staleBookImage);
+  const setStaleBookImage = useStore((state) => state.setStaleBookImage);
 
   const getImage = async () => {
     if (!auth.currentUser) {
@@ -34,6 +37,12 @@ export const Book = (props: BookProps) => {
   useEffect(() => {
     getImage();
   }, []);
+
+  useEffect(() => {
+    if (staleBookImage) {
+      getImage().then(() => setStaleBookImage(""));
+    }
+  }, [staleBookImage]);
 
   return (
     <TouchableOpacity
