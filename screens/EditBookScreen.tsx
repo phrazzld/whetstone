@@ -11,12 +11,11 @@ import { View } from "../components/Themed";
 import { storage, updateBook, auth } from "../firebase";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import * as ImagePicker from "expo-image-picker";
-import { ref, uploadBytes } from "firebase/storage";
+import { ref, getDownloadURL, uploadBytesResumable } from "firebase/storage";
 
 export const EditBookScreen = () => {
   const navigation = useNavigation();
-  const route = useRoute();
-  const book = route.params.book;
+  const { book } = useRoute().params;
   const [title, setTitle] = useState(book.title);
   const [author, setAuthor] = useState(book.author);
 
@@ -51,10 +50,42 @@ export const EditBookScreen = () => {
       });
       if (!result.cancelled) {
         const filename = `${auth.currentUser.uid}/${book.id}/cover.jpg`;
+        const metadata = { contentType: "image/jpeg" };
         const imgRef = ref(storage, filename);
         const img = await fetch(result.uri);
         const bytes = await img.blob();
-        await uploadBytes(imgRef, bytes);
+        const uploadTask = uploadBytesResumable(imgRef, bytes, metadata);
+
+        uploadTask.on(
+          "state_changed",
+          (snapshot) => {
+            // Observe state change events such as progress, pause, and resume
+            // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
+            const progress = Math.round(
+              (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+            );
+            console.log("Upload is " + progress + "% done");
+            switch (snapshot.state) {
+              case "paused": // or 'paused'
+                console.log("Upload is paused");
+                break;
+              case "running": // or 'running'
+                console.log("Upload is running");
+                break;
+            }
+          },
+          (error) => {
+            // Handle unsuccessful uploads
+            console.log("error:", error);
+          },
+          () => {
+            // Handle successful uploads on complete
+            // For instance, get the download URL: https://firebasestorage.googleapis.com/...
+            getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+              console.log("downloadURL:", downloadURL);
+            });
+          }
+        );
       }
     } catch (err) {
       console.error(err);
