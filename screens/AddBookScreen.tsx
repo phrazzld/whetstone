@@ -8,15 +8,20 @@ import {
   StyleSheet,
 } from "react-native";
 import { View } from "../components/Themed";
-import { createBook, auth } from "../firebase";
+import { storage, createBook, auth } from "../firebase";
 import { useNavigation } from "@react-navigation/native";
+import * as ImagePicker from "expo-image-picker";
+import { ref, getDownloadURL, uploadBytesResumable } from "firebase/storage";
+import { useStore } from "../zstore";
 
 export const AddBookScreen = () => {
   const [title, setTitle] = useState("");
   const [author, setAuthor] = useState("");
+  const [image, setImage] = useState<any>(null);
   const navigation = useNavigation();
+  const setStaleBookImage = useStore((state) => state.setStaleBookImage);
 
-  const addBook = () => {
+  const addBook = async () => {
     if (!auth.currentUser) {
       throw new Error("Cannot add book, user is not logged in.");
     }
@@ -28,12 +33,73 @@ export const AddBookScreen = () => {
       started: new Date(),
       userId: auth.currentUser.uid,
     };
-    createBook(book);
-    navigation.navigate("Books");
+    const bookRef = await createBook(book);
+    const bookId = bookRef.id;
+
+    // Upload image to firebase storage
+    if (!image.cancelled) {
+      const filename = `${auth.currentUser.uid}/${bookId}/cover.jpg`;
+      const metadata = { contentType: "image/jpeg" };
+      const imgRef = ref(storage, filename);
+      const img = await fetch(image.uri);
+      const bytes = await img.blob();
+      const uploadTask = uploadBytesResumable(imgRef, bytes, metadata);
+
+      uploadTask.on(
+        "state_changed",
+        (snapshot) => {
+          // Observe state change events such as progress, pause, and resume
+          // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
+          const progress = Math.round(
+            (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+          );
+          console.log("Upload is " + progress + "% done");
+          switch (snapshot.state) {
+            case "paused": // or 'paused'
+              console.log("Upload is paused");
+              break;
+            case "running": // or 'running'
+              console.log("Upload is running");
+              break;
+          }
+        },
+        (error) => {
+          // Handle unsuccessful uploads
+          console.log("error:", error);
+        },
+        () => {
+          // Handle successful uploads on complete
+          // For instance, get the download URL: https://firebasestorage.googleapis.com/...
+          getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+            console.log("downloadURL:", downloadURL);
+          });
+          setStaleBookImage(bookId);
+          navigation.navigate("Books");
+        }
+      );
+    }
   };
 
   const cancel = () => {
     navigation.navigate("Books");
+  };
+
+  const pickImage = async () => {
+    if (!auth.currentUser) {
+      throw new Error("Cannot edit book image, user is not logged in.");
+    }
+
+    try {
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.All,
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 1,
+      });
+      setImage(result);
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   return (
@@ -44,6 +110,7 @@ export const AddBookScreen = () => {
         darkColor="rgba(255,255,255,0.1)"
       />
 
+      <Button title="Add image" onPress={pickImage} />
       <TextInput
         placeholder="Title"
         style={styles.input}

@@ -37,12 +37,12 @@ export const storage = getStorage(app);
 
 // Books
 
-export const createBook = (newBook: any): void => {
-  addDoc(collection(db, "books"), newBook);
+export const createBook = async (newBook: any): Promise<any> => {
+  const docRef = await addDoc(collection(db, "books"), newBook);
+  return docRef;
 };
 
 export const getFinishedBooks = async (): Promise<Array<any>> => {
-  console.log("getFinishedBooks");
   let books: Array<any> = [];
   const booksQuery = query(
     collection(db, "books"),

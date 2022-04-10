@@ -28,7 +28,6 @@ export const Book = (props: BookProps) => {
       `${auth.currentUser.uid}/${book.id}/cover.jpg`
     );
     const coverUrl = await getDownloadURL(coverRef);
-    console.log("coverUrl:", coverUrl);
     if (coverUrl) {
       setImage(coverUrl);
     }
