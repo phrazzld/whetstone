@@ -109,7 +109,7 @@ export const AddBookScreen = () => {
       const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.All,
         allowsEditing: true,
-        aspect: [4, 3],
+        aspect: [6, 9],
         quality: 1,
       });
       // TODO: handle cancel case here instead of on save

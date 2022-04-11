@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { StatusBar } from "expo-status-bar";
 import {
   SafeAreaView,
@@ -28,6 +28,25 @@ export const EditBookScreen = () => {
   const [imageUploadProgress, setImageUploadProgress] = useState(0);
   const [showImageUploadProgress, setShowImageUploadProgress] = useState(false);
   const setStaleBookImage = useStore((state) => state.setStaleBookImage);
+
+  const getImage = async () => {
+    if (!auth.currentUser) {
+      throw new Error("Not logged in");
+    }
+
+    const coverRef = ref(
+      storage,
+      `${auth.currentUser.uid}/${book.id}/cover.jpg`
+    );
+    const coverUrl = await getDownloadURL(coverRef);
+    if (coverUrl) {
+      setLocalImage(coverUrl);
+    }
+  };
+
+  useEffect(() => {
+    getImage();
+  }, []);
 
   const saveChanges = async () => {
     if (!auth.currentUser) {
@@ -132,15 +151,8 @@ export const EditBookScreen = () => {
           title={localImage ? "Edit image" : "Pick image"}
           onPress={pickImage}
         />
-        <ProgressBar
-          visible={showImageUploadProgress}
-          progress={imageUploadProgress}
-          style={[styles.progressBar, { width: windowWidth * 0.9 }]}
-        />
       </View>
-      <View>
-        {imageUploadProgress === 1 && <Text>Image successfully uploaded!</Text>}
-      </View>
+      <View></View>
       <TextInput
         mode="outlined"
         label="Title"
@@ -160,6 +172,20 @@ export const EditBookScreen = () => {
       <View style={styles.buttonContainer}>
         <Button onPress={saveChanges} title="Save" />
         <Button onPress={cancel} title="Cancel" color="gray" />
+      </View>
+      <View style={styles.progressContainer}>
+        <ProgressBar
+          visible={showImageUploadProgress}
+          progress={imageUploadProgress}
+          style={[styles.progressBar, { width: windowWidth * 0.9 }]}
+        />
+        {showImageUploadProgress && (
+          <Text>
+            {imageUploadProgress === 1
+              ? "Image successfully uploaded."
+              : "Uploading image..."}
+          </Text>
+        )}
       </View>
 
       {/* Use a light status bar on iOS to account for the black space above the modal */}
@@ -198,5 +224,8 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(255,255,255,0.1)",
     justifyContent: "center",
     alignItems: "center",
+  },
+  progressContainer: {
+    backgroundColor: "rgba(255,255,255,0.1)",
   },
 });
