@@ -2,9 +2,9 @@ import { useState } from "react";
 import { StatusBar } from "expo-status-bar";
 import {
   SafeAreaView,
+  Image,
   Dimensions,
   Button,
-  TextInput,
   Platform,
   StyleSheet,
 } from "react-native";
@@ -13,7 +13,7 @@ import { storage, updateBook, auth } from "../firebase";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import * as ImagePicker from "expo-image-picker";
 import { ref, getDownloadURL, uploadBytesResumable } from "firebase/storage";
-import { ProgressBar } from "react-native-paper";
+import { ProgressBar, TextInput } from "react-native-paper";
 import { useStore } from "../zstore";
 
 const windowWidth = Dimensions.get("window").width;
@@ -23,48 +23,30 @@ export const EditBookScreen = () => {
   const { book } = useRoute().params;
   const [title, setTitle] = useState(book.title);
   const [author, setAuthor] = useState(book.author);
-  const [refreshImage, setRefreshImage] = useState(false);
+  const [localImage, setLocalImage] = useState<any>(null);
+  const [image, setImage] = useState<any>(null);
   const [imageUploadProgress, setImageUploadProgress] = useState(0);
   const [showImageUploadProgress, setShowImageUploadProgress] = useState(false);
   const setStaleBookImage = useStore((state) => state.setStaleBookImage);
 
-  const editBook = () => {
+  const saveChanges = async () => {
     if (!auth.currentUser) {
       throw new Error("Cannot edit book, user is not logged in.");
     }
 
-    const payload = {
-      title,
-      author,
-    };
-    updateBook(book.id, payload);
-    navigation.navigate("BookDetails", {
-      book: { ...book, ...payload },
-    });
-  };
-
-  const cancel = () => {
-    navigation.navigate("BookDetails", { book });
-  };
-
-  const pickImage = async () => {
-    if (!auth.currentUser) {
-      throw new Error("Cannot edit book image, user is not logged in.");
-    }
-
     try {
-      const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.All,
-        allowsEditing: true,
-        aspect: [4, 3],
-        quality: 1,
-      });
-      if (!result.cancelled) {
+      const payload = {
+        title,
+        author,
+      };
+      await updateBook(book.id, payload);
+
+      if (!image.cancelled) {
         setShowImageUploadProgress(true);
         const filename = `${auth.currentUser.uid}/${book.id}/cover.jpg`;
         const metadata = { contentType: "image/jpeg" };
         const imgRef = ref(storage, filename);
-        const img = await fetch(result.uri);
+        const img = await fetch(image.uri);
         const bytes = await img.blob();
         const uploadTask = uploadBytesResumable(imgRef, bytes, metadata);
 
@@ -98,11 +80,38 @@ export const EditBookScreen = () => {
               console.log("downloadURL:", downloadURL);
             });
             setStaleBookImage(book.id);
+            navigation.navigate("BookDetails", {
+              book: { ...book, ...payload },
+            });
           }
         );
       }
+    } catch (error) {
+      console.log("error:", error);
+    }
+  };
+
+  const cancel = () => {
+    navigation.navigate("BookDetails", { book });
+  };
+
+  const pickImage = async () => {
+    if (!auth.currentUser) {
+      throw new Error("Cannot edit book image, user is not logged in.");
+    }
+
+    try {
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.All,
+        allowsEditing: true,
+        aspect: [6, 9],
+        quality: 1,
+      });
+      // TODO: handle cancel case here instead of on save
+      setLocalImage(result.uri);
+      setImage(result);
     } catch (err) {
-      console.error(err);
+      console.log(err);
     }
   };
 
@@ -114,29 +123,42 @@ export const EditBookScreen = () => {
         darkColor="rgba(255,255,255,0.1)"
       />
 
-      <Button title="Edit image" onPress={pickImage} />
-      <ProgressBar
-        visible={showImageUploadProgress}
-        progress={imageUploadProgress}
-        style={[styles.progressBar, { width: windowWidth * 0.9 }]}
-      />
+      <View style={styles.imageForm}>
+        <Image
+          source={{ uri: localImage }}
+          style={{ width: 120, height: 180, borderRadius: 10 }}
+        />
+        <Button
+          title={localImage ? "Edit image" : "Pick image"}
+          onPress={pickImage}
+        />
+        <ProgressBar
+          visible={showImageUploadProgress}
+          progress={imageUploadProgress}
+          style={[styles.progressBar, { width: windowWidth * 0.9 }]}
+        />
+      </View>
       <View>
         {imageUploadProgress === 1 && <Text>Image successfully uploaded!</Text>}
       </View>
       <TextInput
+        mode="outlined"
+        label="Title"
         placeholder="Title"
         style={styles.input}
         value={title}
         onChangeText={setTitle}
       />
       <TextInput
+        mode="outlined"
+        label="Author"
         placeholder="Author"
         style={styles.input}
         value={author}
         onChangeText={setAuthor}
       />
       <View style={styles.buttonContainer}>
-        <Button onPress={editBook} title="Save" />
+        <Button onPress={saveChanges} title="Save" />
         <Button onPress={cancel} title="Cancel" color="gray" />
       </View>
 
@@ -159,11 +181,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   input: {
-    padding: 10,
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 6,
-    height: 40,
     width: "90%",
     margin: 10,
   },
@@ -176,5 +193,10 @@ const styles = StyleSheet.create({
     marginVertical: 30,
     height: 1,
     width: "80%",
+  },
+  imageForm: {
+    backgroundColor: "rgba(255,255,255,0.1)",
+    justifyContent: "center",
+    alignItems: "center",
   },
 });

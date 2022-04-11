@@ -2,22 +2,29 @@ import { useState } from "react";
 import { StatusBar } from "expo-status-bar";
 import {
   SafeAreaView,
+  Dimensions,
   Button,
-  TextInput,
+  Image,
   Platform,
   StyleSheet,
 } from "react-native";
-import { View } from "../components/Themed";
+import { View, Text } from "../components/Themed";
 import { storage, createBook, auth } from "../firebase";
 import { useNavigation } from "@react-navigation/native";
 import * as ImagePicker from "expo-image-picker";
 import { ref, getDownloadURL, uploadBytesResumable } from "firebase/storage";
 import { useStore } from "../zstore";
+import { ProgressBar, TextInput } from "react-native-paper";
+
+const windowWidth = Dimensions.get("window").width;
 
 export const AddBookScreen = () => {
   const [title, setTitle] = useState("");
   const [author, setAuthor] = useState("");
+  const [localImage, setLocalImage] = useState<any>(null);
   const [image, setImage] = useState<any>(null);
+  const [creationProgress, setCreationProgress] = useState(0);
+  const [progressText, setProgressText] = useState("");
   const navigation = useNavigation();
   const setStaleBookImage = useStore((state) => state.setStaleBookImage);
 
@@ -26,57 +33,66 @@ export const AddBookScreen = () => {
       throw new Error("Cannot add book, user is not logged in.");
     }
 
-    const book = {
-      title,
-      author,
-      finished: null,
-      started: new Date(),
-      userId: auth.currentUser.uid,
-    };
-    const bookRef = await createBook(book);
-    const bookId = bookRef.id;
+    try {
+      setProgressText("Saving book details...");
+      const book = {
+        title,
+        author,
+        finished: null,
+        started: new Date(),
+        userId: auth.currentUser.uid,
+      };
+      const bookRef = await createBook(book);
+      setProgressText("Uploading book image...");
+      const bookId = bookRef.id;
 
-    // Upload image to firebase storage
-    if (!image.cancelled) {
-      const filename = `${auth.currentUser.uid}/${bookId}/cover.jpg`;
-      const metadata = { contentType: "image/jpeg" };
-      const imgRef = ref(storage, filename);
-      const img = await fetch(image.uri);
-      const bytes = await img.blob();
-      const uploadTask = uploadBytesResumable(imgRef, bytes, metadata);
+      // Upload image to firebase storage
+      if (!image.cancelled) {
+        const filename = `${auth.currentUser.uid}/${bookId}/cover.jpg`;
+        const metadata = { contentType: "image/jpeg" };
+        const imgRef = ref(storage, filename);
+        const img = await fetch(image.uri);
+        const bytes = await img.blob();
+        const uploadTask = uploadBytesResumable(imgRef, bytes, metadata);
 
-      uploadTask.on(
-        "state_changed",
-        (snapshot) => {
-          // Observe state change events such as progress, pause, and resume
-          // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
-          const progress = Math.round(
-            (snapshot.bytesTransferred / snapshot.totalBytes) * 100
-          );
-          console.log("Upload is " + progress + "% done");
-          switch (snapshot.state) {
-            case "paused": // or 'paused'
-              console.log("Upload is paused");
-              break;
-            case "running": // or 'running'
-              console.log("Upload is running");
-              break;
+        uploadTask.on(
+          "state_changed",
+          (snapshot) => {
+            // Observe state change events such as progress, pause, and resume
+            // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
+            const progress = Math.round(
+              (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+            );
+            setCreationProgress(progress * 0.01);
+            console.log("Upload is " + progress + "% done");
+            switch (snapshot.state) {
+              case "paused": // or 'paused'
+                console.log("Upload is paused");
+                break;
+              case "running": // or 'running'
+                console.log("Upload is running");
+                break;
+            }
+          },
+          (error) => {
+            // Handle unsuccessful uploads
+            console.log("error:", error);
+            setProgressText(`Uh-oh, something went wrong. Error: ${error}`);
+          },
+          () => {
+            // Handle successful uploads on complete
+            // For instance, get the download URL: https://firebasestorage.googleapis.com/...
+            getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+              console.log("downloadURL:", downloadURL);
+            });
+            setProgressText("Image successfully uploaded.");
+            setStaleBookImage(bookId);
+            navigation.navigate("Books");
           }
-        },
-        (error) => {
-          // Handle unsuccessful uploads
-          console.log("error:", error);
-        },
-        () => {
-          // Handle successful uploads on complete
-          // For instance, get the download URL: https://firebasestorage.googleapis.com/...
-          getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-            console.log("downloadURL:", downloadURL);
-          });
-          setStaleBookImage(bookId);
-          navigation.navigate("Books");
-        }
-      );
+        );
+      }
+    } catch (error) {
+      console.log("error:", error);
     }
   };
 
@@ -96,6 +112,8 @@ export const AddBookScreen = () => {
         aspect: [4, 3],
         quality: 1,
       });
+      // TODO: handle cancel case here instead of on save
+      setLocalImage(result.uri);
       setImage(result);
     } catch (err) {
       console.error(err);
@@ -110,7 +128,16 @@ export const AddBookScreen = () => {
         darkColor="rgba(255,255,255,0.1)"
       />
 
-      <Button title="Add image" onPress={pickImage} />
+      <View style={styles.imageForm}>
+        <Image
+          source={{ uri: localImage }}
+          style={{ width: 120, height: 180, borderRadius: 10 }}
+        />
+        <Button
+          title={localImage ? "Edit image" : "Pick image"}
+          onPress={pickImage}
+        />
+      </View>
       <TextInput
         placeholder="Title"
         style={styles.input}
@@ -126,6 +153,14 @@ export const AddBookScreen = () => {
       <View style={styles.buttonContainer}>
         <Button onPress={addBook} title="Add Book" />
         <Button onPress={cancel} title="Cancel" color="gray" />
+      </View>
+      <View style={styles.progressContainer}>
+        <ProgressBar
+          visible={!!progressText}
+          progress={creationProgress}
+          style={[styles.progressBar, { width: windowWidth * 0.9 }]}
+        />
+        {!!progressText && <Text>{progressText}</Text>}
       </View>
 
       {/* Use a light status bar on iOS to account for the black space above the modal */}
@@ -146,18 +181,28 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
   },
-  input: {
-    padding: 10,
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 6,
-    height: 40,
-    width: "90%",
-    margin: 10,
-  },
   separator: {
     marginVertical: 30,
     height: 1,
     width: "80%",
+  },
+  input: {
+    width: "90%",
+    margin: 10,
+  },
+  progressBar: {
+    margin: 10,
+    height: 10,
+    borderRadius: 10,
+  },
+  imageForm: {
+    backgroundColor: "rgba(255,255,255,0.1)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  progressContainer: {
+    backgroundColor: "rgba(255,255,255,0.1)",
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
