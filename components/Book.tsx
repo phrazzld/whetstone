@@ -11,10 +11,12 @@ interface BookProps {
   book: TBook;
 }
 
+const DEFAULT_IMAGE = "https://picsum.photos/200/300.jpg";
+
 export const Book = (props: BookProps) => {
   const { book } = props;
   const navigation = useNavigation();
-  const [image, setImage] = useState("https://picsum.photos/200/300.jpg");
+  const [image, setImage] = useState("");
   const staleBookImage = useStore((state) => state.staleBookImage);
   const setStaleBookImage = useStore((state) => state.setStaleBookImage);
 
@@ -30,6 +32,8 @@ export const Book = (props: BookProps) => {
     const coverUrl = await getDownloadURL(coverRef);
     if (coverUrl) {
       setImage(coverUrl);
+    } else {
+      setImage(DEFAULT_IMAGE);
     }
   };
 
@@ -49,7 +53,11 @@ export const Book = (props: BookProps) => {
       onPress={() => navigation.navigate("BookDetails", { book })}
     >
       <View style={{ marginRight: 10 }}>
-        <Image style={styles.image} source={{ uri: image }} />
+        {!!image ? (
+          <Image style={styles.image} source={{ uri: image }} />
+        ) : (
+          <View style={styles.image}></View>
+        )}
       </View>
       <View>
         <Text style={styles.title}>{book.title}</Text>

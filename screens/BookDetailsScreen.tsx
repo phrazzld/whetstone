@@ -15,13 +15,15 @@ import { useNotes } from "../hooks/useNotes";
 import { ref, getDownloadURL, deleteObject } from "firebase/storage";
 import { useStore } from "../zstore";
 
+const DEFAULT_IMAGE = "https://picsum.photos/200/300.jpg";
+
 export const BookDetailsScreen = () => {
   const { book, refreshImage } = useRoute().params;
   const [loading, setLoading] = useState(false);
   const [selectedNote, setSelectedNote] = useState("");
   const navigation = useNavigation();
   const notes = useNotes(book.id);
-  const [image, setImage] = useState("https://picsum.photos/200/300.jpg");
+  const [image, setImage] = useState("");
   const staleBookImage = useStore((state) => state.staleBookImage);
   const setStaleBookImage = useStore((state) => state.setStaleBookImage);
 
@@ -42,6 +44,8 @@ export const BookDetailsScreen = () => {
     const coverUrl = await getDownloadURL(coverRef);
     if (coverUrl) {
       setImage(coverUrl);
+    } else {
+      setImage(DEFAULT_IMAGE);
     }
   };
 
@@ -128,7 +132,11 @@ export const BookDetailsScreen = () => {
         <View>
           <View style={{ flex: 1, flexDirection: "row" }}>
             <View style={{ marginRight: 10 }}>
-              <Image style={styles.image} source={{ uri: image }} />
+              {!!image ? (
+                <Image style={styles.image} source={{ uri: image }} />
+              ) : (
+                <View style={styles.image}></View>
+              )}
             </View>
             <View>
               <Text style={styles.title}>{book.title}</Text>
@@ -196,7 +204,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   image: {
-    height: 80,
+    height: 90,
     width: 60,
     borderRadius: 10,
   },
