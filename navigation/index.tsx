@@ -24,7 +24,6 @@ import { BookDetailsScreen } from "../screens/BookDetailsScreen";
 import { AddBookScreen } from "../screens/AddBookScreen";
 import { EditBookScreen } from "../screens/EditBookScreen";
 import { AddNoteScreen } from "../screens/AddNoteScreen";
-import { SignInScreen } from "../screens/SignInScreen";
 import { SignUpScreen } from "../screens/SignUpScreen";
 import { auth } from "../firebase";
 import { onAuthStateChanged } from "firebase/auth";
@@ -96,18 +95,11 @@ function RootNavigator() {
           </Stack.Group>
         </>
       ) : (
-        <>
-          <Stack.Screen
-            name="SignUp"
-            component={SignUpScreen}
-            options={{ headerShown: false }}
-          />
-          <Stack.Screen
-            name="SignIn"
-            component={SignInScreen}
-            options={{ headerShown: false }}
-          />
-        </>
+        <Stack.Screen
+          name="SignUp"
+          component={SignUpScreen}
+          options={{ headerShown: false }}
+        />
       )}
     </Stack.Navigator>
   );
