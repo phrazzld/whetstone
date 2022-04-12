@@ -169,6 +169,7 @@ export const BookDetailsScreen = () => {
               />
             ))}
           </View>
+
           {notes.length === 0 && (
             <View>
               <Text style={{ marginVertical: 20, textAlign: "center" }}>

@@ -1,6 +1,6 @@
-import { ScrollView, StyleSheet } from "react-native";
+import { SafeAreaView, SectionList, StyleSheet } from "react-native";
 import { Book } from "../components/Book";
-import { Text, View } from "../components/Themed";
+import { Text } from "../components/Themed";
 import { useUnfinishedBooks } from "../hooks/useUnfinishedBooks";
 import { useFinishedBooks } from "../hooks/useFinishedBooks";
 
@@ -8,39 +8,43 @@ const BooksScreen = () => {
   const unfinishedBooks = useUnfinishedBooks();
   const finishedBooks = useFinishedBooks();
 
-  return (
-    <ScrollView style={styles.container}>
-      <View style={styles.sectionContainer}>
-        <Text style={styles.sectionHeader}>Reading</Text>
-        {unfinishedBooks.map((unfinishedBook) => (
-          <Book key={unfinishedBook.id} book={unfinishedBook} />
-        ))}
-      </View>
+  const renderItem = ({ item }: any) => <Book key={item.id} book={item} />;
 
-      <View style={styles.sectionContainer}>
-        <Text style={styles.sectionHeader}>Finished</Text>
-        {finishedBooks.map((finishedBook) => (
-          <Book key={finishedBook.id} book={finishedBook} />
-        ))}
-      </View>
-    </ScrollView>
+  return (
+    <SafeAreaView style={styles.container}>
+      <SectionList
+        sections={[
+          {
+            title: "Reading",
+            data: unfinishedBooks,
+          },
+          {
+            title: "Finished",
+            data: finishedBooks,
+          },
+        ]}
+        renderItem={renderItem}
+        keyExtractor={(item) => item.id}
+        renderSectionHeader={({ section: { title } }) => (
+          <Text style={styles.sectionHeader}>{title}</Text>
+        )}
+        stickySectionHeadersEnabled={false}
+      />
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: 20,
     backgroundColor: "#fff",
-  },
-  sectionContainer: {
-    marginBottom: 32,
   },
   sectionHeader: {
     fontSize: 20,
     fontWeight: "600",
     marginHorizontal: 10,
     marginBottom: 10,
+    marginTop: 20,
     paddingHorizontal: 10,
   },
 });
