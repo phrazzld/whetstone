@@ -7,7 +7,15 @@ import {
   StyleSheet,
 } from "react-native";
 import { Text, View } from "../components/Themed";
-import { auth } from "../firebase";
+import {
+  auth,
+  storage,
+  getBooks,
+  getBookNotes,
+  deleteNote,
+  deleteBook,
+} from "../firebase";
+import { getStorage, ref, listAll, deleteObject } from "firebase/storage";
 
 export const ProfileScreen = () => {
   const deleteAccount = () => {
@@ -23,12 +31,80 @@ export const ProfileScreen = () => {
         {
           text: "Delete",
           style: "destructive",
-          onPress: () => {
+          onPress: async () => {
+            if (!auth.currentUser) {
+              throw new Error("Can't delete user. No user logged in.");
+            }
+
+            console.log("Deleting user...");
+
+            // Get books and notes
+            const books = await getBooks();
+            let notes: Array<any> = [];
+            for (const book of books) {
+              const bookNotes = await getBookNotes(book.id);
+              notes = notes.concat(bookNotes);
+            }
+
+            // Delete notes
+            console.log("Deleting notes...");
+            for (const note of notes) {
+              await deleteNote(note.id);
+            }
+            console.log("Notes deleted.");
+
+            // Delete images
+            console.log("Deleting images...");
+            for (const book of books) {
+              const bookImageRef = ref(
+                storage,
+                `${auth.currentUser.uid}/${book.id}/cover.jpg`
+              );
+              try {
+                await deleteObject(bookImageRef);
+              } catch (err) {
+                console.log(err);
+              }
+            }
+            console.log("Images deleted.");
+
+            // Delete books
+            console.log("Deleting books...");
+            for (const book of books) {
+              await deleteBook(book.id);
+            }
+            console.log("Books deleted.");
+
             // Delete account
-            // TODO: Unstub
-            //auth.currentUser.delete().then(() => {
-            //  Alert.alert("Account Deleted", "Your account has been deleted.");
-            //});
+            console.log("Deleting account...");
+            auth.currentUser
+              .delete()
+              .then(() => {
+                Alert.alert(
+                  "Account Deleted",
+                  "Your account has been deleted."
+                );
+              })
+              .catch((err) => {
+                console.log(err);
+                if (err.code.includes("requires-recent-login")) {
+                  // Reauthenticate user
+                  Alert.alert(
+                    "Reauthenticate",
+                    "You need to reauthenticate to delete your account. Please sign back in and try again.",
+                    [
+                      {
+                        text: "Cancel",
+                        style: "cancel",
+                      },
+                      {
+                        text: "Sign Out",
+                        onPress: () => auth.signOut(),
+                      },
+                    ]
+                  );
+                }
+              });
           },
         },
       ],

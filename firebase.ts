@@ -42,6 +42,20 @@ export const createBook = async (newBook: any): Promise<any> => {
   return docRef;
 };
 
+export const getBooks = async (): Promise<Array<any>> => {
+  let books: Array<any> = [];
+  const booksQuery = query(collection(db, "books"));
+  const snapshot = await getDocs(booksQuery);
+  if (snapshot.empty) {
+    console.log("No books found.");
+  } else {
+    snapshot.forEach((snap) => {
+      books.push({ id: snap.id, ...snap.data() });
+    });
+  }
+  return books;
+};
+
 export const getFinishedBooks = async (): Promise<Array<any>> => {
   let books: Array<any> = [];
   const booksQuery = query(
@@ -120,8 +134,7 @@ export const getBookNotes = async (bookId: string): Promise<Array<any>> => {
   let notes: Array<any> = [];
   const notesQuery = query(
     collection(db, "notes"),
-    where("bookId", "==", bookId),
-    orderBy("createdAt")
+    where("bookId", "==", bookId)
   );
   const snapshot = await getDocs(notesQuery);
   if (snapshot.empty) {
