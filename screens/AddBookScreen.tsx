@@ -47,7 +47,7 @@ export const AddBookScreen = () => {
       const bookId = bookRef.id;
 
       // Upload image to firebase storage
-      if (!image.cancelled) {
+      if (!!image && !image.cancelled) {
         const filename = `${auth.currentUser.uid}/${bookId}/cover.jpg`;
         const metadata = { contentType: "image/jpeg" };
         const imgRef = ref(storage, filename);
@@ -80,11 +80,6 @@ export const AddBookScreen = () => {
             setProgressText(`Uh-oh, something went wrong. Error: ${error}`);
           },
           () => {
-            // Handle successful uploads on complete
-            // For instance, get the download URL: https://firebasestorage.googleapis.com/...
-            getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-              console.log("downloadURL:", downloadURL);
-            });
             setProgressText("Image successfully uploaded.");
             setStaleBookImage(bookId);
             navigation.navigate("Books");
@@ -106,6 +101,19 @@ export const AddBookScreen = () => {
     }
 
     try {
+      // Check media permissions
+      const permissions = await ImagePicker.getMediaLibraryPermissionsAsync();
+
+      // If media permissions are not granted, request permissions
+      if (permissions.granted === false) {
+        const newPermissions = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+        // If media permissions are still not granted, return
+        if (newPermissions.granted === false) {
+          throw new Error("Media permissions not granted.");
+        }
+      }
+
       const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.All,
         allowsEditing: true,
@@ -143,12 +151,14 @@ export const AddBookScreen = () => {
         style={styles.input}
         value={title}
         onChangeText={setTitle}
+        mode="outlined"
       />
       <TextInput
         placeholder="Author"
         style={styles.input}
         value={author}
         onChangeText={setAuthor}
+        mode="outlined"
       />
       <View style={styles.buttonContainer}>
         <Button onPress={addBook} title="Add Book" />

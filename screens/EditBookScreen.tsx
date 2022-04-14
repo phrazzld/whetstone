@@ -60,7 +60,7 @@ export const EditBookScreen = () => {
       };
       await updateBook(book.id, payload);
 
-      if (!image.cancelled) {
+      if (!!image && !image.cancelled) {
         setShowImageUploadProgress(true);
         const filename = `${auth.currentUser.uid}/${book.id}/cover.jpg`;
         const metadata = { contentType: "image/jpeg" };
@@ -93,11 +93,6 @@ export const EditBookScreen = () => {
             console.log("error:", error);
           },
           () => {
-            // Handle successful uploads on complete
-            // For instance, get the download URL: https://firebasestorage.googleapis.com/...
-            getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-              console.log("downloadURL:", downloadURL);
-            });
             setStaleBookImage(book.id);
             navigation.navigate("BookDetails", {
               book: { ...book, ...payload },
@@ -120,6 +115,19 @@ export const EditBookScreen = () => {
     }
 
     try {
+      // Check media permissions
+      const permissions = await ImagePicker.getMediaLibraryPermissionsAsync();
+
+      // If media permissions are not granted, request permissions
+      if (permissions.granted === false) {
+        const newPermissions = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+        // If media permissions are still not granted, return
+        if (newPermissions.granted === false) {
+          throw new Error("Media permissions not granted.");
+        }
+      }
+
       const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.All,
         allowsEditing: true,

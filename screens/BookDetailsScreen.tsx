@@ -33,19 +33,27 @@ export const BookDetailsScreen = () => {
   }
 
   const getImage = async () => {
-    if (!auth.currentUser) {
-      throw new Error("Not logged in");
-    }
+    try {
+      if (!auth.currentUser) {
+        throw new Error("Not logged in");
+      }
 
-    const coverRef = ref(
-      storage,
-      `${auth.currentUser.uid}/${book.id}/cover.jpg`
-    );
-    const coverUrl = await getDownloadURL(coverRef);
-    if (coverUrl) {
-      setImage(coverUrl);
-    } else {
-      setImage(DEFAULT_IMAGE);
+      const coverRef = ref(
+        storage,
+        `${auth.currentUser.uid}/${book.id}/cover.jpg`
+      );
+      const coverUrl = await getDownloadURL(coverRef);
+      if (coverUrl) {
+        setImage(coverUrl);
+      } else {
+        setImage(DEFAULT_IMAGE);
+      }
+    } catch (err) {
+      if (err.message.includes("storage/object-not-found")) {
+        setImage(DEFAULT_IMAGE);
+      } else {
+        console.log("Error getting image:", err);
+      }
     }
   };
 
