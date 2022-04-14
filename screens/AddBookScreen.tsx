@@ -12,7 +12,7 @@ import { View, Text } from "../components/Themed";
 import { storage, createBook, auth } from "../firebase";
 import { useNavigation } from "@react-navigation/native";
 import * as ImagePicker from "expo-image-picker";
-import { ref, getDownloadURL, uploadBytesResumable } from "firebase/storage";
+import { ref, uploadBytesResumable } from "firebase/storage";
 import { useStore } from "../zstore";
 import { ProgressBar, TextInput } from "react-native-paper";
 

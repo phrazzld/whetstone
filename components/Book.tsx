@@ -1,59 +1,17 @@
-import { useState, useEffect } from "react";
 import { Image, StyleSheet, TouchableOpacity } from "react-native";
 import { TBook } from "../types";
 import { View, Text } from "./Themed";
 import { useNavigation } from "@react-navigation/native";
-import { ref, getDownloadURL } from "firebase/storage";
-import { auth, storage } from "../firebase";
-import { useStore } from "../zstore";
+import { useBookImage } from "../hooks/useBookImage";
 
 interface BookProps {
   book: TBook;
 }
 
-const DEFAULT_IMAGE = "https://picsum.photos/200/300.jpg";
-
 export const Book = (props: BookProps) => {
   const { book } = props;
   const navigation = useNavigation();
-  const [image, setImage] = useState("");
-  const staleBookImage = useStore((state) => state.staleBookImage);
-  const setStaleBookImage = useStore((state) => state.setStaleBookImage);
-
-  const getImage = async () => {
-    try {
-      if (!auth.currentUser) {
-        throw new Error("Not logged in");
-      }
-
-      const coverRef = ref(
-        storage,
-        `${auth.currentUser.uid}/${book.id}/cover.jpg`
-      );
-      const coverUrl = await getDownloadURL(coverRef);
-      if (coverUrl) {
-        setImage(coverUrl);
-      } else {
-        setImage(DEFAULT_IMAGE);
-      }
-    } catch (err) {
-      if (err.message.includes("storage/object-not-found")) {
-        setImage(DEFAULT_IMAGE);
-      } else {
-        console.log("Error getting image:", err);
-      }
-    }
-  };
-
-  useEffect(() => {
-    getImage();
-  }, []);
-
-  useEffect(() => {
-    if (staleBookImage) {
-      getImage().then(() => setStaleBookImage(""));
-    }
-  }, [staleBookImage]);
+  const image = useBookImage(book.id, true);
 
   return (
     <TouchableOpacity

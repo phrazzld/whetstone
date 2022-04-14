@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   Alert,
   Image,
@@ -12,60 +12,21 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import { auth, storage, updateBook, deleteBook } from "../firebase";
 import { Note } from "../components/Note";
 import { useNotes } from "../hooks/useNotes";
-import { ref, getDownloadURL, deleteObject } from "firebase/storage";
-import { useStore } from "../zstore";
-
-const DEFAULT_IMAGE = "https://picsum.photos/200/300.jpg";
+import { ref, deleteObject } from "firebase/storage";
+import { useBookImage } from "../hooks/useBookImage";
 
 export const BookDetailsScreen = () => {
-  const { book, refreshImage } = useRoute().params;
+  const { book } = useRoute().params;
   const [loading, setLoading] = useState(false);
   const [selectedNote, setSelectedNote] = useState("");
   const navigation = useNavigation();
   const notes = useNotes(book.id);
-  const [image, setImage] = useState("");
-  const staleBookImage = useStore((state) => state.staleBookImage);
-  const setStaleBookImage = useStore((state) => state.setStaleBookImage);
+  const image = useBookImage(book.id, true);
 
   let timeline = `Started: ${book.started.toDate().toLocaleString()}`;
   if (book.finished) {
     timeline += `\nFinished: ${book.finished.toDate().toLocaleString()}`;
   }
-
-  const getImage = async () => {
-    try {
-      if (!auth.currentUser) {
-        throw new Error("Not logged in");
-      }
-
-      const coverRef = ref(
-        storage,
-        `${auth.currentUser.uid}/${book.id}/cover.jpg`
-      );
-      const coverUrl = await getDownloadURL(coverRef);
-      if (coverUrl) {
-        setImage(coverUrl);
-      } else {
-        setImage(DEFAULT_IMAGE);
-      }
-    } catch (err) {
-      if (err.message.includes("storage/object-not-found")) {
-        setImage(DEFAULT_IMAGE);
-      } else {
-        console.log("Error getting image:", err);
-      }
-    }
-  };
-
-  useEffect(() => {
-    getImage();
-  }, []);
-
-  useEffect(() => {
-    if (staleBookImage) {
-      getImage().then(() => setStaleBookImage(""));
-    }
-  }, [staleBookImage]);
 
   const finishBook = async () => {
     setLoading(true);
