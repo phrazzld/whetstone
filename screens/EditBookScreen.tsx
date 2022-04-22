@@ -99,6 +99,10 @@ export const EditBookScreen = () => {
             });
           }
         );
+      } else {
+        navigation.navigate("BookDetails", {
+          book: { ...book, ...payload },
+        });
       }
     } catch (error) {
       console.log("error:", error);

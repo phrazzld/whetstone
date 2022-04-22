@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "whetstone",
+    "name": "Whetstone",
     "slug": "whetstone",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -19,7 +19,8 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.phaedrus.whetstone"
     },
     "android": {
       "adaptiveIcon": {
