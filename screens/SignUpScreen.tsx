@@ -6,8 +6,10 @@ import {
 import {
   View,
   SafeAreaView,
+  KeyboardAvoidingView,
   TextInput,
   Button,
+  Platform,
   Text,
   StyleSheet,
 } from "react-native";
@@ -52,26 +54,33 @@ export const SignUpScreen = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <TextInput
-        placeholder="Email"
-        style={styles.input}
-        value={email}
-        onChangeText={setEmail}
-        keyboardType="email-address"
-        autoCapitalize="none"
-      />
-      <TextInput
-        placeholder="Password"
-        style={styles.input}
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-      />
-      {!!error && <Text style={styles.error}>{error}</Text>}
-      <View style={styles.actions}>
-        <Button title="Sign Up" onPress={signUp} />
-        <Button title="Sign In" onPress={signIn} />
-      </View>
+      <KeyboardAvoidingView
+        style={[styles.container, { width: "100%" }]}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+      >
+        <TextInput
+          placeholder="Email"
+          style={styles.input}
+          value={email}
+          onChangeText={setEmail}
+          keyboardType="email-address"
+          autoCapitalize="none"
+          returnKeyType="next"
+        />
+        <TextInput
+          placeholder="Password"
+          style={styles.input}
+          value={password}
+          onChangeText={setPassword}
+          returnKeyType="done"
+          secureTextEntry
+        />
+        {!!error && <Text style={styles.error}>{error}</Text>}
+        <View style={styles.actions}>
+          <Button title="Sign Up" onPress={signUp} />
+          <Button title="Sign In" onPress={signIn} />
+        </View>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 };

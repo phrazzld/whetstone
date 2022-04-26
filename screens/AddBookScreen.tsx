@@ -2,6 +2,7 @@ import { useState } from "react";
 import { StatusBar } from "expo-status-bar";
 import {
   SafeAreaView,
+  KeyboardAvoidingView,
   Dimensions,
   Button,
   Image,
@@ -130,51 +131,58 @@ export const AddBookScreen = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View
-        style={styles.separator}
-        lightColor="#eee"
-        darkColor="rgba(255,255,255,0.1)"
-      />
+      <KeyboardAvoidingView
+        style={[styles.container, { width: "100%" }]}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+      >
+        <View
+          style={styles.separator}
+          lightColor="#eee"
+          darkColor="rgba(255,255,255,0.1)"
+        />
 
-      <View style={styles.imageForm}>
-        <Image
-          source={{ uri: localImage }}
-          style={{ width: 120, height: 180, borderRadius: 10 }}
+        <View style={styles.imageForm}>
+          <Image
+            source={{ uri: localImage }}
+            style={{ width: 120, height: 180, borderRadius: 10 }}
+          />
+          <Button
+            title={localImage ? "Edit image" : "Pick image"}
+            onPress={pickImage}
+          />
+        </View>
+        <TextInput
+          placeholder="Title"
+          style={styles.input}
+          value={title}
+          onChangeText={setTitle}
+          mode="outlined"
+          returnKeyType="next"
         />
-        <Button
-          title={localImage ? "Edit image" : "Pick image"}
-          onPress={pickImage}
+        <TextInput
+          placeholder="Author"
+          style={styles.input}
+          value={author}
+          onChangeText={setAuthor}
+          mode="outlined"
+          returnKeyType="done"
         />
-      </View>
-      <TextInput
-        placeholder="Title"
-        style={styles.input}
-        value={title}
-        onChangeText={setTitle}
-        mode="outlined"
-      />
-      <TextInput
-        placeholder="Author"
-        style={styles.input}
-        value={author}
-        onChangeText={setAuthor}
-        mode="outlined"
-      />
-      <View style={styles.buttonContainer}>
-        <Button onPress={addBook} title="Add Book" />
-        <Button onPress={cancel} title="Cancel" color="gray" />
-      </View>
-      <View style={styles.progressContainer}>
-        <ProgressBar
-          visible={!!progressText}
-          progress={creationProgress}
-          style={[styles.progressBar, { width: windowWidth * 0.9 }]}
-        />
-        {!!progressText && <Text>{progressText}</Text>}
-      </View>
+        <View style={styles.buttonContainer}>
+          <Button onPress={addBook} title="Add Book" />
+          <Button onPress={cancel} title="Cancel" color="gray" />
+        </View>
+        <View style={styles.progressContainer}>
+          <ProgressBar
+            visible={!!progressText}
+            progress={creationProgress}
+            style={[styles.progressBar, { width: windowWidth * 0.9 }]}
+          />
+          {!!progressText && <Text>{progressText}</Text>}
+        </View>
 
-      {/* Use a light status bar on iOS to account for the black space above the modal */}
-      <StatusBar style={Platform.OS === "ios" ? "light" : "auto"} />
+        {/* Use a light status bar on iOS to account for the black space above the modal */}
+        <StatusBar style={Platform.OS === "ios" ? "light" : "auto"} />
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 };
