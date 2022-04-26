@@ -17,6 +17,12 @@
     }
   },
   "submit": {
-    "production": {}
+    "production": {
+      "ios": {
+        "appleId": "phraznikov@gmail.com",
+        "ascAppId": "1620581442",
+        "appleTeamId": "A56K8A636Z"
+      }
+    }
   }
 }
