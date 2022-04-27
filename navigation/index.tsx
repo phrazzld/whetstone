@@ -54,11 +54,6 @@ function RootNavigator() {
   const [user, setUser] = React.useState<any>();
 
   onAuthStateChanged(auth, (u) => {
-    if (u) {
-      console.log("user is signed in");
-    } else {
-      console.log("user is signed out");
-    }
     setUser(u);
   });
 

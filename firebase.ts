@@ -17,7 +17,7 @@ import { getStorage } from "firebase/storage";
 
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
+const firebaseProdConfig = {
   apiKey: "AIzaSyAOPhqxHeFvM-Ue83BCria8bNj19Zni4X0",
   authDomain: "whetstone-books.firebaseapp.com",
   projectId: "whetstone-books",
@@ -26,6 +26,21 @@ const firebaseConfig = {
   appId: "1:831340759975:web:e81c6dfbf400e562504482",
   measurementId: "G-DKPRJZ1VTC",
 };
+
+// Dev config
+const firebaseDevConfig = {
+  apiKey: "AIzaSyBTHDrFhCqDnv0KQdgDLEs9YN8xTMYb01k",
+  authDomain: "whetstone-dev.firebaseapp.com",
+  projectId: "whetstone-dev",
+  storageBucket: "whetstone-dev.appspot.com",
+  messagingSenderId: "530102487904",
+  appId: "1:530102487904:web:f961a347946e6a65762c05",
+};
+
+const firebaseConfig =
+  process.env.NODE_ENV === "production"
+    ? firebaseProdConfig
+    : firebaseDevConfig;
 
 // Initialize Firebase
 export const app = initializeApp(firebaseConfig);

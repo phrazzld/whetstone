@@ -1,35 +1,56 @@
-import { SafeAreaView, SectionList, StyleSheet } from "react-native";
+import { Button, SafeAreaView, SectionList, StyleSheet } from "react-native";
 import { Book } from "../components/Book";
-import { Text } from "../components/Themed";
+import { Text, View } from "../components/Themed";
 import { useUnfinishedBooks } from "../hooks/useUnfinishedBooks";
 import { useFinishedBooks } from "../hooks/useFinishedBooks";
+import { useNavigation } from "@react-navigation/native";
 
 const BooksScreen = () => {
   const unfinishedBooks = useUnfinishedBooks();
   const finishedBooks = useFinishedBooks();
+  const navigation = useNavigation();
+
+  const noBooks = unfinishedBooks.length === 0 && finishedBooks.length === 0;
 
   const renderItem = ({ item }: any) => <Book key={item.id} book={item} />;
 
   return (
     <SafeAreaView style={styles.container}>
-      <SectionList
-        sections={[
-          {
-            title: "Reading",
-            data: unfinishedBooks,
-          },
-          {
-            title: "Finished",
-            data: finishedBooks,
-          },
-        ]}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.id}
-        renderSectionHeader={({ section: { title } }) => (
-          <Text style={styles.sectionHeader}>{title}</Text>
-        )}
-        stickySectionHeadersEnabled={false}
-      />
+      {noBooks ? (
+        <View
+          style={{
+            display: "flex",
+            flex: 1,
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <Text style={{ marginVertical: 20 }}>No books yet.</Text>
+          <Button
+            title="Add Book"
+            onPress={() => navigation.navigate("AddBook")}
+          />
+        </View>
+      ) : (
+        <SectionList
+          sections={[
+            {
+              title: "Reading",
+              data: unfinishedBooks,
+            },
+            {
+              title: "Finished",
+              data: finishedBooks,
+            },
+          ]}
+          renderItem={renderItem}
+          keyExtractor={(item) => item.id}
+          renderSectionHeader={({ section: { title } }) => (
+            <Text style={styles.sectionHeader}>{title}</Text>
+          )}
+          stickySectionHeadersEnabled={false}
+        />
+      )}
     </SafeAreaView>
   );
 };
