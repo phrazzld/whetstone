@@ -2,6 +2,7 @@ import { useState } from "react";
 import { StatusBar } from "expo-status-bar";
 import {
   SafeAreaView,
+  KeyboardAvoidingView,
   Button,
   TextInput,
   Platform,
@@ -33,33 +34,38 @@ export const AddNoteScreen = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View
-        style={styles.separator}
-        lightColor="#eee"
-        darkColor="rgba(255,255,255,0.1)"
-      />
+      <KeyboardAvoidingView
+        style={[styles.container, { width: "100%" }]}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+      >
+        <View
+          style={styles.separator}
+          lightColor="#eee"
+          darkColor="rgba(255,255,255,0.1)"
+        />
 
-      <TextInput
-        placeholder="Content"
-        multiline={true}
-        style={styles.multilineInput}
-        value={content}
-        onChangeText={setContent}
-      />
-      <TextInput
-        placeholder="Page number"
-        style={styles.input}
-        value={page}
-        onChangeText={setPage}
-        keyboardType="numeric"
-      />
-      <View style={styles.buttonContainer}>
-        <Button onPress={addNote} title="Add Note" />
-        <Button onPress={cancel} title="Cancel" color="gray" />
-      </View>
+        <TextInput
+          placeholder="Content"
+          multiline={true}
+          style={styles.multilineInput}
+          value={content}
+          onChangeText={setContent}
+        />
+        <TextInput
+          placeholder="Page number"
+          style={styles.input}
+          value={page}
+          onChangeText={setPage}
+          keyboardType="numeric"
+        />
+        <View style={styles.buttonContainer}>
+          <Button onPress={addNote} title="Add Note" />
+          <Button onPress={cancel} title="Cancel" color="gray" />
+        </View>
 
-      {/* Use a light status bar on iOS to account for the black space above the modal */}
-      <StatusBar style={Platform.OS === "ios" ? "light" : "auto"} />
+        {/* Use a light status bar on iOS to account for the black space above the modal */}
+        <StatusBar style={Platform.OS === "ios" ? "light" : "auto"} />
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 };
