@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { StatusBar } from "expo-status-bar";
 import {
-  SafeAreaView,
   KeyboardAvoidingView,
   Image,
   Dimensions,
@@ -9,7 +8,7 @@ import {
   Platform,
   StyleSheet,
 } from "react-native";
-import { View, Text } from "../components/Themed";
+import { SafeAreaView, View, Text } from "../components/Themed";
 import { storage, updateBook, auth } from "../firebase";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import * as ImagePicker from "expo-image-picker";
@@ -219,7 +218,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "flex-start",
     margin: 10,
-    backgroundColor: "rgba(255,255,255,0.1)",
     width: "90%",
   },
   container: {
@@ -241,11 +239,8 @@ const styles = StyleSheet.create({
     width: "80%",
   },
   imageForm: {
-    backgroundColor: "rgba(255,255,255,0.1)",
     justifyContent: "center",
     alignItems: "center",
   },
-  progressContainer: {
-    backgroundColor: "rgba(255,255,255,0.1)",
-  },
+  progressContainer: {},
 });

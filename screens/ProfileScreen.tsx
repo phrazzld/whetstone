@@ -1,12 +1,11 @@
 import {
   Alert,
   Button,
-  SafeAreaView,
   Linking,
   TouchableOpacity,
   StyleSheet,
 } from "react-native";
-import { Text, View } from "../components/Themed";
+import { SafeAreaView, Text, View } from "../components/Themed";
 import {
   auth,
   storage,
@@ -15,7 +14,7 @@ import {
   deleteNote,
   deleteBook,
 } from "../firebase";
-import { getStorage, ref, listAll, deleteObject } from "firebase/storage";
+import { ref, deleteObject } from "firebase/storage";
 
 export const ProfileScreen = () => {
   const deleteAccount = () => {
@@ -161,7 +160,6 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    backgroundColor: "#fff",
     justifyContent: "space-between",
   },
   link: {

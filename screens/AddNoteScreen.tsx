@@ -1,14 +1,12 @@
 import { useState } from "react";
 import { StatusBar } from "expo-status-bar";
 import {
-  SafeAreaView,
   KeyboardAvoidingView,
   Button,
-  TextInput,
   Platform,
   StyleSheet,
 } from "react-native";
-import { View } from "../components/Themed";
+import { SafeAreaView, TextInput, View } from "../components/Themed";
 import { createNote, auth } from "../firebase";
 import { useRoute, useNavigation } from "@react-navigation/native";
 
@@ -75,7 +73,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "flex-start",
     margin: 10,
-    backgroundColor: "rgba(255,255,255,0.1)",
     width: "90%",
   },
   container: {

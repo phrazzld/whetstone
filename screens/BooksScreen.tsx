@@ -1,6 +1,6 @@
-import { Button, SafeAreaView, SectionList, StyleSheet } from "react-native";
+import { Button, SectionList, StyleSheet } from "react-native";
 import { Book } from "../components/Book";
-import { Text, View } from "../components/Themed";
+import { SafeAreaView, Text, View } from "../components/Themed";
 import { useUnfinishedBooks } from "../hooks/useUnfinishedBooks";
 import { useFinishedBooks } from "../hooks/useFinishedBooks";
 import { useNavigation } from "@react-navigation/native";
@@ -58,7 +58,6 @@ const BooksScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
   },
   sectionHeader: {
     fontSize: 20,

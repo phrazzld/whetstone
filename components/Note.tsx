@@ -1,6 +1,5 @@
-import { FontAwesome } from "@expo/vector-icons";
 import { Alert, StyleSheet, TouchableOpacity } from "react-native";
-import { View, Text } from "./Themed";
+import { View, Text, FontAwesome } from "./Themed";
 import { deleteNote } from "../firebase";
 
 interface NoteProps {
@@ -40,7 +39,7 @@ export const Note = (props: NoteProps) => {
             justifyContent: "center",
           }}
         >
-          <FontAwesome name="bookmark-o" size={24} color="#555" />
+          <FontAwesome name="bookmark-o" size={24} />
           <Text>{note.page}</Text>
         </View>
         <View style={styles.main}>
@@ -77,13 +76,12 @@ const styles = StyleSheet.create({
     marginTop: 10,
     marginBottom: 10,
     borderRadius: 10,
-    backgroundColor: "white",
   },
   timestamp: {
-    fontSize: 12,
-    color: "grey",
+    fontSize: 11,
   },
   content: {
-    fontSize: 18,
+    fontSize: 14,
+    marginBottom: 10,
   },
 });

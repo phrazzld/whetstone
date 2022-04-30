@@ -50,7 +50,6 @@ const styles = StyleSheet.create({
     marginHorizontal: 10,
     marginBottom: 10,
     paddingHorizontal: 10,
-    backgroundColor: "white",
   },
   image: {
     height: 90,
@@ -60,7 +59,6 @@ const styles = StyleSheet.create({
   },
   author: {
     fontSize: 12,
-    color: "grey",
   },
   title: {
     fontSize: 20,

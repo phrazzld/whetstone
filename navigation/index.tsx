@@ -141,6 +141,8 @@ function BottomTabNavigator() {
 const BookStack = createNativeStackNavigator();
 
 function BookStackScreen({ navigation }) {
+  const colorScheme = useColorScheme();
+
   return (
     <BookStack.Navigator>
       <BookStack.Screen
@@ -158,7 +160,7 @@ function BookStackScreen({ navigation }) {
               <FontAwesome
                 name="plus-square-o"
                 size={25}
-                color={Colors.text}
+                color={Colors[colorScheme].tabIconSelected}
                 style={{ marginRight: 15 }}
               />
             </Pressable>
@@ -182,7 +184,7 @@ function BookStackScreen({ navigation }) {
               <FontAwesome
                 name="plus-square-o"
                 size={25}
-                color={Colors.text}
+                color={Colors[colorScheme].tabIconSelected}
                 style={{ marginRight: 15 }}
               />
             </Pressable>

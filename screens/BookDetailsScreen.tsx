@@ -110,7 +110,7 @@ export const BookDetailsScreen = () => {
             <View>
               <Text style={styles.title}>{book.title}</Text>
               <Text style={styles.author}>{book.author}</Text>
-              <Text style={[styles.author, { fontSize: 14, marginTop: 10 }]}>
+              <Text style={[styles.author, { fontSize: 12, marginTop: 10 }]}>
                 {timeline}
               </Text>
             </View>
@@ -163,14 +163,12 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 15,
     justifyContent: "space-between",
-    backgroundColor: "#fff",
   },
   author: {
-    fontSize: 16,
-    color: "grey",
+    fontSize: 14,
   },
   title: {
-    fontSize: 20,
+    fontSize: 16,
     fontWeight: "bold",
   },
   image: {
