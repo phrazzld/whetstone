@@ -149,19 +149,13 @@ export const EditBookScreen = () => {
   return (
     <SafeAreaView style={styles.container}>
       <KeyboardAvoidingView
-        style={[styles.container, { width: "100%" }]}
+        style={[styles.container, { width: "100%", paddingTop: 20 }]}
         behavior={Platform.OS === "ios" ? "padding" : "height"}
       >
-        <View
-          style={styles.separator}
-          lightColor="#eee"
-          darkColor="rgba(255,255,255,0.1)"
-        />
-
         <View style={styles.imageForm}>
           <Image
             source={{ uri: localImage }}
-            style={{ width: 120, height: 180, borderRadius: 10 }}
+            style={{ width: 180, height: 180, borderRadius: 5 }}
           />
           <Button
             title={localImage ? "Edit image" : "Pick image"}

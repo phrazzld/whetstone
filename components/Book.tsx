@@ -25,16 +25,20 @@ export const Book = (props: BookProps) => {
           <View style={styles.image}></View>
         )}
       </View>
-      <View>
-        <Text style={styles.title}>{book.title}</Text>
-        <Text style={styles.author}>{book.author}</Text>
+      <View
+        style={{ display: "flex", flex: 1, justifyContent: "space-between" }}
+      >
+        <View>
+          <Text style={styles.title}>{book.title}</Text>
+          <Text style={styles.author}>{book.author}</Text>
+        </View>
         {book.finished ? (
-          <Text style={styles.author}>
-            Finished on {book.finished.toDate().toDateString()}
+          <Text style={styles.date}>
+            Finished: {book.finished.toDate().toDateString()}
           </Text>
         ) : (
-          <Text style={styles.author}>
-            Started on {book.started.toDate().toDateString()}
+          <Text style={styles.date}>
+            Started: {book.started.toDate().toDateString()}
           </Text>
         )}
       </View>
@@ -46,19 +50,24 @@ const styles = StyleSheet.create({
   book: {
     flex: 1,
     flexDirection: "row",
-    alignItems: "center",
     marginHorizontal: 10,
-    marginBottom: 10,
+    marginBottom: 15,
     paddingHorizontal: 10,
   },
   image: {
-    height: 90,
-    width: 60,
+    height: 80,
+    width: 80,
+    //height: 90,
+    //width: 60,
     resizeMode: "cover",
-    borderRadius: 10,
+    borderRadius: 5,
   },
   author: {
+    fontSize: 14,
+  },
+  date: {
     fontSize: 12,
+    marginBottom: 5,
   },
   title: {
     fontSize: 20,

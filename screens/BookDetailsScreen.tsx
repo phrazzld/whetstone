@@ -233,8 +233,8 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   image: {
-    height: 90,
-    width: 60,
-    borderRadius: 10,
+    height: 80,
+    width: 80,
+    borderRadius: 5,
   },
 });
