@@ -4,6 +4,7 @@ import {
   Image,
   ScrollView,
   ActivityIndicator,
+  TouchableOpacity,
   StyleSheet,
   Button,
 } from "react-native";
@@ -14,6 +15,7 @@ import { Note } from "../components/Note";
 import { useNotes } from "../hooks/useNotes";
 import { ref, deleteObject } from "firebase/storage";
 import { useBookImage } from "../hooks/useBookImage";
+import { useStore } from "../zstore";
 
 export const BookDetailsScreen = () => {
   const { book } = useRoute().params;
@@ -22,6 +24,8 @@ export const BookDetailsScreen = () => {
   const navigation = useNavigation();
   const notes = useNotes(book.id);
   const image = useBookImage(book.id, true);
+  const showActionMenu = useStore((state) => state.showActionMenu);
+  const setShowActionMenu = useStore((state) => state.setShowActionMenu);
 
   let timeline = `Started: ${book.started.toDate().toLocaleString()}`;
   if (book.finished) {
@@ -29,6 +33,7 @@ export const BookDetailsScreen = () => {
   }
 
   const finishBook = async () => {
+    setShowActionMenu(false);
     setLoading(true);
     await updateBook(book.id, { finished: new Date() });
     setLoading(false);
@@ -36,6 +41,7 @@ export const BookDetailsScreen = () => {
   };
 
   const removeBook = async () => {
+    setShowActionMenu(false);
     Alert.alert(
       "Delete Book",
       "Are you sure you want to delete this book?",
@@ -76,7 +82,13 @@ export const BookDetailsScreen = () => {
   };
 
   const editBook = () => {
+    setShowActionMenu(false);
     navigation.navigate("EditBook", { book });
+  };
+
+  const addNote = (): void => {
+    setShowActionMenu(false);
+    navigation.navigate("AddNote", { bookId: book.id });
   };
 
   const selectNote = (id: string): void => {
@@ -96,65 +108,112 @@ export const BookDetailsScreen = () => {
   }
 
   return (
-    <ScrollView>
-      <View style={styles.container}>
-        <View>
-          <View style={{ flex: 1, flexDirection: "row" }}>
-            <View style={{ marginRight: 10 }}>
-              {!!image ? (
-                <Image style={styles.image} source={{ uri: image }} />
-              ) : (
-                <View style={styles.image}></View>
-              )}
-            </View>
-            <View>
-              <Text style={styles.title}>{book.title}</Text>
-              <Text style={styles.author}>{book.author}</Text>
-              <Text style={[styles.author, { fontSize: 12, marginTop: 10 }]}>
-                {timeline}
-              </Text>
-            </View>
-          </View>
-
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-around",
-              marginVertical: 10,
-            }}
-          >
-            {!book.finished && <Button title="Finish" onPress={finishBook} />}
-            <Button title="Edit" onPress={editBook} />
-            <Button title="Delete" onPress={removeBook} color="#cc0000" />
-          </View>
-
+    <View>
+      <ScrollView>
+        <View style={styles.container}>
           <View>
-            {notes.map((note) => (
-              <Note
-                key={note.id}
-                note={note}
-                selected={selectedNote === note.id}
-                onPress={selectNote}
-              />
-            ))}
-          </View>
-
-          {notes.length === 0 && (
-            <View>
-              <Text style={{ marginVertical: 20, textAlign: "center" }}>
-                No notes yet.
-              </Text>
-              <Button
-                title="Add Note"
-                onPress={() =>
-                  navigation.navigate("AddNote", { bookId: book.id })
-                }
-              />
+            <View style={{ flex: 1, flexDirection: "row", marginBottom: 10 }}>
+              <View style={{ marginRight: 10 }}>
+                {!!image ? (
+                  <Image style={styles.image} source={{ uri: image }} />
+                ) : (
+                  <View style={styles.image}></View>
+                )}
+              </View>
+              <View>
+                <Text style={styles.title}>{book.title}</Text>
+                <Text style={styles.author}>{book.author}</Text>
+                <Text style={[styles.author, { fontSize: 12, marginTop: 10 }]}>
+                  {timeline}
+                </Text>
+              </View>
             </View>
-          )}
+
+            <View>
+              {notes.map((note) => (
+                <Note
+                  key={note.id}
+                  note={note}
+                  selected={selectedNote === note.id}
+                  onPress={selectNote}
+                />
+              ))}
+            </View>
+
+            {notes.length === 0 && (
+              <View>
+                <Text style={{ marginVertical: 20, textAlign: "center" }}>
+                  No notes yet.
+                </Text>
+                <Button title="Add Note" onPress={addNote} />
+              </View>
+            )}
+          </View>
         </View>
-      </View>
-    </ScrollView>
+      </ScrollView>
+
+      {showActionMenu && (
+        <View
+          style={{
+            position: "absolute",
+            right: 30,
+            top: 0,
+            borderColor: "grey",
+            borderWidth: 2,
+            borderRadius: 5,
+          }}
+        >
+          <View>
+            <TouchableOpacity
+              style={{ padding: 5, paddingLeft: 10, paddingRight: 10 }}
+              onPress={addNote}
+            >
+              <Text
+                style={{ fontSize: 16, textAlign: "left", color: "#147efb" }}
+              >
+                Add Note
+              </Text>
+            </TouchableOpacity>
+          </View>
+          <View>
+            <TouchableOpacity
+              style={{ padding: 5, paddingLeft: 10, paddingRight: 10 }}
+              onPress={editBook}
+            >
+              <Text
+                style={{ fontSize: 16, textAlign: "left", color: "#147efb" }}
+              >
+                Edit
+              </Text>
+            </TouchableOpacity>
+          </View>
+          <View>
+            <TouchableOpacity
+              style={{ padding: 5, paddingLeft: 10, paddingRight: 10 }}
+              onPress={finishBook}
+            >
+              <Text
+                style={{ fontSize: 16, textAlign: "left", color: "#147efb" }}
+              >
+                Finish
+              </Text>
+            </TouchableOpacity>
+          </View>
+          <View>
+            <TouchableOpacity
+              style={{ padding: 5, paddingLeft: 10, paddingRight: 10 }}
+              onPress={removeBook}
+            >
+              <Text
+                style={{ fontSize: 16, textAlign: "left", color: "#cc0000" }}
+              >
+                Delete
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      )}
+    </View>
   );
 };
 

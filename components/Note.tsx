@@ -1,6 +1,8 @@
 import { Alert, StyleSheet, TouchableOpacity } from "react-native";
 import { View, Text, FontAwesome } from "./Themed";
 import { deleteNote } from "../firebase";
+import Colors from "../constants/Colors";
+import useColorScheme from "../hooks/useColorScheme";
 
 interface NoteProps {
   note: any;
@@ -10,6 +12,7 @@ interface NoteProps {
 
 export const Note = (props: NoteProps) => {
   const { note, selected, onPress } = props;
+  const colorScheme = useColorScheme();
 
   const removeNote = async () => {
     // Ask user to confirm deletion
@@ -32,21 +35,46 @@ export const Note = (props: NoteProps) => {
   return (
     <TouchableOpacity onPress={() => onPress(note.id)} style={styles.note}>
       <View style={{ flex: 1, flexDirection: "row", alignItems: "center" }}>
-        <View
-          style={{
-            marginRight: 10,
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <FontAwesome name="bookmark-o" size={24} />
-          <Text>{note.page}</Text>
-        </View>
         <View style={styles.main}>
           <Text style={styles.content}>{note.content}</Text>
-          <Text style={styles.timestamp}>
-            {note.createdAt.toDate().toLocaleString()}
-          </Text>
+          <View
+            style={{
+              display: "flex",
+              flex: 1,
+              flexDirection: "row",
+              alignItems: "center",
+            }}
+          >
+            <View
+              style={{
+                display: "flex",
+                flex: 1,
+                flexDirection: "row",
+                alignItems: "center",
+              }}
+            >
+              <FontAwesome
+                name="clock-o"
+                size={15}
+                color={Colors[colorScheme].text}
+                style={{ marginRight: 10 }}
+              />
+              <Text style={styles.timestamp}>
+                {note.createdAt.toDate().toLocaleString()}
+              </Text>
+            </View>
+            {!!note.page && (
+              <View style={{ display: "flex", flex: 1, flexDirection: "row" }}>
+                <FontAwesome
+                  name="sticky-note-o"
+                  size={15}
+                  color={Colors[colorScheme].text}
+                  style={{ marginRight: 10 }}
+                />
+                <Text style={styles.timestamp}>Page {note.page}</Text>
+              </View>
+            )}
+          </View>
         </View>
       </View>
 
@@ -63,12 +91,12 @@ export const Note = (props: NoteProps) => {
 
 const styles = StyleSheet.create({
   actions: {
-    width: "12%",
+    width: "5%",
     alignItems: "center",
     justifyContent: "center",
   },
   main: {
-    width: "80%",
+    width: "95%",
   },
   note: {
     flexDirection: "row",
@@ -76,6 +104,9 @@ const styles = StyleSheet.create({
     marginTop: 10,
     marginBottom: 10,
     borderRadius: 10,
+    paddingTop: 20,
+    borderTopColor: "grey",
+    borderTopWidth: 1,
   },
   timestamp: {
     fontSize: 11,

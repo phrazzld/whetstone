@@ -3,7 +3,6 @@
  * https://reactnavigation.org/docs/getting-started
  *
  */
-import { FontAwesome } from "@expo/vector-icons";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import {
   NavigationContainer,
@@ -11,7 +10,7 @@ import {
   DarkTheme,
 } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import * as React from "react";
+import React from "react";
 import { ColorSchemeName, Pressable } from "react-native";
 
 import Colors from "../constants/Colors";
@@ -28,6 +27,8 @@ import { SignUpScreen } from "../screens/SignUpScreen";
 import { auth } from "../firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import { ProfileScreen } from "../screens/ProfileScreen";
+import { FontAwesome, Text, View } from "../components/Themed";
+import { useStore } from "../zstore";
 
 export default function Navigation({
   colorScheme,
@@ -142,6 +143,12 @@ const BookStack = createNativeStackNavigator();
 
 function BookStackScreen({ navigation }) {
   const colorScheme = useColorScheme();
+  const showActionMenu = useStore((state) => state.showActionMenu);
+  const setShowActionMenu = useStore((state) => state.setShowActionMenu);
+
+  const toggleActionMenu = (): void => {
+    setShowActionMenu(!showActionMenu);
+  };
 
   return (
     <BookStack.Navigator>
@@ -174,15 +181,14 @@ function BookStackScreen({ navigation }) {
           title: route.params.book.title,
           headerRight: () => (
             <Pressable
-              onPress={() =>
-                navigation.navigate("AddNote", { bookId: route.params.book.id })
-              }
+              onPress={toggleActionMenu}
+              hitSlop={15}
               style={({ pressed }) => ({
                 opacity: pressed ? 0.5 : 1,
               })}
             >
               <FontAwesome
-                name="plus-square-o"
+                name="ellipsis-v"
                 size={25}
                 color={Colors[colorScheme].tabIconSelected}
                 style={{ marginRight: 15 }}
