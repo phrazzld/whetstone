@@ -44,11 +44,11 @@ export const AddBookScreen = () => {
         userId: auth.currentUser.uid,
       };
       const bookRef = await createBook(book);
-      setProgressText("Uploading book image...");
       const bookId = bookRef.id;
 
       // Upload image to firebase storage
       if (!!image && !image.cancelled) {
+        setProgressText("Uploading book image...");
         const filename = `${auth.currentUser.uid}/${bookId}/cover.jpg`;
         const metadata = { contentType: "image/jpeg" };
         const imgRef = ref(storage, filename);
@@ -86,6 +86,8 @@ export const AddBookScreen = () => {
             navigation.navigate("Books");
           }
         );
+      } else {
+        navigation.navigate("Books");
       }
     } catch (error) {
       console.log("error:", error);
