@@ -187,18 +187,20 @@ export const BookDetailsScreen = () => {
               </Text>
             </TouchableOpacity>
           </View>
-          <View>
-            <TouchableOpacity
-              style={{ padding: 5, paddingLeft: 10, paddingRight: 10 }}
-              onPress={finishBook}
-            >
-              <Text
-                style={{ fontSize: 16, textAlign: "left", color: "#147efb" }}
+          {!book.finished && (
+            <View>
+              <TouchableOpacity
+                style={{ padding: 5, paddingLeft: 10, paddingRight: 10 }}
+                onPress={finishBook}
               >
-                Finish
-              </Text>
-            </TouchableOpacity>
-          </View>
+                <Text
+                  style={{ fontSize: 16, textAlign: "left", color: "#147efb" }}
+                >
+                  Finish
+                </Text>
+              </TouchableOpacity>
+            </View>
+          )}
           <View>
             <TouchableOpacity
               style={{ padding: 5, paddingLeft: 10, paddingRight: 10 }}
