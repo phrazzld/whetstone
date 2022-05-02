@@ -1,20 +1,20 @@
-import { useState } from "react";
+import { useNavigation } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
+import { ref, uploadBytesResumable } from "firebase/storage";
+import { useState } from "react";
 import {
-  KeyboardAvoidingView,
-  Dimensions,
   Button,
+  Dimensions,
   Image,
+  KeyboardAvoidingView,
   Platform,
   StyleSheet,
 } from "react-native";
-import { SafeAreaView, View, Text } from "../components/Themed";
-import { storage, createBook, auth } from "../firebase";
-import { useNavigation } from "@react-navigation/native";
-import * as ImagePicker from "expo-image-picker";
-import { ref, uploadBytesResumable } from "firebase/storage";
-import { useStore } from "../zstore";
 import { ProgressBar, TextInput } from "react-native-paper";
+import { SafeAreaView, Text, View } from "../components/Themed";
+import { auth, createBook, storage } from "../firebase";
+import { pickImage } from "../utils";
+import { useStore } from "../zstore";
 
 const windowWidth = Dimensions.get("window").width;
 
@@ -97,36 +97,10 @@ export const AddBookScreen = () => {
     navigation.navigate("Books");
   };
 
-  const pickImage = async () => {
-    if (!auth.currentUser) {
-      throw new Error("Cannot edit book image, user is not logged in.");
-    }
-
-    try {
-      // Check media permissions
-      const permissions = await ImagePicker.getMediaLibraryPermissionsAsync();
-
-      // If media permissions are not granted, request permissions
-      if (permissions.granted === false) {
-        const newPermissions = await ImagePicker.requestMediaLibraryPermissionsAsync();
-
-        // If media permissions are still not granted, return
-        if (newPermissions.granted === false) {
-          throw new Error("Media permissions not granted.");
-        }
-      }
-
-      const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.All,
-        allowsEditing: true,
-        quality: 1,
-      });
-      // TODO: handle cancel case here instead of on save
-      setLocalImage(result.uri);
-      setImage(result);
-    } catch (err) {
-      console.error(err);
-    }
+  const selectImage = async () => {
+    const result = await pickImage();
+    setLocalImage(result.uri);
+    setImage(result);
   };
 
   return (
@@ -142,7 +116,7 @@ export const AddBookScreen = () => {
           />
           <Button
             title={localImage ? "Edit image" : "Pick image"}
-            onPress={pickImage}
+            onPress={selectImage}
           />
         </View>
         <TextInput
@@ -152,6 +126,7 @@ export const AddBookScreen = () => {
           onChangeText={setTitle}
           mode="outlined"
           returnKeyType="next"
+          autoFocus={true}
         />
         <TextInput
           placeholder="Author"

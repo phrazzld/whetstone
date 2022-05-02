@@ -48,6 +48,7 @@ export const AddNoteScreen = () => {
           style={styles.multilineInput}
           value={content}
           onChangeText={setContent}
+          autoFocus={true}
         />
         <TextInput
           placeholder="Page number"
