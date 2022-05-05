@@ -1,21 +1,50 @@
+import { useNavigation, useRoute } from "@react-navigation/native";
+import { deleteObject, ref } from "firebase/storage";
 import { useState } from "react";
 import {
+  ActivityIndicator,
   Alert,
+  Button,
   Image,
   ScrollView,
-  ActivityIndicator,
-  TouchableOpacity,
   StyleSheet,
-  Button,
+  TouchableOpacity,
 } from "react-native";
-import { Text, View } from "../components/Themed";
-import { useNavigation, useRoute } from "@react-navigation/native";
-import { auth, storage, updateBook, deleteBook } from "../firebase";
 import { Note } from "../components/Note";
-import { useNotes } from "../hooks/useNotes";
-import { ref, deleteObject } from "firebase/storage";
+import { Text, View } from "../components/Themed";
+import { auth, deleteBook, storage, updateBook } from "../firebase";
 import { useBookImage } from "../hooks/useBookImage";
+import { useNotes } from "../hooks/useNotes";
 import { useStore } from "../zstore";
+
+interface ActionMenuItemProps {
+  text: string;
+  onPress: () => void;
+  destructive: boolean;
+}
+
+const ActionMenuItem = (props: ActionMenuItemProps) => {
+  const { text, onPress, destructive } = props;
+
+  const color = destructive ? "#cc0000" : "#147efb";
+
+  return (
+    <View
+      style={
+        destructive ? {} : { borderBottomWidth: 1, borderBottomColor: "grey" }
+      }
+    >
+      <TouchableOpacity
+        style={{ padding: 10, paddingLeft: 15, paddingRight: 15 }}
+        onPress={onPress}
+      >
+        <Text style={{ fontSize: 18, textAlign: "left", color: color }}>
+          {text}
+        </Text>
+      </TouchableOpacity>
+    </View>
+  );
+};
 
 export const BookDetailsScreen = () => {
   const { book } = useRoute().params;
@@ -99,6 +128,26 @@ export const BookDetailsScreen = () => {
     }
   };
 
+  const ActionMenu = () => {
+    return (
+      <View
+        style={{
+          position: "absolute",
+          right: 30,
+          top: 0,
+          borderColor: "grey",
+          borderWidth: 2,
+          borderRadius: 5,
+        }}
+      >
+        <ActionMenuItem text="Add Note" onPress={addNote} />
+        <ActionMenuItem text="Edit" onPress={editBook} />
+        <ActionMenuItem text="Finish" onPress={finishBook} />
+        <ActionMenuItem text="Delete" onPress={removeBook} destructive />
+      </View>
+    );
+  };
+
   if (loading) {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
@@ -152,69 +201,7 @@ export const BookDetailsScreen = () => {
         </View>
       </ScrollView>
 
-      {showActionMenu && (
-        <View
-          style={{
-            position: "absolute",
-            right: 30,
-            top: 0,
-            borderColor: "grey",
-            borderWidth: 2,
-            borderRadius: 5,
-          }}
-        >
-          <View>
-            <TouchableOpacity
-              style={{ padding: 5, paddingLeft: 10, paddingRight: 10 }}
-              onPress={addNote}
-            >
-              <Text
-                style={{ fontSize: 16, textAlign: "left", color: "#147efb" }}
-              >
-                Add Note
-              </Text>
-            </TouchableOpacity>
-          </View>
-          <View>
-            <TouchableOpacity
-              style={{ padding: 5, paddingLeft: 10, paddingRight: 10 }}
-              onPress={editBook}
-            >
-              <Text
-                style={{ fontSize: 16, textAlign: "left", color: "#147efb" }}
-              >
-                Edit
-              </Text>
-            </TouchableOpacity>
-          </View>
-          {!book.finished && (
-            <View>
-              <TouchableOpacity
-                style={{ padding: 5, paddingLeft: 10, paddingRight: 10 }}
-                onPress={finishBook}
-              >
-                <Text
-                  style={{ fontSize: 16, textAlign: "left", color: "#147efb" }}
-                >
-                  Finish
-                </Text>
-              </TouchableOpacity>
-            </View>
-          )}
-          <View>
-            <TouchableOpacity
-              style={{ padding: 5, paddingLeft: 10, paddingRight: 10 }}
-              onPress={removeBook}
-            >
-              <Text
-                style={{ fontSize: 16, textAlign: "left", color: "#cc0000" }}
-              >
-                Delete
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      )}
+      {showActionMenu && <ActionMenu />}
     </View>
   );
 };
