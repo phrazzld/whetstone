@@ -10,6 +10,24 @@ import {
 import { SafeAreaView, TextInput, View } from "../components/Themed";
 import { auth, createNote } from "../firebase";
 
+interface DictionaryDefinition {
+  definition: string;
+  example: string;
+  synonyms: Array<string>;
+  antonyms: Array<string>;
+}
+
+interface DictionaryMeaning {
+  partOfSpeech: string;
+  definitions: Array<DictionaryDefinition>;
+}
+
+interface DictionaryWord {
+  word: string;
+  origin: string;
+  meanings: Array<DictionaryMeaning>;
+}
+
 export const AddVocabScreen = () => {
   const [word, setWord] = useState("");
   const [definition, setDefinition] = useState("");
@@ -17,7 +35,7 @@ export const AddVocabScreen = () => {
   const { bookId } = useRoute().params;
   const navigation = useNavigation();
 
-  const addVocab = () => {
+  const addVocab = (): void => {
     if (!auth.currentUser) {
       throw new Error("Cannot add vocab, user is not logged in.");
     }
@@ -34,8 +52,34 @@ export const AddVocabScreen = () => {
     navigation.goBack();
   };
 
-  const cancel = () => {
+  const cancel = (): void => {
     navigation.goBack();
+  };
+
+  const getDefinition = async (): Promise<void> => {
+    const res = await fetch(
+      `https://api.dictionaryapi.dev/api/v2/entries/en/${word}`
+    );
+
+    const defs: Array<DictionaryWord> = await res.json();
+
+    if (defs.length > 0 && defs[0].meanings.length > 0) {
+      console.log("defs[0].meanings:", defs[0].meanings);
+      console.log("length:", defs[0].meanings.length);
+      if (defs[0].meanings.length === 1) {
+        setDefinition(defs[0].meanings[0].definitions[0].definition);
+      } else {
+        let def = "";
+        for (let i = 0; i < defs[0].meanings.length; i++) {
+          def += `${i + 1}. ${defs[0].meanings[i].definitions[0].definition}`;
+          if (i !== defs[0].meanings.length - 1) {
+            def += "\n";
+          }
+        }
+
+        setDefinition(def);
+      }
+    }
   };
 
   return (
@@ -50,6 +94,7 @@ export const AddVocabScreen = () => {
           value={word}
           onChangeText={setWord}
           keyboardType="numeric"
+          autoFocus={true}
         />
         <TextInput
           placeholder="Definition"
@@ -57,7 +102,7 @@ export const AddVocabScreen = () => {
           style={styles.multilineInput}
           value={definition}
           onChangeText={setDefinition}
-          autoFocus={true}
+          onFocus={getDefinition}
         />
         <TextInput
           placeholder="Page number"
