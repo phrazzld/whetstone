@@ -1,14 +1,14 @@
-import { useState } from "react";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
+import { useState } from "react";
 import {
-  KeyboardAvoidingView,
   Button,
+  KeyboardAvoidingView,
   Platform,
   StyleSheet,
 } from "react-native";
 import { SafeAreaView, TextInput, View } from "../components/Themed";
-import { createNote, auth } from "../firebase";
-import { useRoute, useNavigation } from "@react-navigation/native";
+import { auth, createNote } from "../firebase";
 
 export const AddNoteScreen = () => {
   const [content, setContent] = useState("");
@@ -58,7 +58,7 @@ export const AddNoteScreen = () => {
           keyboardType="numeric"
         />
         <View style={styles.buttonContainer}>
-          <Button onPress={addNote} title="Add Note" />
+          <Button onPress={addNote} title="Save" />
           <Button onPress={cancel} title="Cancel" color="gray" />
         </View>
 

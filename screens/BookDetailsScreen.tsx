@@ -140,7 +140,6 @@ export const BookDetailsScreen = () => {
           borderRadius: 5,
         }}
       >
-        <ActionMenuItem text="Add Note" onPress={addNote} />
         <ActionMenuItem text="Edit" onPress={editBook} />
         <ActionMenuItem text="Finish" onPress={finishBook} />
         <ActionMenuItem text="Delete" onPress={removeBook} destructive />
@@ -179,6 +178,7 @@ export const BookDetailsScreen = () => {
             </View>
 
             <View>
+              <Button title="Add Note" onPress={addNote} />
               {notes.map((note) => (
                 <Note
                   key={note.id}
@@ -194,7 +194,6 @@ export const BookDetailsScreen = () => {
                 <Text style={{ marginVertical: 20, textAlign: "center" }}>
                   No notes yet.
                 </Text>
-                <Button title="Add Note" onPress={addNote} />
               </View>
             )}
           </View>
