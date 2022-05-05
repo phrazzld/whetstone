@@ -1,18 +1,18 @@
 import { initializeApp } from "firebase/app";
-import {
-  getDoc,
-  orderBy,
-  deleteDoc,
-  getDocs,
-  query,
-  collection,
-  where,
-  addDoc,
-  getFirestore,
-  setDoc,
-  doc,
-} from "firebase/firestore";
 import { getAuth } from "firebase/auth";
+import {
+  addDoc,
+  collection,
+  deleteDoc,
+  doc,
+  getDoc,
+  getDocs,
+  getFirestore,
+  orderBy,
+  query,
+  setDoc,
+  where,
+} from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 
 // Your web app's Firebase configuration

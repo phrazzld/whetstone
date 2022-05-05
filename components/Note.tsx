@@ -1,8 +1,8 @@
 import { Alert, StyleSheet, TouchableOpacity } from "react-native";
-import { View, Text, FontAwesome } from "./Themed";
-import { deleteNote } from "../firebase";
 import Colors from "../constants/Colors";
+import { deleteNote } from "../firebase";
 import useColorScheme from "../hooks/useColorScheme";
+import { FontAwesome, Text, View } from "./Themed";
 
 interface NoteProps {
   note: any;
@@ -36,7 +36,17 @@ export const Note = (props: NoteProps) => {
     <TouchableOpacity onPress={() => onPress(note.id)} style={styles.note}>
       <View style={{ flex: 1, flexDirection: "row", alignItems: "center" }}>
         <View style={styles.main}>
-          <Text style={styles.content}>{note.content}</Text>
+          {note.type === "note" && (
+            <Text style={styles.content}>{note.content}</Text>
+          )}
+
+          {note.type === "vocab" && (
+            <>
+              <Text style={styles.word}>{note.word}</Text>
+              <Text style={styles.definition}>{note.definition}</Text>
+            </>
+          )}
+
           <View
             style={{
               display: "flex",
@@ -45,6 +55,9 @@ export const Note = (props: NoteProps) => {
               alignItems: "center",
             }}
           >
+            <View style={styles.noteTypeContainer}>
+              <Text style={styles.noteType}>{note.type || "note"}</Text>
+            </View>
             <View
               style={{
                 display: "flex",
@@ -63,6 +76,7 @@ export const Note = (props: NoteProps) => {
                 {note.createdAt.toDate().toLocaleString()}
               </Text>
             </View>
+
             {!!note.page && (
               <View style={{ display: "flex", flex: 1, flexDirection: "row" }}>
                 <FontAwesome
@@ -114,5 +128,26 @@ const styles = StyleSheet.create({
   content: {
     fontSize: 14,
     marginBottom: 10,
+  },
+  word: {
+    fontWeight: "600",
+    fontSize: 14,
+    marginBottom: 5,
+  },
+  definition: {
+    fontSize: 14,
+    marginBottom: 10,
+  },
+  noteTypeContainer: {
+    marginRight: 15,
+    width: "12%",
+    borderRadius: 5,
+    borderColor: "grey",
+    borderWidth: 1,
+    paddingVertical: 3,
+  },
+  noteType: {
+    fontSize: 11,
+    textAlign: "center",
   },
 });

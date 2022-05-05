@@ -120,6 +120,11 @@ export const BookDetailsScreen = () => {
     navigation.navigate("AddNote", { bookId: book.id });
   };
 
+  const addVocab = (): void => {
+    setShowActionMenu(false);
+    navigation.navigate("AddVocab", { bookId: book.id });
+  };
+
   const selectNote = (id: string): void => {
     if (selectedNote === id) {
       setSelectedNote("");
@@ -178,7 +183,17 @@ export const BookDetailsScreen = () => {
             </View>
 
             <View>
-              <Button title="Add Note" onPress={addNote} />
+              <View
+                style={{
+                  display: "flex",
+                  flex: 1,
+                  flexDirection: "row",
+                  justifyContent: "space-evenly",
+                }}
+              >
+                <Button title="Add Note" onPress={addNote} />
+                <Button title="Add Vocab" onPress={addVocab} />
+              </View>
               {notes.map((note) => (
                 <Note
                   key={note.id}

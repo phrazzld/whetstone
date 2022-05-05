@@ -10,19 +10,27 @@ import {
 import { SafeAreaView, TextInput, View } from "../components/Themed";
 import { auth, createNote } from "../firebase";
 
-export const AddNoteScreen = () => {
-  const [content, setContent] = useState("");
+export const AddVocabScreen = () => {
+  const [word, setWord] = useState("");
+  const [definition, setDefinition] = useState("");
   const [page, setPage] = useState("");
   const { bookId } = useRoute().params;
   const navigation = useNavigation();
 
-  const addNote = () => {
+  const addVocab = () => {
     if (!auth.currentUser) {
-      throw new Error("Cannot add note, user is not logged in.");
+      throw new Error("Cannot add vocab, user is not logged in.");
     }
 
-    const note = { type: "note", content, bookId, page, createdAt: new Date() };
-    createNote(note);
+    const vocab = {
+      type: "vocab",
+      word,
+      definition,
+      bookId,
+      page,
+      createdAt: new Date(),
+    };
+    createNote(vocab);
     navigation.goBack();
   };
 
@@ -37,11 +45,18 @@ export const AddNoteScreen = () => {
         behavior={Platform.OS === "ios" ? "padding" : "height"}
       >
         <TextInput
-          placeholder="Content"
+          placeholder="Word"
+          style={styles.input}
+          value={word}
+          onChangeText={setWord}
+          keyboardType="numeric"
+        />
+        <TextInput
+          placeholder="Definition"
           multiline={true}
           style={styles.multilineInput}
-          value={content}
-          onChangeText={setContent}
+          value={definition}
+          onChangeText={setDefinition}
           autoFocus={true}
         />
         <TextInput
@@ -52,7 +67,7 @@ export const AddNoteScreen = () => {
           keyboardType="numeric"
         />
         <View style={styles.buttonContainer}>
-          <Button onPress={addNote} title="Save" />
+          <Button onPress={addVocab} title="Save" />
           <Button onPress={cancel} title="Cancel" color="gray" />
         </View>
 

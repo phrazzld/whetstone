@@ -5,30 +5,30 @@
  */
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import {
-  NavigationContainer,
-  DefaultTheme,
   DarkTheme,
+  DefaultTheme,
+  NavigationContainer,
 } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { onAuthStateChanged } from "firebase/auth";
 import React from "react";
 import { ColorSchemeName, Pressable } from "react-native";
-
+import { FontAwesome } from "../components/Themed";
 import Colors from "../constants/Colors";
-import useColorScheme from "../hooks/useColorScheme";
-import NotFoundScreen from "../screens/NotFoundScreen";
-import BooksScreen from "../screens/BooksScreen";
-import { RootStackParamList, RootTabParamList } from "../types";
-import LinkingConfiguration from "./LinkingConfiguration";
-import { BookDetailsScreen } from "../screens/BookDetailsScreen";
-import { AddBookScreen } from "../screens/AddBookScreen";
-import { EditBookScreen } from "../screens/EditBookScreen";
-import { AddNoteScreen } from "../screens/AddNoteScreen";
-import { SignUpScreen } from "../screens/SignUpScreen";
 import { auth } from "../firebase";
-import { onAuthStateChanged } from "firebase/auth";
+import useColorScheme from "../hooks/useColorScheme";
+import { AddBookScreen } from "../screens/AddBookScreen";
+import { AddNoteScreen } from "../screens/AddNoteScreen";
+import { AddVocabScreen } from "../screens/AddVocabScreen";
+import { BookDetailsScreen } from "../screens/BookDetailsScreen";
+import BooksScreen from "../screens/BooksScreen";
+import { EditBookScreen } from "../screens/EditBookScreen";
+import NotFoundScreen from "../screens/NotFoundScreen";
 import { ProfileScreen } from "../screens/ProfileScreen";
-import { FontAwesome, Text, View } from "../components/Themed";
+import { SignUpScreen } from "../screens/SignUpScreen";
+import { RootStackParamList, RootTabParamList } from "../types";
 import { useStore } from "../zstore";
+import LinkingConfiguration from "./LinkingConfiguration";
 
 export default function Navigation({
   colorScheme,
@@ -87,6 +87,11 @@ function RootNavigator() {
               name="AddNote"
               component={AddNoteScreen}
               options={{ title: "Add Note" }}
+            />
+            <Stack.Screen
+              name="AddVocab"
+              component={AddVocabScreen}
+              options={{ title: "Add Vocab" }}
             />
           </Stack.Group>
         </>
