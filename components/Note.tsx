@@ -36,9 +36,7 @@ export const Note = (props: NoteProps) => {
     <TouchableOpacity onPress={() => onPress(note.id)} style={styles.note}>
       <View style={{ flex: 1, flexDirection: "row", alignItems: "center" }}>
         <View style={styles.main}>
-          {note.type === "note" && (
-            <Text style={styles.content}>{note.content}</Text>
-          )}
+          {!!note.content && <Text style={styles.content}>{note.content}</Text>}
 
           {note.type === "vocab" && (
             <>
