@@ -64,8 +64,6 @@ export const AddVocabScreen = () => {
     const defs: Array<DictionaryWord> = await res.json();
 
     if (defs.length > 0 && defs[0].meanings.length > 0) {
-      console.log("defs[0].meanings:", defs[0].meanings);
-      console.log("length:", defs[0].meanings.length);
       if (defs[0].meanings.length === 1) {
         setDefinition(defs[0].meanings[0].definitions[0].definition);
       } else {
