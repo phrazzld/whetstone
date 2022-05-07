@@ -24,7 +24,7 @@
       "infoPlist": {
         "NSPhotoLibraryUsageDescription": "Whetstone uses your photos to display book covers, and provide a better experience."
       },
-      "buildNumber": "4"
+      "buildNumber": "5"
     },
     "android": {
       "adaptiveIcon": {
