@@ -91,7 +91,6 @@ export const AddVocabScreen = () => {
           style={styles.input}
           value={word}
           onChangeText={setWord}
-          keyboardType="numeric"
           autoFocus={true}
         />
         <TextInput
