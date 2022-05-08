@@ -2,6 +2,7 @@ import { Alert, StyleSheet, TouchableOpacity } from "react-native";
 import Colors from "../constants/Colors";
 import { deleteNote } from "../firebase";
 import useColorScheme from "../hooks/useColorScheme";
+import { dateLocaleStringOptions } from "../utils";
 import { FontAwesome, Text, View } from "./Themed";
 
 interface NoteProps {
@@ -71,7 +72,9 @@ export const Note = (props: NoteProps) => {
                 style={{ marginRight: 10 }}
               />
               <Text style={styles.timestamp}>
-                {note.createdAt.toDate().toLocaleString()}
+                {note.createdAt
+                  .toDate()
+                  .toLocaleString([], dateLocaleStringOptions)}
               </Text>
             </View>
 

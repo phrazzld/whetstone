@@ -1,8 +1,9 @@
-import { Image, StyleSheet, TouchableOpacity } from "react-native";
-import { TBook } from "../types";
-import { View, Text } from "./Themed";
 import { useNavigation } from "@react-navigation/native";
+import { Image, StyleSheet, TouchableOpacity } from "react-native";
 import { useBookImage } from "../hooks/useBookImage";
+import { TBook } from "../types";
+import { dateLocaleStringOptions } from "../utils";
+import { Text, View } from "./Themed";
 
 interface BookProps {
   book: TBook;
@@ -34,11 +35,13 @@ export const Book = (props: BookProps) => {
         </View>
         {book.finished ? (
           <Text style={styles.date}>
-            Finished: {book.finished.toDate().toDateString()}
+            Finished:{" "}
+            {book.finished.toDate().toLocaleString([], dateLocaleStringOptions)}
           </Text>
         ) : (
           <Text style={styles.date}>
-            Started: {book.started.toDate().toDateString()}
+            Started:{" "}
+            {book.started.toDate().toLocaleString([], dateLocaleStringOptions)}
           </Text>
         )}
       </View>
@@ -57,8 +60,6 @@ const styles = StyleSheet.create({
   image: {
     height: 80,
     width: 80,
-    //height: 90,
-    //width: 60,
     resizeMode: "cover",
     borderRadius: 5,
   },

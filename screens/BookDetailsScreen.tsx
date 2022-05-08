@@ -15,6 +15,7 @@ import { Text, View } from "../components/Themed";
 import { auth, deleteBook, storage, updateBook } from "../firebase";
 import { useBookImage } from "../hooks/useBookImage";
 import { useNotes } from "../hooks/useNotes";
+import { dateLocaleStringOptions } from "../utils";
 import { useStore } from "../zstore";
 
 interface ActionMenuItemProps {
@@ -56,9 +57,13 @@ export const BookDetailsScreen = () => {
   const showActionMenu = useStore((state) => state.showActionMenu);
   const setShowActionMenu = useStore((state) => state.setShowActionMenu);
 
-  let timeline = `Started: ${book.started.toDate().toLocaleString()}`;
+  let timeline = `Started: ${book.started
+    .toDate()
+    .toLocaleString([], dateLocaleStringOptions)}`;
   if (book.finished) {
-    timeline += `\nFinished: ${book.finished.toDate().toLocaleString()}`;
+    timeline += `\nFinished: ${book.finished
+      .toDate()
+      .toLocaleString([], dateLocaleStringOptions)}`;
   }
 
   const finishBook = async () => {
