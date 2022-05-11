@@ -57,13 +57,19 @@ export const BookDetailsScreen = () => {
   const showActionMenu = useStore((state) => state.showActionMenu);
   const setShowActionMenu = useStore((state) => state.setShowActionMenu);
 
-  let timeline = `Started: ${book.started
-    .toDate()
-    .toLocaleString([], dateLocaleStringOptions)}`;
+  const startDate =
+    book.started instanceof Date
+      ? book.started.toLocaleString([], dateLocaleStringOptions)
+      : book.started.toDate().toLocaleString([], dateLocaleStringOptions);
+
+  let timeline = `Started: ${startDate}`;
   if (book.finished) {
-    timeline += `\nFinished: ${book.finished
-      .toDate()
-      .toLocaleString([], dateLocaleStringOptions)}`;
+    const finishDate =
+      book.finished instanceof Date
+        ? book.finished.toLocaleString([], dateLocaleStringOptions)
+        : book.finished.toDate().toLocaleString([], dateLocaleStringOptions);
+
+    timeline += `\nFinished: ${finishDate}`;
   }
 
   const finishBook = async () => {

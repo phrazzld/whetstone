@@ -1,3 +1,4 @@
+import DateTimePicker from "@react-native-community/datetimepicker";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
 import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
@@ -27,7 +28,23 @@ export const EditBookScreen = () => {
   const [image, setImage] = useState<any>(null);
   const [imageUploadProgress, setImageUploadProgress] = useState(0);
   const [showImageUploadProgress, setShowImageUploadProgress] = useState(false);
+
+  const [startDate, setStartDate] = useState<Date>(book.started.toDate());
+  const [finishDate, setFinishDate] = useState<Date | null>(
+    book.finished?.toDate()
+  );
+
   const setStaleBookImage = useStore((state) => state.setStaleBookImage);
+
+  const onStartDatePickerChange = (event, selectedDate) => {
+    const date = selectedDate;
+    setStartDate(date);
+  };
+
+  const onFinishDatePickerChange = (event, selectedDate) => {
+    const date = selectedDate;
+    setFinishDate(date);
+  };
 
   const getImage = async () => {
     if (!auth.currentUser) {
@@ -54,10 +71,14 @@ export const EditBookScreen = () => {
     }
 
     try {
-      const payload = {
+      let payload = {
         title,
         author,
+        started: new Date(startDate),
       };
+      if (!!finishDate) {
+        payload.finished = new Date(finishDate);
+      }
       await updateBook(book.id, payload);
 
       if (!!image && !image.cancelled) {
@@ -154,6 +175,44 @@ export const EditBookScreen = () => {
           onChangeText={setAuthor}
           returnKeyType="done"
         />
+        <View
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "flex-start",
+            marginVertical: 10,
+          }}
+        >
+          <Text>Started:</Text>
+          <DateTimePicker
+            style={{ width: "40%" }}
+            value={startDate}
+            mode="date"
+            is24Hour={true}
+            onChange={onStartDatePickerChange}
+          />
+        </View>
+        {!!finishDate && (
+          <View
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "flex-start",
+              marginVertical: 10,
+            }}
+          >
+            <Text>Finished:</Text>
+            <DateTimePicker
+              style={{ width: "40%" }}
+              value={finishDate}
+              mode="date"
+              is24Hour={true}
+              onChange={onFinishDatePickerChange}
+            />
+          </View>
+        )}
         <View style={styles.buttonContainer}>
           <Button onPress={saveChanges} title="Save" />
           <Button onPress={cancel} title="Cancel" color="gray" />
