@@ -1,9 +1,9 @@
+import { useNavigation } from "@react-navigation/native";
 import { Button, SectionList, StyleSheet } from "react-native";
 import { Book } from "../components/Book";
 import { SafeAreaView, Text, View } from "../components/Themed";
-import { useUnfinishedBooks } from "../hooks/useUnfinishedBooks";
 import { useFinishedBooks } from "../hooks/useFinishedBooks";
-import { useNavigation } from "@react-navigation/native";
+import { useUnfinishedBooks } from "../hooks/useUnfinishedBooks";
 
 const BooksScreen = () => {
   const unfinishedBooks = useUnfinishedBooks();
@@ -46,7 +46,9 @@ const BooksScreen = () => {
           renderItem={renderItem}
           keyExtractor={(item) => item.id}
           renderSectionHeader={({ section: { title } }) => (
-            <Text style={styles.sectionHeader}>{title}</Text>
+            <View style={{ borderBottomColor: "grey", borderBottomWidth: 1 }}>
+              <Text style={styles.sectionHeader}>{title}</Text>
+            </View>
           )}
           stickySectionHeadersEnabled={false}
         />
@@ -65,7 +67,6 @@ const styles = StyleSheet.create({
     marginHorizontal: 10,
     marginBottom: 10,
     marginTop: 20,
-    paddingHorizontal: 10,
   },
 });
 

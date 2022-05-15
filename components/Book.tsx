@@ -14,6 +14,23 @@ export const Book = (props: BookProps) => {
   const navigation = useNavigation();
   const image = useBookImage(book.id, true);
 
+  const truncate = (s: string): string => {
+    const MAX_LENGTH = 35;
+    return s.length > MAX_LENGTH ? s.slice(0, MAX_LENGTH).concat("...") : s;
+  };
+
+  const timeline = book.finished
+    ? book.started
+        .toDate()
+        .toLocaleString([], dateLocaleStringOptions)
+        .concat(" - ")
+        .concat(
+          book.finished.toDate().toLocaleString([], dateLocaleStringOptions)
+        )
+    : `Started: ${book.started
+        .toDate()
+        .toLocaleString([], dateLocaleStringOptions)}`;
+
   return (
     <TouchableOpacity
       style={styles.book}
@@ -27,23 +44,18 @@ export const Book = (props: BookProps) => {
         )}
       </View>
       <View
-        style={{ display: "flex", flex: 1, justifyContent: "space-between" }}
+        style={{
+          display: "flex",
+          flex: 1,
+          justifyContent: "space-between",
+          paddingVertical: 5,
+        }}
       >
         <View>
-          <Text style={styles.title}>{book.title}</Text>
-          <Text style={styles.author}>{book.author}</Text>
+          <Text style={styles.title}>{truncate(book.title)}</Text>
+          <Text style={styles.author}>{truncate(book.author)}</Text>
         </View>
-        {book.finished ? (
-          <Text style={styles.date}>
-            Finished:{" "}
-            {book.finished.toDate().toLocaleString([], dateLocaleStringOptions)}
-          </Text>
-        ) : (
-          <Text style={styles.date}>
-            Started:{" "}
-            {book.started.toDate().toLocaleString([], dateLocaleStringOptions)}
-          </Text>
-        )}
+        <Text style={styles.date}>{timeline}</Text>
       </View>
     </TouchableOpacity>
   );
@@ -53,15 +65,13 @@ const styles = StyleSheet.create({
   book: {
     flex: 1,
     flexDirection: "row",
-    marginHorizontal: 10,
-    marginBottom: 15,
-    paddingHorizontal: 10,
+    borderBottomColor: "grey",
+    borderBottomWidth: 1,
   },
   image: {
     height: 80,
     width: 80,
     resizeMode: "cover",
-    borderRadius: 5,
   },
   author: {
     fontSize: 14,
@@ -71,7 +81,8 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   title: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: "400",
+    marginRight: 5,
   },
 });
