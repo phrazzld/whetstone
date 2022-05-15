@@ -50,4 +50,7 @@ export type TNote = {
   bookId: string;
   content: string;
   createdAt: any;
+  type: "note" | "vocab";
+  word: string;
+  definition: string;
 };

@@ -3,14 +3,13 @@
  * https://docs.expo.io/guides/color-schemes/
  */
 
+import { FontAwesome as DefaultFontAwesome } from "@expo/vector-icons";
 import {
   SafeAreaView as DefaultSafeAreaView,
   Text as DefaultText,
   TextInput as DefaultTextInput,
   View as DefaultView,
 } from "react-native";
-import { FontAwesome as DefaultFontAwesome } from "@expo/vector-icons";
-
 import Colors from "../constants/Colors";
 import useColorScheme from "../hooks/useColorScheme";
 

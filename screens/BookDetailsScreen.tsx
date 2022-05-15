@@ -5,6 +5,7 @@ import {
   ActivityIndicator,
   Alert,
   Button,
+  Dimensions,
   Image,
   ScrollView,
   StyleSheet,
@@ -17,6 +18,8 @@ import { useBookImage } from "../hooks/useBookImage";
 import { useNotes } from "../hooks/useNotes";
 import { dateLocaleStringOptions } from "../utils";
 import { useStore } from "../zstore";
+
+const windowWidth = Dimensions.get("window").width;
 
 interface ActionMenuItemProps {
   text: string;
@@ -62,17 +65,15 @@ export const BookDetailsScreen = () => {
       ? book.started.toLocaleString([], dateLocaleStringOptions)
       : book.started.toDate().toLocaleString([], dateLocaleStringOptions);
 
-  let timeline = `Started: ${startDate}`;
-  if (book.finished) {
-    const finishDate =
-      book.finished instanceof Date
-        ? book.finished.toLocaleString([], dateLocaleStringOptions)
-        : book.finished.toDate().toLocaleString([], dateLocaleStringOptions);
+  const timeline = book.finished
+    ? startDate
+        .concat(" - ")
+        .concat(
+          book.finished.toDate().toLocaleString([], dateLocaleStringOptions)
+        )
+    : `Started: ${startDate}`;
 
-    timeline += `\nFinished: ${finishDate}`;
-  }
-
-  const finishBook = async () => {
+  const finishBook = async (): Promise<void> => {
     setShowActionMenu(false);
     setLoading(true);
     await updateBook(book.id, { finished: new Date() });
@@ -80,7 +81,7 @@ export const BookDetailsScreen = () => {
     navigation.goBack();
   };
 
-  const removeBook = async () => {
+  const removeBook = async (): Promise<void> => {
     setShowActionMenu(false);
     Alert.alert(
       "Delete Book",
@@ -121,7 +122,7 @@ export const BookDetailsScreen = () => {
     );
   };
 
-  const editBook = () => {
+  const editBook = (): void => {
     setShowActionMenu(false);
     navigation.navigate("EditBook", { book });
   };
@@ -172,19 +173,34 @@ export const BookDetailsScreen = () => {
   }
 
   return (
-    <View>
+    <View style={{ height: "100%" }}>
       <ScrollView>
         <View style={styles.container}>
           <View>
-            <View style={{ flex: 1, flexDirection: "row", marginBottom: 10 }}>
-              <View style={{ marginRight: 10 }}>
-                {!!image ? (
-                  <Image style={styles.image} source={{ uri: image }} />
-                ) : (
-                  <View style={styles.image}></View>
-                )}
-              </View>
-              <View>
+            <View style={{ marginRight: 10 }}>
+              {!!image ? (
+                <Image
+                  style={{
+                    width: windowWidth,
+                    height: windowWidth,
+                  }}
+                  source={{ uri: image }}
+                />
+              ) : (
+                <View
+                  style={{ width: windowWidth, height: windowWidth }}
+                ></View>
+              )}
+              <View
+                style={{
+                  margin: 5,
+                  padding: 5,
+                  marginBottom: 10,
+                  paddingBottom: 10,
+                  borderBottomColor: "grey",
+                  borderBottomWidth: 1,
+                }}
+              >
                 <Text style={styles.title}>{book.title}</Text>
                 <Text style={styles.author}>{book.author}</Text>
                 <Text style={[styles.author, { fontSize: 12, marginTop: 10 }]}>
@@ -234,19 +250,15 @@ export const BookDetailsScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 15,
     justifyContent: "space-between",
   },
   author: {
-    fontSize: 14,
+    fontSize: 16,
+    paddingBottom: 5,
   },
   title: {
-    fontSize: 16,
-    fontWeight: "bold",
-  },
-  image: {
-    height: 80,
-    width: 80,
-    borderRadius: 5,
+    fontSize: 18,
+    fontWeight: "500",
+    paddingBottom: 5,
   },
 });

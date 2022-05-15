@@ -36,21 +36,14 @@ export const Book = (props: BookProps) => {
       style={styles.book}
       onPress={() => navigation.navigate("BookDetails", { book })}
     >
-      <View style={{ marginRight: 10 }}>
+      <View style={styles.imageContainer}>
         {!!image ? (
           <Image style={styles.image} source={{ uri: image }} />
         ) : (
           <View style={styles.image}></View>
         )}
       </View>
-      <View
-        style={{
-          display: "flex",
-          flex: 1,
-          justifyContent: "space-between",
-          paddingVertical: 5,
-        }}
-      >
+      <View style={styles.bookDetails}>
         <View>
           <Text style={styles.title}>{truncate(book.title)}</Text>
           <Text style={styles.author}>{truncate(book.author)}</Text>
@@ -68,10 +61,19 @@ const styles = StyleSheet.create({
     borderBottomColor: "grey",
     borderBottomWidth: 1,
   },
+  bookDetails: {
+    display: "flex",
+    flex: 1,
+    justifyContent: "space-between",
+    paddingVertical: 5,
+  },
   image: {
     height: 80,
     width: 80,
     resizeMode: "cover",
+  },
+  imageContainer: {
+    marginRight: 10,
   },
   author: {
     fontSize: 14,

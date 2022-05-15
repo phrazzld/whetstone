@@ -2,11 +2,12 @@ import { Alert, StyleSheet, TouchableOpacity } from "react-native";
 import Colors from "../constants/Colors";
 import { deleteNote } from "../firebase";
 import useColorScheme from "../hooks/useColorScheme";
+import { TNote } from "../types";
 import { dateLocaleStringOptions } from "../utils";
 import { FontAwesome, Text, View } from "./Themed";
 
 interface NoteProps {
-  note: any;
+  note: TNote;
   selected: boolean;
   onPress: (id: string) => void;
 }
@@ -122,6 +123,7 @@ const styles = StyleSheet.create({
     paddingTop: 20,
     borderTopColor: "grey",
     borderTopWidth: 1,
+    paddingHorizontal: 10,
   },
   timestamp: {
     fontSize: 11,
