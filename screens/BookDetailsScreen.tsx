@@ -60,9 +60,6 @@ export const BookDetailsScreen = () => {
   const showActionMenu = useStore((state) => state.showActionMenu);
   const setShowActionMenu = useStore((state) => state.setShowActionMenu);
 
-  console.log("book:", book);
-  console.log("book.finished:", book.finished);
-
   const startDate =
     book.started instanceof Date
       ? book.started.toLocaleString([], dateLocaleStringOptions)
