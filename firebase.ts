@@ -58,8 +58,15 @@ export const createBook = async (newBook: any): Promise<any> => {
 };
 
 export const getBooks = async (): Promise<Array<any>> => {
+  if (!auth.currentUser) {
+    throw new Error("Cannot get books, no user is logged in.");
+  }
+
   let books: Array<any> = [];
-  const booksQuery = query(collection(db, "books"));
+  const booksQuery = query(
+    collection(db, "books"),
+    where("userId", "==", auth.currentUser.uid)
+  );
   const snapshot = await getDocs(booksQuery);
   if (snapshot.empty) {
     console.log("No books found.");
@@ -72,10 +79,15 @@ export const getBooks = async (): Promise<Array<any>> => {
 };
 
 export const getFinishedBooks = async (): Promise<Array<any>> => {
+  if (!auth.currentUser) {
+    throw new Error("Cannot get books, no user is logged in.");
+  }
+
   let books: Array<any> = [];
   const booksQuery = query(
     collection(db, "books"),
     where("finished", "!=", null),
+    where("userId", "==", auth.currentUser.uid),
     orderBy("finished")
   );
   const snapshot = await getDocs(booksQuery);
@@ -90,10 +102,15 @@ export const getFinishedBooks = async (): Promise<Array<any>> => {
 };
 
 export const getUnfinishedBooks = async (): Promise<Array<any>> => {
+  if (!auth.currentUser) {
+    throw new Error("Cannot get books, no user is logged in.");
+  }
+
   let books: Array<any> = [];
   const booksQuery = query(
     collection(db, "books"),
     where("finished", "==", null),
+    where("userId", "==", auth.currentUser.uid),
     orderBy("started")
   );
   const snapshot = await getDocs(booksQuery);
