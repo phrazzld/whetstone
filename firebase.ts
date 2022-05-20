@@ -159,15 +159,13 @@ export const updateBook = async (
 // Notes
 
 export const createNote = (newNote: any): void => {
-  addDoc(collection(db, "notes"), newNote);
+  const bookRef = doc(db, "books", newNote.bookId);
+  addDoc(collection(bookRef, "notes"), newNote);
 };
 
 export const getBookNotes = async (bookId: string): Promise<Array<any>> => {
   let notes: Array<any> = [];
-  const notesQuery = query(
-    collection(db, "notes"),
-    where("bookId", "==", bookId)
-  );
+  const notesQuery = query(collection(db, "books", bookId, "notes"));
   const snapshot = await getDocs(notesQuery);
   if (snapshot.empty) {
     console.log("No notes found.");
@@ -179,10 +177,13 @@ export const getBookNotes = async (bookId: string): Promise<Array<any>> => {
   return notes;
 };
 
-export const deleteNote = async (noteId: string): Promise<void> => {
+export const deleteNote = async (
+  bookId: string,
+  noteId: string
+): Promise<void> => {
   try {
-    const noteRef = doc(collection(db, "notes"), noteId);
-    await deleteDoc(noteRef);
+    const bookRef = doc(db, "books", bookId);
+    await deleteDoc(doc(bookRef, "notes", noteId));
   } catch (err) {
     console.error("error deleting note:", err);
   }

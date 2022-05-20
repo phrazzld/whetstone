@@ -1,21 +1,14 @@
-import { useState, useEffect } from "react";
-import {
-  orderBy,
-  query,
-  collection,
-  where,
-  onSnapshot,
-} from "firebase/firestore";
-import { TNote } from "../types";
+import { collection, onSnapshot, orderBy, query } from "firebase/firestore";
+import { useEffect, useState } from "react";
 import { db } from "../firebase";
+import { TNote } from "../types";
 
 export const useNotes = (bookId: string): Array<TNote> => {
   const [notes, setNotes] = useState<Array<TNote>>([]);
 
   useEffect(() => {
     const notesQuery = query(
-      collection(db, "notes"),
-      where("bookId", "==", bookId),
+      collection(db, "books", bookId, "notes"),
       orderBy("createdAt", "desc")
     );
     const unsubscribe = onSnapshot(notesQuery, (snapshot) => {

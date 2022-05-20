@@ -39,16 +39,13 @@ export const ProfileScreen = () => {
 
             // Get books and notes
             const books = await getBooks();
-            let notes: Array<any> = [];
+            console.log("Deleting notes...");
             for (const book of books) {
               const bookNotes = await getBookNotes(book.id);
-              notes = notes.concat(bookNotes);
-            }
-
-            // Delete notes
-            console.log("Deleting notes...");
-            for (const note of notes) {
-              await deleteNote(note.id);
+              // Delete notes
+              for (const note of bookNotes) {
+                await deleteNote(book.id, note.id);
+              }
             }
             console.log("Notes deleted.");
 

@@ -66,6 +66,7 @@ export const SignUpScreen = () => {
           keyboardType="email-address"
           autoCapitalize="none"
           returnKeyType="next"
+          testID="EmailInput"
         />
         <TextInput
           placeholder="Password"
@@ -73,12 +74,13 @@ export const SignUpScreen = () => {
           value={password}
           onChangeText={setPassword}
           returnKeyType="done"
+          testID="PasswordInput"
           secureTextEntry
         />
         {!!error && <Text style={styles.error}>{error}</Text>}
         <View style={styles.actions}>
-          <Button title="Sign Up" onPress={signUp} />
-          <Button title="Sign In" onPress={signIn} />
+          <Button title="Sign Up" onPress={signUp} testID="SignUpButton" />
+          <Button title="Sign In" onPress={signIn} testID="SignInButton" />
         </View>
       </KeyboardAvoidingView>
     </SafeAreaView>

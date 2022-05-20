@@ -229,6 +229,7 @@ export const BookDetailsScreen = () => {
                 <Note
                   key={note.id}
                   note={note}
+                  bookId={book.id}
                   selected={selectedNote === note.id}
                   onPress={selectNote}
                 />

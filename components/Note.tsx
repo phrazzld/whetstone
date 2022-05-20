@@ -8,12 +8,13 @@ import { FontAwesome, Text, View } from "./Themed";
 
 interface NoteProps {
   note: TNote;
+  bookId: string;
   selected: boolean;
   onPress: (id: string) => void;
 }
 
 export const Note = (props: NoteProps) => {
-  const { note, selected, onPress } = props;
+  const { note, bookId, selected, onPress } = props;
   const colorScheme = useColorScheme();
 
   const removeNote = async () => {
@@ -28,7 +29,7 @@ export const Note = (props: NoteProps) => {
         style: "destructive",
         onPress: async () => {
           // Delete note from database
-          await deleteNote(note.id);
+          await deleteNote(bookId, note.id);
         },
       },
     ]);
