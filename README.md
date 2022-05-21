@@ -1,6 +1,6 @@
 # Whetstone
 
-Whetstone is a mobile app for tracking your reading. It's like a trimmed down, open-source Goodreads with a focus on notes, and none of the social features.
+Whetstone is a mobile app for tracking your reading. It's like a trimmed down, open-source Goodreads with a focus on notes, and none of the ads or social features.
 
 [![GitHub license](https://img.shields.io/github/license/phrazzld/whetstone)](https://github.com/phrazzld/whetstone/blob/master/LICENSE)
 
