@@ -1,3 +1,5 @@
+import { useNavigation } from "@react-navigation/native";
+import { useRef } from "react";
 import { Alert, Animated, StyleSheet } from "react-native";
 import { RectButton } from "react-native-gesture-handler";
 import Swipeable from "react-native-gesture-handler/Swipeable";
@@ -16,8 +18,26 @@ interface NoteProps {
 export const Note = (props: NoteProps) => {
   const { note, bookId, onPress } = props;
   const colorScheme = useColorScheme();
+  const navigation = useNavigation();
+  const swipeableRef = useRef(null);
+
+  const editNote = (): void => {
+    if (swipeableRef.current) {
+      swipeableRef.current.close();
+    }
+
+    if (note.type === "vocab") {
+      navigation.navigate("AddVocab", { bookId, editVocab: note });
+    } else {
+      navigation.navigate("AddNote", { bookId, editNote: note });
+    }
+  };
 
   const removeNote = async () => {
+    if (swipeableRef.current) {
+      swipeableRef.current.close();
+    }
+
     // Ask user to confirm deletion
     Alert.alert("Delete Note?", "Are you sure you want to delete this note?", [
       {
@@ -39,7 +59,8 @@ export const Note = (props: NoteProps) => {
     text: string,
     color: string,
     x: number,
-    progress: any
+    progress: any,
+    pressHandler: any
   ): any => {
     const trans = progress.interpolate({
       inputRange: [0, 1],
@@ -49,7 +70,7 @@ export const Note = (props: NoteProps) => {
       <Animated.View style={{ flex: 1, transform: [{ translateX: 0 }] }}>
         <RectButton
           style={[styles.rightAction, { backgroundColor: color }]}
-          onPress={removeNote}
+          onPress={pressHandler}
         >
           <Text style={styles.actionText}>{text}</Text>
         </RectButton>
@@ -60,14 +81,15 @@ export const Note = (props: NoteProps) => {
   const renderRightActions = (progress: any): any => (
     <View
       style={{
-        width: "20%",
+        width: "40%",
         flexDirection: "row",
         height: "100%",
         marginTop: "auto",
         marginBottom: "auto",
       }}
     >
-      {renderRightAction("Delete", "red", 64, progress)}
+      {renderRightAction("Edit", "#ffab00", 128, progress, editNote)}
+      {renderRightAction("Delete", "red", 64, progress, removeNote)}
     </View>
   );
 
@@ -76,6 +98,7 @@ export const Note = (props: NoteProps) => {
       renderRightActions={renderRightActions}
       friction={2}
       rightThreshold={40}
+      ref={swipeableRef}
     >
       <View
         style={[
@@ -198,5 +221,7 @@ const styles = StyleSheet.create({
     color: "white",
     backgroundColor: "transparent",
     padding: 10,
+    fontSize: 15,
+    fontWeight: "500",
   },
 });

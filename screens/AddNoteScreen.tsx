@@ -8,22 +8,36 @@ import {
   StyleSheet,
 } from "react-native";
 import { SafeAreaView, TextInput, View } from "../components/Themed";
-import { auth, createNote } from "../firebase";
+import { auth, createNote, updateNote } from "../firebase";
 
 export const AddNoteScreen = () => {
-  const [content, setContent] = useState("");
-  const [page, setPage] = useState("");
-  const { bookId } = useRoute().params;
+  const { bookId, editNote } = useRoute().params;
+  const [content, setContent] = useState(editNote?.content);
+  const [page, setPage] = useState(editNote?.page);
   const navigation = useNavigation();
 
   const addNote = () => {
-    if (!auth.currentUser) {
-      throw new Error("Cannot add note, user is not logged in.");
-    }
-
     const note = { type: "note", content, bookId, page, createdAt: new Date() };
     createNote(note);
     navigation.goBack();
+  };
+
+  const modifyNote = () => {
+    const payload = { type: "note", content, page, updatedAt: new Date() };
+    updateNote(bookId, editNote.id, payload);
+    navigation.goBack();
+  };
+
+  const save = () => {
+    if (!auth.currentUser) {
+      throw new Error("Cannot save note, user is not logged in.");
+    }
+
+    if (editNote) {
+      modifyNote();
+    } else {
+      addNote();
+    }
   };
 
   const cancel = () => {
@@ -52,7 +66,7 @@ export const AddNoteScreen = () => {
           keyboardType="numeric"
         />
         <View style={styles.buttonContainer}>
-          <Button onPress={addNote} title="Save" />
+          <Button onPress={save} title="Save" />
           <Button onPress={cancel} title="Cancel" color="gray" />
         </View>
 

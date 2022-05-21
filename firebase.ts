@@ -152,7 +152,7 @@ export const updateBook = async (
     const bookRef = doc(collection(db, "books"), bookId);
     await setDoc(bookRef, payload, { merge: true });
   } catch (err) {
-    console.error("error finishing book:", err);
+    console.error("error updating book:", err);
   }
 };
 
@@ -186,5 +186,19 @@ export const deleteNote = async (
     await deleteDoc(doc(bookRef, "notes", noteId));
   } catch (err) {
     console.error("error deleting note:", err);
+  }
+};
+
+export const updateNote = async (
+  bookId: string,
+  noteId: string,
+  payload: any
+): Promise<void> => {
+  try {
+    const bookRef = doc(db, "books", bookId);
+    const noteRef = doc(bookRef, "notes", noteId);
+    await setDoc(noteRef, payload, { merge: true });
+  } catch (err) {
+    console.error("error updating book:", err);
   }
 };

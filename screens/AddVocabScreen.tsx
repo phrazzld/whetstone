@@ -8,7 +8,7 @@ import {
   StyleSheet,
 } from "react-native";
 import { SafeAreaView, TextInput, View } from "../components/Themed";
-import { auth, createNote } from "../firebase";
+import { auth, createNote, updateNote } from "../firebase";
 
 interface DictionaryDefinition {
   definition: string;
@@ -29,17 +29,13 @@ interface DictionaryWord {
 }
 
 export const AddVocabScreen = () => {
-  const [word, setWord] = useState("");
-  const [definition, setDefinition] = useState("");
-  const [page, setPage] = useState("");
-  const { bookId } = useRoute().params;
+  const { bookId, editVocab } = useRoute().params;
+  const [word, setWord] = useState(editVocab?.word);
+  const [definition, setDefinition] = useState(editVocab?.definition);
+  const [page, setPage] = useState(editVocab?.page);
   const navigation = useNavigation();
 
   const addVocab = (): void => {
-    if (!auth.currentUser) {
-      throw new Error("Cannot add vocab, user is not logged in.");
-    }
-
     const vocab = {
       type: "vocab",
       word,
@@ -50,6 +46,30 @@ export const AddVocabScreen = () => {
     };
     createNote(vocab);
     navigation.goBack();
+  };
+
+  const modifyVocab = () => {
+    const payload = {
+      type: "vocab",
+      word,
+      definition,
+      page,
+      updatedAt: new Date(),
+    };
+    updateNote(bookId, editVocab.id, payload);
+    navigation.goBack();
+  };
+
+  const save = () => {
+    if (!auth.currentUser) {
+      throw new Error("Cannot save note, user is not logged in.");
+    }
+
+    if (editVocab) {
+      modifyVocab();
+    } else {
+      addVocab();
+    }
   };
 
   const cancel = (): void => {
@@ -109,7 +129,7 @@ export const AddVocabScreen = () => {
           keyboardType="numeric"
         />
         <View style={styles.buttonContainer}>
-          <Button onPress={addVocab} title="Save" />
+          <Button onPress={save} title="Save" />
           <Button onPress={cancel} title="Cancel" color="gray" />
         </View>
 
