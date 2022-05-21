@@ -53,4 +53,5 @@ export type TNote = {
   type: "note" | "vocab";
   word: string;
   definition: string;
+  page: number;
 };

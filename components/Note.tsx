@@ -1,4 +1,6 @@
-import { Alert, StyleSheet, TouchableOpacity } from "react-native";
+import { Alert, Animated, StyleSheet } from "react-native";
+import { RectButton } from "react-native-gesture-handler";
+import Swipeable from "react-native-gesture-handler/Swipeable";
 import Colors from "../constants/Colors";
 import { deleteNote } from "../firebase";
 import useColorScheme from "../hooks/useColorScheme";
@@ -9,12 +11,10 @@ import { FontAwesome, Text, View } from "./Themed";
 interface NoteProps {
   note: TNote;
   bookId: string;
-  selected: boolean;
-  onPress: (id: string) => void;
 }
 
 export const Note = (props: NoteProps) => {
-  const { note, bookId, selected, onPress } = props;
+  const { note, bookId, onPress } = props;
   const colorScheme = useColorScheme();
 
   const removeNote = async () => {
@@ -35,30 +35,67 @@ export const Note = (props: NoteProps) => {
     ]);
   };
 
+  const renderRightAction = (
+    text: string,
+    color: string,
+    x: number,
+    progress: any
+  ): any => {
+    const trans = progress.interpolate({
+      inputRange: [0, 1],
+      outputRange: [x, 0],
+    });
+    return (
+      <Animated.View style={{ flex: 1, transform: [{ translateX: 0 }] }}>
+        <RectButton
+          style={[styles.rightAction, { backgroundColor: color }]}
+          onPress={removeNote}
+        >
+          <Text style={styles.actionText}>{text}</Text>
+        </RectButton>
+      </Animated.View>
+    );
+  };
+
+  const renderRightActions = (progress: any): any => (
+    <View
+      style={{
+        width: "20%",
+        flexDirection: "row",
+        height: "100%",
+        marginTop: "auto",
+        marginBottom: "auto",
+      }}
+    >
+      {renderRightAction("Delete", "red", 64, progress)}
+    </View>
+  );
+
   return (
-    <TouchableOpacity onPress={() => onPress(note.id)} style={styles.note}>
-      <View style={{ flex: 1, flexDirection: "row", alignItems: "center" }}>
-        <View style={styles.main}>
-          {!!note.content && <Text style={styles.content}>{note.content}</Text>}
+    <Swipeable
+      renderRightActions={renderRightActions}
+      friction={2}
+      rightThreshold={40}
+    >
+      <View
+        style={[
+          styles.note,
+          { backgroundColor: Colors[colorScheme].background },
+        ]}
+      >
+        <View style={{ flex: 1, flexDirection: "row", alignItems: "center" }}>
+          <View style={styles.main}>
+            {!!note.content && (
+              <Text style={styles.content}>{note.content}</Text>
+            )}
 
-          {note.type === "vocab" && (
-            <>
-              <Text style={styles.word}>{note.word}</Text>
-              <Text style={styles.definition}>{note.definition}</Text>
-            </>
-          )}
+            {note.type === "vocab" && (
+              <>
+                <Text style={styles.word}>{note.word}</Text>
+                <Text style={styles.definition}>{note.definition}</Text>
+              </>
+            )}
 
-          <View
-            style={{
-              display: "flex",
-              flex: 1,
-              flexDirection: "row",
-              alignItems: "center",
-            }}
-          >
-            <View style={styles.noteTypeContainer}>
-              <Text style={styles.noteType}>{note.type || "note"}</Text>
-            </View>
             <View
               style={{
                 display: "flex",
@@ -67,61 +104,59 @@ export const Note = (props: NoteProps) => {
                 alignItems: "center",
               }}
             >
-              <FontAwesome
-                name="clock-o"
-                size={15}
-                color={Colors[colorScheme].text}
-                style={{ marginRight: 10 }}
-              />
-              <Text style={styles.timestamp}>
-                {note.createdAt
-                  .toDate()
-                  .toLocaleString([], dateLocaleStringOptions)}
-              </Text>
-            </View>
-
-            {!!note.page && (
-              <View style={{ display: "flex", flex: 1, flexDirection: "row" }}>
+              <View style={styles.noteTypeContainer}>
+                <Text style={styles.noteType}>{note.type || "note"}</Text>
+              </View>
+              <View
+                style={{
+                  display: "flex",
+                  flex: 1,
+                  flexDirection: "row",
+                  alignItems: "center",
+                }}
+              >
                 <FontAwesome
-                  name="sticky-note-o"
+                  name="clock-o"
                   size={15}
                   color={Colors[colorScheme].text}
                   style={{ marginRight: 10 }}
                 />
-                <Text style={styles.timestamp}>Page {note.page}</Text>
+                <Text style={styles.timestamp}>
+                  {note.createdAt
+                    .toDate()
+                    .toLocaleString([], dateLocaleStringOptions)}
+                </Text>
               </View>
-            )}
+
+              {!!note.page && (
+                <View
+                  style={{ display: "flex", flex: 1, flexDirection: "row" }}
+                >
+                  <FontAwesome
+                    name="sticky-note-o"
+                    size={15}
+                    color={Colors[colorScheme].text}
+                    style={{ marginRight: 10 }}
+                  />
+                  <Text style={styles.timestamp}>Page {note.page}</Text>
+                </View>
+              )}
+            </View>
           </View>
         </View>
       </View>
-
-      <View style={styles.actions}>
-        {selected && (
-          <TouchableOpacity onPress={removeNote}>
-            <FontAwesome name="trash" size={24} color="#cc0000" />
-          </TouchableOpacity>
-        )}
-      </View>
-    </TouchableOpacity>
+    </Swipeable>
   );
 };
 
 const styles = StyleSheet.create({
-  actions: {
-    width: "5%",
-    alignItems: "center",
-    justifyContent: "center",
-  },
   main: {
-    width: "95%",
+    width: "100%",
   },
   note: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginTop: 10,
-    marginBottom: 10,
-    borderRadius: 10,
-    paddingTop: 20,
+    paddingVertical: 20,
     borderTopColor: "grey",
     borderTopWidth: 1,
     paddingHorizontal: 10,
@@ -153,5 +188,15 @@ const styles = StyleSheet.create({
   noteType: {
     fontSize: 11,
     textAlign: "center",
+  },
+  rightAction: {
+    alignItems: "center",
+    justifyContent: "center",
+    flex: 1,
+  },
+  actionText: {
+    color: "white",
+    backgroundColor: "transparent",
+    padding: 10,
   },
 });

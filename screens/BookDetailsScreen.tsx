@@ -53,7 +53,6 @@ const ActionMenuItem = (props: ActionMenuItemProps) => {
 export const BookDetailsScreen = () => {
   const { book } = useRoute().params;
   const [loading, setLoading] = useState(false);
-  const [selectedNote, setSelectedNote] = useState("");
   const navigation = useNavigation();
   const notes = useNotes(book.id);
   const image = useBookImage(book.id, true);
@@ -139,14 +138,6 @@ export const BookDetailsScreen = () => {
     navigation.navigate("AddVocab", { bookId: book.id });
   };
 
-  const selectNote = (id: string): void => {
-    if (selectedNote === id) {
-      setSelectedNote("");
-    } else {
-      setSelectedNote(id);
-    }
-  };
-
   const ActionMenu = () => {
     return (
       <View
@@ -181,7 +172,7 @@ export const BookDetailsScreen = () => {
       <ScrollView>
         <View style={styles.container}>
           <View>
-            <View style={{ marginRight: 10 }}>
+            <View>
               {!!image ? (
                 <Image
                   style={{
@@ -197,10 +188,8 @@ export const BookDetailsScreen = () => {
               )}
               <View
                 style={{
-                  margin: 5,
-                  padding: 5,
+                  padding: 10,
                   marginBottom: 10,
-                  paddingBottom: 10,
                   borderBottomColor: "grey",
                   borderBottomWidth: 1,
                 }}
@@ -220,19 +209,14 @@ export const BookDetailsScreen = () => {
                   flex: 1,
                   flexDirection: "row",
                   justifyContent: "space-evenly",
+                  paddingBottom: 10,
                 }}
               >
                 <Button title="Add Note" onPress={addNote} />
                 <Button title="Add Vocab" onPress={addVocab} />
               </View>
               {notes.map((note) => (
-                <Note
-                  key={note.id}
-                  note={note}
-                  bookId={book.id}
-                  selected={selectedNote === note.id}
-                  onPress={selectNote}
-                />
+                <Note key={note.id} note={note} bookId={book.id} />
               ))}
             </View>
 
