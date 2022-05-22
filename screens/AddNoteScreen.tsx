@@ -12,19 +12,23 @@ import { auth, createNote, updateNote } from "../firebase";
 
 export const AddNoteScreen = () => {
   const { bookId, editNote } = useRoute().params;
-  const [content, setContent] = useState(editNote?.content);
-  const [page, setPage] = useState(editNote?.page);
+  const [content, setContent] = useState(editNote?.content || "");
+  const [page, setPage] = useState(editNote?.page || "");
   const navigation = useNavigation();
 
   const addNote = () => {
     const note = { type: "note", content, bookId, page, createdAt: new Date() };
-    createNote(note);
+    if (!!content || !!page) {
+      createNote(note);
+    }
     navigation.goBack();
   };
 
   const modifyNote = () => {
     const payload = { type: "note", content, page, updatedAt: new Date() };
-    updateNote(bookId, editNote.id, payload);
+    if (!!content || !!page) {
+      updateNote(bookId, editNote.id, payload);
+    }
     navigation.goBack();
   };
 

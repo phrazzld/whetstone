@@ -1,4 +1,5 @@
 import { useNavigation } from "@react-navigation/native";
+import { Badge } from "@rneui/themed";
 import { useRef } from "react";
 import { Alert, Animated, StyleSheet } from "react-native";
 import { RectButton } from "react-native-gesture-handler";
@@ -9,6 +10,45 @@ import useColorScheme from "../hooks/useColorScheme";
 import { TNote } from "../types";
 import { dateLocaleStringOptions } from "../utils";
 import { FontAwesome, Text, View } from "./Themed";
+
+interface NoteTypeBadgeProps {
+  noteType: "bookmark" | "vocab" | "note" | "quote";
+}
+
+const NoteTypeBadge = (props: NoteTypeBadgeProps) => {
+  const { noteType } = props;
+  let icon;
+
+  switch (noteType) {
+    case "bookmark":
+      icon = "bookmark";
+      break;
+    case "vocab":
+      icon = "font";
+      break;
+    case "note":
+      icon = "file-text";
+      break;
+    case "quote":
+      icon = "quote-left";
+      break;
+    default:
+      throw new Error(`Unrecognized noteType: ${noteType}`);
+  }
+
+  return (
+    <Badge
+      value={<FontAwesome name={icon} size={15} color="white" />}
+      status="primary"
+      containerStyle={{ marginRight: 10 }}
+      badgeStyle={{
+        height: 30,
+        borderRadius: 20,
+        width: 30,
+      }}
+    />
+  );
+};
 
 interface NoteProps {
   note: TNote;
@@ -122,20 +162,32 @@ export const Note = (props: NoteProps) => {
             <View
               style={{
                 display: "flex",
-                flex: 1,
                 flexDirection: "row",
                 alignItems: "center",
               }}
             >
-              <View style={styles.noteTypeContainer}>
-                <Text style={styles.noteType}>{note.type || "note"}</Text>
-              </View>
+              <NoteTypeBadge
+                noteType={
+                  !note.content && !note.word ? "bookmark" : note.type || "note"
+                }
+              />
+
+              {!!note.page && (
+                <View style={{}}>
+                  <Text style={[styles.timestamp, { textAlign: "left" }]}>
+                    Page {note.page}
+                  </Text>
+                </View>
+              )}
+
               <View
                 style={{
                   display: "flex",
                   flex: 1,
                   flexDirection: "row",
                   alignItems: "center",
+                  justifyContent: "flex-end",
+                  marginRight: 10,
                 }}
               >
                 <FontAwesome
@@ -150,20 +202,6 @@ export const Note = (props: NoteProps) => {
                     .toLocaleString([], dateLocaleStringOptions)}
                 </Text>
               </View>
-
-              {!!note.page && (
-                <View
-                  style={{ display: "flex", flex: 1, flexDirection: "row" }}
-                >
-                  <FontAwesome
-                    name="sticky-note-o"
-                    size={15}
-                    color={Colors[colorScheme].text}
-                    style={{ marginRight: 10 }}
-                  />
-                  <Text style={styles.timestamp}>Page {note.page}</Text>
-                </View>
-              )}
             </View>
           </View>
         </View>
@@ -179,7 +217,7 @@ const styles = StyleSheet.create({
   note: {
     flexDirection: "row",
     justifyContent: "space-between",
-    paddingVertical: 20,
+    paddingVertical: 15,
     borderTopColor: "grey",
     borderTopWidth: 1,
     paddingHorizontal: 10,
@@ -189,7 +227,7 @@ const styles = StyleSheet.create({
   },
   content: {
     fontSize: 14,
-    marginBottom: 10,
+    marginBottom: 15,
   },
   word: {
     fontWeight: "600",
@@ -198,15 +236,15 @@ const styles = StyleSheet.create({
   },
   definition: {
     fontSize: 14,
-    marginBottom: 10,
+    marginBottom: 15,
   },
   noteTypeContainer: {
     marginRight: 15,
-    width: "12%",
+    width: "15%",
     borderRadius: 5,
     borderColor: "grey",
     borderWidth: 1,
-    paddingVertical: 3,
+    paddingVertical: 5,
   },
   noteType: {
     fontSize: 11,

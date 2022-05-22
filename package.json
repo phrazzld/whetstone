@@ -31,6 +31,8 @@
     "@react-navigation/bottom-tabs": "^6.0.5",
     "@react-navigation/native": "^6.0.10",
     "@react-navigation/native-stack": "^6.1.0",
+    "@rneui/base": "^4.0.0-rc.4",
+    "@rneui/themed": "^4.0.0-rc.4",
     "expo": "~44.0.0",
     "expo-asset": "~8.4.4",
     "expo-constants": "~13.0.0",
