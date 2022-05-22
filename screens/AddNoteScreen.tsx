@@ -17,9 +17,9 @@ export const AddNoteScreen = () => {
   const navigation = useNavigation();
 
   const addNote = () => {
-    const note = { type: "note", content, bookId, page, createdAt: new Date() };
+    const note = { type: "note", content, page, createdAt: new Date() };
     if (!!content || !!page) {
-      createNote(note);
+      createNote(bookId, note);
     }
     navigation.goBack();
   };

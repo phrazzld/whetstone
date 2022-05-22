@@ -18,9 +18,8 @@ export const useUnfinishedBooks = () => {
     }
 
     const booksQuery = query(
-      collection(db, "books"),
+      collection(db, "users", auth.currentUser.uid, "books"),
       where("finished", "==", null),
-      where("userId", "==", auth.currentUser.uid),
       orderBy("started", "desc")
     );
 

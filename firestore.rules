@@ -4,14 +4,14 @@ service cloud.firestore {
     match /{document=**} {
       allow read, write: if false;
     }
-    match /books/{bookId} {
-      allow read, write: if (resource.data.userId == request.auth.uid)
-      match /notes/{noteId} {
-        allow read, write: if get(/databases/$(database)/documents/books/$(bookId)).data.userId == request.auth.uid;
+    match /users/{userId} {
+      allow read, write: if userId == request.auth.uid;
+      match /books/{bookId} {
+        allow read, write: if userId == request.auth.uid;
+        match /notes/{noteId} {
+          allow read, write: if userId == request.auth.uid;
+        }
       }
-    }
-    match /notes/{noteId} {
-      allow read, write: if false
     }
   }
 }

@@ -30,9 +30,9 @@ interface DictionaryWord {
 
 export const AddVocabScreen = () => {
   const { bookId, editVocab } = useRoute().params;
-  const [word, setWord] = useState(editVocab?.word);
-  const [definition, setDefinition] = useState(editVocab?.definition);
-  const [page, setPage] = useState(editVocab?.page);
+  const [word, setWord] = useState(editVocab?.word || "");
+  const [definition, setDefinition] = useState(editVocab?.definition || "");
+  const [page, setPage] = useState(editVocab?.page || "");
   const navigation = useNavigation();
 
   const addVocab = (): void => {
@@ -40,11 +40,10 @@ export const AddVocabScreen = () => {
       type: "vocab",
       word,
       definition,
-      bookId,
       page,
       createdAt: new Date(),
     };
-    createNote(vocab);
+    createNote(bookId, vocab);
     navigation.goBack();
   };
 

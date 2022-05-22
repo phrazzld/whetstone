@@ -50,33 +50,51 @@ describe("Firestore security rules", () => {
     it("cannot read books that belong to another user", async () => {
       const admin = getAdminFirestore();
       const bookId = "theirBook";
-      const setupDoc = admin.collection("books").doc(bookId);
+      const setupDoc = admin
+        .collection("users")
+        .doc(theirId)
+        .collection("books")
+        .doc(bookId);
       await setupDoc.set({
         userId: theirId,
         title: "This Doesn't Belong to You",
       });
 
       const db = getFirestore(myAuth);
-      const theirBook = db.collection("books").doc(bookId);
+      const theirBook = db
+        .collection("users")
+        .doc(theirId)
+        .collection("books")
+        .doc(bookId);
       await firebase.assertFails(theirBook.get());
     });
 
     it("cannot write books that belong to another user", async () => {
       const db = getFirestore(myAuth);
-      const testBook = db.collection("books").doc("testBook");
+      const testBook = db
+        .collection("users")
+        .doc(theirId)
+        .collection("books")
+        .doc("testBook");
       await firebase.assertFails(testBook.set({ title: "Forbidden" }));
     });
 
     it("cannot read notes that belong to another user", async () => {
       const admin = getAdminFirestore();
       const bookId = "theirBook";
-      const setupBook = admin.collection("books").doc(bookId);
+      const setupBook = admin
+        .collection("users")
+        .doc(theirId)
+        .collection("books")
+        .doc(bookId);
       await setupBook.set({
         userId: theirId,
         title: "This Doesn't Belong to You",
       });
       const noteId = "theirNote";
       const setupNote = admin
+        .collection("users")
+        .doc(theirId)
         .collection("books")
         .doc(bookId)
         .collection("notes")
@@ -86,20 +104,31 @@ describe("Firestore security rules", () => {
       });
 
       const db = getFirestore(myAuth);
-      const testNote = db.collection("books").doc(bookId).collection("notes");
+      const testNote = db
+        .collection("users")
+        .doc(theirId)
+        .collection("books")
+        .doc(bookId)
+        .collection("notes");
       await firebase.assertFails(testNote.get());
     });
 
     it("cannot write notes that belong to another user", async () => {
       const admin = getAdminFirestore();
       const bookId = "theirBook";
-      const setupBook = admin.collection("books").doc(bookId);
+      const setupBook = admin
+        .collection("users")
+        .doc(theirId)
+        .collection("books")
+        .doc(bookId);
       await setupBook.set({
         userId: theirId,
         title: "This Doesn't Belong to You",
       });
       const noteId = "theirNote";
       const setupNote = admin
+        .collection("users")
+        .doc(theirId)
         .collection("books")
         .doc(bookId)
         .collection("notes")
@@ -110,76 +139,90 @@ describe("Firestore security rules", () => {
 
       const db = getFirestore(myAuth);
       const testNote = db
+        .collection("users")
+        .doc(theirId)
         .collection("books")
         .doc(bookId)
         .collection("notes")
         .doc(noteId);
-      await firebase.assertFails(testNote.set({ content: "Much success." }));
+      await firebase.assertFails(testNote.set({ content: "So failure." }));
     });
 
     it("can read books that belong to the authenticated user", async () => {
       const admin = getAdminFirestore();
       const bookId = "myBook";
-      const setupBook = admin.collection("books").doc(bookId);
+      const setupBook = admin
+        .collection("users")
+        .doc(myId)
+        .collection("books")
+        .doc(bookId);
       await setupBook.set({
         userId: myId,
         title: "Lila",
       });
 
       const db = getFirestore(myAuth);
-      const testQuery = db.collection("books").where("userId", "==", myId);
+      const testQuery = db
+        .collection("users")
+        .doc(myId)
+        .collection("books")
+        .where("userId", "==", myId);
       await firebase.assertSucceeds(testQuery.get());
     });
 
     it("can write books that belong to the authenticated user", async () => {
       const admin = getAdminFirestore();
       const bookId = "myBook";
-      const setupBook = admin.collection("books").doc(bookId);
+      const setupBook = admin
+        .collection("users")
+        .doc(myId)
+        .collection("books")
+        .doc(bookId);
       await setupBook.set({
         userId: myId,
         title: "Lila",
       });
 
       const db = getFirestore(myAuth);
-      const testBook = db.collection("books").doc(bookId);
+      const testBook = db
+        .collection("users")
+        .doc(myId)
+        .collection("books")
+        .doc(bookId);
       await firebase.assertSucceeds(
         testBook.set({ title: "The Lord of the Rings" })
+      );
+    });
+
+    it("can create new books", async () => {
+      const db = getFirestore(myAuth);
+      const bookId = "newBook";
+      const testBook = db
+        .collection("users")
+        .doc(myId)
+        .collection("books")
+        .doc(bookId);
+      await firebase.assertSucceeds(
+        testBook.set({ userId: myId, title: "New Book" })
       );
     });
 
     it("can read notes that belong to the authenticated user", async () => {
       const admin = getAdminFirestore();
       const bookId = "myBook";
-      const setupBook = admin.collection("books").doc(bookId);
-      await setupBook.set({
-        userId: myId,
-        title: "Lila",
-      });
-      const noteId = "myNote";
-      const setupNote = admin
+      const setupBook = admin
+        .collection("users")
+        .doc(myId)
         .collection("books")
-        .doc(bookId)
-        .collection("notes")
-        .doc(noteId);
-      await setupNote.set({
-        content: "Stuff that I would write",
-      });
-
-      const db = getFirestore(myAuth);
-      const testNote = db.collection("books").doc(bookId).collection("notes");
-      await firebase.assertSucceeds(testNote.get());
-    });
-
-    it("can write notes that belong to the authenticated user", async () => {
-      const admin = getAdminFirestore();
-      const bookId = "myBook";
-      const setupBook = admin.collection("books").doc(bookId);
+        .doc(bookId);
       await setupBook.set({
         userId: myId,
         title: "Lila",
       });
       const noteId = "myNote";
       const setupNote = admin
+        .collection("users")
+        .doc(myId)
         .collection("books")
         .doc(bookId)
         .collection("notes")
@@ -190,6 +233,42 @@ describe("Firestore security rules", () => {
 
       const db = getFirestore(myAuth);
       const testNote = db
+        .collection("users")
+        .doc(myId)
+        .collection("books")
+        .doc(bookId)
+        .collection("notes");
+      await firebase.assertSucceeds(testNote.get());
+    });
+
+    it("can write notes that belong to the authenticated user", async () => {
+      const admin = getAdminFirestore();
+      const bookId = "myBook";
+      const setupBook = admin
+        .collection("users")
+        .doc(myId)
+        .collection("books")
+        .doc(bookId);
+      await setupBook.set({
+        userId: myId,
+        title: "Lila",
+      });
+      const noteId = "myNote";
+      const setupNote = admin
+        .collection("users")
+        .doc(myId)
+        .collection("books")
+        .doc(bookId)
+        .collection("notes")
+        .doc(noteId);
+      await setupNote.set({
+        content: "Stuff that I would write",
+      });
+
+      const db = getFirestore(myAuth);
+      const testNote = db
+        .collection("users")
+        .doc(myId)
         .collection("books")
         .doc(bookId)
         .collection("notes")

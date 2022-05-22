@@ -5,7 +5,6 @@ import {
   collection,
   deleteDoc,
   doc,
-  getDoc,
   getDocs,
   getFirestore,
   orderBy,
@@ -53,8 +52,13 @@ export const storage = getStorage(app);
 // Books
 
 export const createBook = async (newBook: any): Promise<any> => {
-  const docRef = await addDoc(collection(db, "books"), newBook);
-  return docRef;
+  if (!auth.currentUser) {
+    throw new Error("Cannot create note, user is not logged in.");
+  }
+
+  const userRef = doc(db, "users", auth.currentUser.uid);
+  const bookRef = await addDoc(collection(userRef, "books"), newBook);
+  return bookRef;
 };
 
 export const getBooks = async (): Promise<Array<any>> => {
@@ -64,8 +68,7 @@ export const getBooks = async (): Promise<Array<any>> => {
 
   let books: Array<any> = [];
   const booksQuery = query(
-    collection(db, "books"),
-    where("userId", "==", auth.currentUser.uid)
+    collection(db, "users", auth.currentUser.uid, "books")
   );
   const snapshot = await getDocs(booksQuery);
   if (snapshot.empty) {
@@ -85,9 +88,8 @@ export const getFinishedBooks = async (): Promise<Array<any>> => {
 
   let books: Array<any> = [];
   const booksQuery = query(
-    collection(db, "books"),
+    collection(db, "users", auth.currentUser.uid, "books"),
     where("finished", "!=", null),
-    where("userId", "==", auth.currentUser.uid),
     orderBy("finished")
   );
   const snapshot = await getDocs(booksQuery);
@@ -108,9 +110,8 @@ export const getUnfinishedBooks = async (): Promise<Array<any>> => {
 
   let books: Array<any> = [];
   const booksQuery = query(
-    collection(db, "books"),
+    collection(db, "users", auth.currentUser.uid, "books"),
     where("finished", "==", null),
-    where("userId", "==", auth.currentUser.uid),
     orderBy("started")
   );
   const snapshot = await getDocs(booksQuery);
@@ -124,20 +125,14 @@ export const getUnfinishedBooks = async (): Promise<Array<any>> => {
   return books;
 };
 
-export const getBook = async (bookRef: any): Promise<any> => {
-  let bookData;
-  const bookSnap = await getDoc(bookRef);
-  if (bookSnap.exists()) {
-    bookData = bookSnap.data();
-  } else {
-    console.log("book does not exist");
-  }
-  return bookData;
-};
-
 export const deleteBook = async (bookId: string): Promise<void> => {
   try {
-    const bookRef = doc(collection(db, "books"), bookId);
+    if (!auth.currentUser) {
+      throw new Error("Cannot update book, user is not logged in.");
+    }
+
+    const userRef = doc(db, "users", auth.currentUser.uid);
+    const bookRef = doc(userRef, "books", bookId);
     await deleteDoc(bookRef);
   } catch (err) {
     console.error("error deleting book:", err);
@@ -149,7 +144,12 @@ export const updateBook = async (
   payload: any
 ): Promise<void> => {
   try {
-    const bookRef = doc(collection(db, "books"), bookId);
+    if (!auth.currentUser) {
+      throw new Error("Cannot update book, user is not logged in.");
+    }
+
+    const userRef = doc(db, "users", auth.currentUser.uid);
+    const bookRef = doc(userRef, "books", bookId);
     await setDoc(bookRef, payload, { merge: true });
   } catch (err) {
     console.error("error updating book:", err);
@@ -158,14 +158,25 @@ export const updateBook = async (
 
 // Notes
 
-export const createNote = (newNote: any): void => {
-  const bookRef = doc(db, "books", newNote.bookId);
+export const createNote = (bookId: string, newNote: any): void => {
+  if (!auth.currentUser) {
+    throw new Error("Cannot create note, user is not logged in.");
+  }
+
+  const userRef = doc(db, "users", auth.currentUser.uid);
+  const bookRef = doc(userRef, "books", bookId);
   addDoc(collection(bookRef, "notes"), newNote);
 };
 
 export const getBookNotes = async (bookId: string): Promise<Array<any>> => {
+  if (!auth.currentUser) {
+    throw new Error("Cannot get notes, user is not logged in.");
+  }
   let notes: Array<any> = [];
-  const notesQuery = query(collection(db, "books", bookId, "notes"));
+
+  const notesQuery = query(
+    collection(db, "users", auth.currentUser.uid, "books", bookId, "notes")
+  );
   const snapshot = await getDocs(notesQuery);
   if (snapshot.empty) {
     console.log("No notes found.");
@@ -182,7 +193,12 @@ export const deleteNote = async (
   noteId: string
 ): Promise<void> => {
   try {
-    const bookRef = doc(db, "books", bookId);
+    if (!auth.currentUser) {
+      throw new Error("Cannot delete note, user is not logged in.");
+    }
+
+    const userRef = doc(db, "users", auth.currentUser.uid);
+    const bookRef = doc(userRef, "books", bookId);
     await deleteDoc(doc(bookRef, "notes", noteId));
   } catch (err) {
     console.error("error deleting note:", err);
@@ -195,7 +211,12 @@ export const updateNote = async (
   payload: any
 ): Promise<void> => {
   try {
-    const bookRef = doc(db, "books", bookId);
+    if (!auth.currentUser) {
+      throw new Error("Cannot update note, user is not logged in.");
+    }
+
+    const userRef = doc(db, "users", auth.currentUser.uid);
+    const bookRef = doc(userRef, "books", bookId);
     const noteRef = doc(bookRef, "notes", noteId);
     await setDoc(noteRef, payload, { merge: true });
   } catch (err) {
