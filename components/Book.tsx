@@ -15,7 +15,7 @@ export const Book = (props: BookProps) => {
   const image = useBookImage(book.id, true);
 
   const truncate = (s: string): string => {
-    const MAX_LENGTH = 35;
+    const MAX_LENGTH = 30;
     return s.length > MAX_LENGTH ? s.slice(0, MAX_LENGTH).concat("...") : s;
   };
 
