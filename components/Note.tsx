@@ -112,7 +112,11 @@ export const Note = (props: NoteProps) => {
           style={[styles.rightAction, { backgroundColor: color }]}
           onPress={pressHandler}
         >
-          <Text style={styles.actionText}>{text}</Text>
+          {text === "Delete" ? (
+            <FontAwesome name="trash" size={25} color="white" />
+          ) : (
+            <FontAwesome name="pencil" size={25} color="white" />
+          )}
         </RectButton>
       </Animated.View>
     );
