@@ -1,19 +1,16 @@
-import { auth } from "../firebase";
 import {
-  signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
 } from "firebase/auth";
+import { useState } from "react";
 import {
-  View,
-  SafeAreaView,
-  KeyboardAvoidingView,
-  TextInput,
   Button,
+  KeyboardAvoidingView,
   Platform,
-  Text,
   StyleSheet,
 } from "react-native";
-import { useState } from "react";
+import { SafeAreaView, Text, TextInput, View } from "../components/Themed";
+import { auth } from "../firebase";
 
 export const SignUpScreen = () => {
   const [email, setEmail] = useState("");
