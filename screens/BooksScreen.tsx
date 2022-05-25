@@ -37,12 +37,12 @@ const BooksScreen = () => {
           <Tab
             value={tabIndex}
             onChange={(e) => setTabIndex(e)}
-            indicatorStyle={{ backgroundColor: "white", height: 3 }}
+            indicatorStyle={{ backgroundColor: "transparent" }}
             variant="primary"
           >
-            <Tab.Item title="Reading" titleStyle={{ fontSize: 12 }} />
-            <Tab.Item title="Finished" titleStyle={{ fontSize: 12 }} />
-            <Tab.Item title="Unread" titleStyle={{ fontSize: 12 }} />
+            <Tab.Item title="Reading" />
+            <Tab.Item title="Finished" />
+            <Tab.Item title="Unread" />
           </Tab>
 
           <TabView

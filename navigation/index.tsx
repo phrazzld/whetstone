@@ -17,7 +17,6 @@ import { FontAwesome } from "../components/Themed";
 import Colors from "../constants/Colors";
 import { auth } from "../firebase";
 import useColorScheme from "../hooks/useColorScheme";
-import { AddBookScreen } from "../screens/AddBookScreen";
 import { AddNoteScreen } from "../screens/AddNoteScreen";
 import { AddVocabScreen } from "../screens/AddVocabScreen";
 import { BookDetailsScreen } from "../screens/BookDetailsScreen";
@@ -76,7 +75,7 @@ function RootNavigator() {
           <Stack.Group screenOptions={{ presentation: "modal" }}>
             <Stack.Screen
               name="AddBook"
-              component={AddBookScreen}
+              component={EditBookScreen}
               options={{ title: "Add Book" }}
             />
             <Stack.Screen

@@ -59,10 +59,11 @@ export const BookDetailsScreen = () => {
   const showActionMenu = useStore((state) => state.showActionMenu);
   const setShowActionMenu = useStore((state) => state.setShowActionMenu);
 
-  const startDate =
-    book.started instanceof Date
+  const startDate = book.started
+    ? book.started instanceof Date
       ? book.started.toLocaleString([], dateLocaleStringOptions)
-      : book.started.toDate().toLocaleString([], dateLocaleStringOptions);
+      : book.started.toDate().toLocaleString([], dateLocaleStringOptions)
+    : null;
 
   const finishDate = book.finished
     ? book.finished instanceof Date
@@ -70,9 +71,12 @@ export const BookDetailsScreen = () => {
       : book.finished.toDate().toLocaleString([], dateLocaleStringOptions)
     : null;
 
-  const timeline = book.finished
-    ? startDate.concat(" - ").concat(finishDate)
-    : `Started: ${startDate}`;
+  const timeline =
+    book.started && book.finished
+      ? book.finished
+        ? startDate.concat(" - ").concat(finishDate)
+        : `Started: ${startDate}`
+      : "";
 
   const finishBook = async (): Promise<void> => {
     setShowActionMenu(false);
@@ -151,9 +155,6 @@ export const BookDetailsScreen = () => {
         }}
       >
         <ActionMenuItem text="Edit" onPress={editBook} />
-        {!book.finished && (
-          <ActionMenuItem text="Finish" onPress={finishBook} />
-        )}
         <ActionMenuItem text="Delete" onPress={removeBook} destructive />
       </View>
     );

@@ -14,7 +14,7 @@ import {
 import { ProgressBar, TextInput } from "react-native-paper";
 import SelectDropdown from "react-native-select-dropdown";
 import { SafeAreaView, Text, View } from "../components/Themed";
-import { auth, storage, updateBook } from "../firebase";
+import { auth, createBook, storage, updateBook } from "../firebase";
 import { pickImage } from "../utils";
 import { useStore } from "../zstore";
 
@@ -26,22 +26,28 @@ const LISTS: Array<TBookList> = ["Reading", "Finished", "Unread"];
 
 export const EditBookScreen = () => {
   const navigation = useNavigation();
-  const { book } = useRoute().params;
-  const [title, setTitle] = useState(book.title);
-  const [author, setAuthor] = useState(book.author);
+  const route = useRoute();
+  const book = route.params?.book;
+  const [title, setTitle] = useState<string>(book?.title);
+  const [author, setAuthor] = useState<string>(book?.author);
   const [list, setList] = useState<TBookList | null>(
-    !!book.started ? (!!book.finished ? "Finished" : "Reading") : "Unread"
+    !!book
+      ? !!book.started
+        ? !!book.finished
+          ? "Finished"
+          : "Reading"
+        : "Unread"
+      : null
   );
-  const [started, setStarted] = useState<Date | null>(book.started?.toDate());
+  const [started, setStarted] = useState<Date | null>(book?.started?.toDate());
   const [finished, setFinished] = useState<Date | null>(
-    book.finished?.toDate()
+    book?.finished?.toDate()
   );
   const [localImage, setLocalImage] = useState<any>(null);
   const [image, setImage] = useState<any>(null);
-  const [imageUploadProgress, setImageUploadProgress] = useState(0);
-  const [showImageUploadProgress, setShowImageUploadProgress] = useState(false);
+  const [creationProgress, setCreationProgress] = useState(0);
+  const [progressText, setProgressText] = useState("");
   const [error, setError] = useState("");
-
   const setStaleBookImage = useStore((state) => state.setStaleBookImage);
 
   const getImage = async () => {
@@ -60,8 +66,10 @@ export const EditBookScreen = () => {
   };
 
   useEffect(() => {
-    getImage();
-  }, []);
+    if (book) {
+      getImage();
+    }
+  }, [book]);
 
   const saveChanges = async () => {
     if (!auth.currentUser) {
@@ -84,17 +92,26 @@ export const EditBookScreen = () => {
     }
 
     try {
+      setProgressText("Saving book details...");
       let payload = {
         title,
         author,
         started,
         finished,
       };
-      await updateBook(book.id, payload);
+
+      let bookId: string;
+      if (!book) {
+        const bookRef = await createBook(payload);
+        bookId = bookRef.id;
+      } else {
+        bookId = book.id;
+        await updateBook(bookId, payload);
+      }
 
       if (!!image && !image.cancelled) {
-        setShowImageUploadProgress(true);
-        const filename = `${auth.currentUser.uid}/${book.id}/cover.jpg`;
+        setProgressText("Uploading book image...");
+        const filename = `${auth.currentUser.uid}/${bookId}/cover.jpg`;
         const metadata = { contentType: "image/jpeg" };
         const imgRef = ref(storage, filename);
         const img = await fetch(image.uri);
@@ -109,7 +126,7 @@ export const EditBookScreen = () => {
             const progress = Math.round(
               (snapshot.bytesTransferred / snapshot.totalBytes) * 100
             );
-            setImageUploadProgress(progress * 0.01);
+            setCreationProgress(progress * 0.01);
             console.log("Upload is " + progress + "% done");
             switch (snapshot.state) {
               case "paused": // or 'paused'
@@ -123,18 +140,29 @@ export const EditBookScreen = () => {
           (error) => {
             // Handle unsuccessful uploads
             console.log("error:", error);
+            setProgressText(`Uh-oh, something went wrong. Error: ${error}`);
           },
           () => {
-            setStaleBookImage(book.id);
-            navigation.navigate("BookDetails", {
-              book: { ...book, ...payload },
-            });
+            setProgressText("Image successfully uploaded.");
+            setStaleBookImage(bookId);
+
+            if (!!book) {
+              navigation.navigate("BookDetails", {
+                book: { ...book, ...payload },
+              });
+            } else {
+              navigation.navigate("Books");
+            }
           }
         );
       } else {
-        navigation.navigate("BookDetails", {
-          book: { ...book, ...payload },
-        });
+        if (!!book) {
+          navigation.navigate("BookDetails", {
+            book: { ...book, ...payload },
+          });
+        } else {
+          navigation.navigate("Books");
+        }
       }
     } catch (error) {
       console.log("error:", error);
@@ -142,7 +170,11 @@ export const EditBookScreen = () => {
   };
 
   const cancel = () => {
-    navigation.navigate("BookDetails", { book });
+    if (!!book) {
+      navigation.navigate("BookDetails", { book });
+    } else {
+      navigation.navigate("Books");
+    }
   };
 
   const isReading = (): void => {
@@ -195,7 +227,6 @@ export const EditBookScreen = () => {
             onPress={selectImage}
           />
         </View>
-        <View></View>
         <TextInput
           mode="outlined"
           label="Title"
@@ -239,7 +270,7 @@ export const EditBookScreen = () => {
           defaultButtonText="Select a list"
           defaultValue={list}
         />
-        {started && (
+        {!!book?.started && (
           <View
             style={{
               display: "flex",
@@ -255,12 +286,11 @@ export const EditBookScreen = () => {
               style={{ width: "40%" }}
               value={started}
               mode="date"
-              is24Hour={true}
               onChange={onStartDatePickerChange}
             />
           </View>
         )}
-        {finished && (
+        {!!book?.finished && (
           <View
             style={{
               display: "flex",
@@ -276,7 +306,6 @@ export const EditBookScreen = () => {
               style={{ width: "40%" }}
               value={finished}
               mode="date"
-              is24Hour={true}
               onChange={onFinishDatePickerChange}
             />
           </View>
@@ -288,17 +317,11 @@ export const EditBookScreen = () => {
         </View>
         <View style={styles.progressContainer}>
           <ProgressBar
-            visible={showImageUploadProgress}
-            progress={imageUploadProgress}
+            visible={!!progressText}
+            progress={creationProgress}
             style={[styles.progressBar, { width: windowWidth * 0.9 }]}
           />
-          {showImageUploadProgress && (
-            <Text>
-              {imageUploadProgress === 1
-                ? "Image successfully uploaded."
-                : "Uploading image..."}
-            </Text>
-          )}
+          {!!progressText && <Text>{progressText}</Text>}
         </View>
 
         {/* Use a light status bar on iOS to account for the black space above the modal */}
@@ -338,4 +361,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   progressContainer: {},
+  error: {
+    color: "#cc0000",
+  },
 });
