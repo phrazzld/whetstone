@@ -1,22 +1,22 @@
 import { useNavigation } from "@react-navigation/native";
-import { Button, SectionList, StyleSheet } from "react-native";
+import { Tab, TabView } from "@rneui/themed";
+import React, { useState } from "react";
+import { Button, FlatList, StyleSheet } from "react-native";
 import { Book } from "../components/Book";
 import { SafeAreaView, Text, View } from "../components/Themed";
 import { useFinishedBooks } from "../hooks/useFinishedBooks";
 import { useUnfinishedBooks } from "../hooks/useUnfinishedBooks";
+import { useUnreadBooks } from "../hooks/useUnreadBooks";
 import { TBook } from "../types";
 
 const BooksScreen = () => {
+  const [tabIndex, setTabIndex] = useState(0);
   const unfinishedBooks = useUnfinishedBooks();
   const finishedBooks = useFinishedBooks();
+  const unreadBooks = useUnreadBooks();
   const navigation = useNavigation();
 
   const noBooks = unfinishedBooks.length === 0 && finishedBooks.length === 0;
-
-  const listSections = [
-    { title: "Reading", data: unfinishedBooks },
-    { title: "Finished", data: finishedBooks },
-  ];
 
   const renderItem = ({ item: book }: { item: TBook }) => (
     <Book key={book.id} book={book} />
@@ -33,17 +33,46 @@ const BooksScreen = () => {
           />
         </View>
       ) : (
-        <SectionList
-          sections={listSections}
-          renderItem={renderItem}
-          keyExtractor={(item) => item.id}
-          renderSectionHeader={({ section: { title } }) => (
-            <View style={styles.sectionHeaderContainer}>
-              <Text style={styles.sectionHeader}>{title}</Text>
-            </View>
-          )}
-          stickySectionHeadersEnabled={false}
-        />
+        <>
+          <Tab
+            value={tabIndex}
+            onChange={(e) => setTabIndex(e)}
+            indicatorStyle={{ backgroundColor: "white", height: 3 }}
+            variant="primary"
+          >
+            <Tab.Item title="Reading" titleStyle={{ fontSize: 12 }} />
+            <Tab.Item title="Finished" titleStyle={{ fontSize: 12 }} />
+            <Tab.Item title="Unread" titleStyle={{ fontSize: 12 }} />
+          </Tab>
+
+          <TabView
+            value={tabIndex}
+            onChange={setTabIndex}
+            animationType="timing"
+          >
+            <TabView.Item style={{ width: "100%" }}>
+              <FlatList
+                data={unfinishedBooks}
+                renderItem={renderItem}
+                keyExtractor={(item) => item.id}
+              />
+            </TabView.Item>
+            <TabView.Item style={{ width: "100%" }}>
+              <FlatList
+                data={finishedBooks}
+                renderItem={renderItem}
+                keyExtractor={(item) => item.id}
+              />
+            </TabView.Item>
+            <TabView.Item style={{ width: "100%" }}>
+              <FlatList
+                data={unreadBooks}
+                renderItem={renderItem}
+                keyExtractor={(item) => item.id}
+              />
+            </TabView.Item>
+          </TabView>
+        </>
       )}
     </SafeAreaView>
   );

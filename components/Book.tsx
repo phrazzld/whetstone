@@ -19,17 +19,21 @@ export const Book = (props: BookProps) => {
     return s.length > MAX_LENGTH ? s.slice(0, MAX_LENGTH).concat("...") : s;
   };
 
-  const timeline = book.finished
-    ? book.started
-        .toDate()
-        .toLocaleString([], dateLocaleStringOptions)
-        .concat(" - ")
-        .concat(
-          book.finished.toDate().toLocaleString([], dateLocaleStringOptions)
-        )
-    : `Started: ${book.started
-        .toDate()
-        .toLocaleString([], dateLocaleStringOptions)}`;
+  let timeline = "";
+
+  if (book.started && book.finished) {
+    timeline = book.started
+      .toDate()
+      .toLocaleString([], dateLocaleStringOptions)
+      .concat(" - ")
+      .concat(
+        book.finished.toDate().toLocaleString([], dateLocaleStringOptions)
+      );
+  } else if (book.started) {
+    timeline = `Started: ${book.started
+      .toDate()
+      .toLocaleString([], dateLocaleStringOptions)}`;
+  }
 
   return (
     <TouchableOpacity

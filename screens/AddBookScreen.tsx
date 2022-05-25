@@ -1,3 +1,4 @@
+import DateTimePicker from "@react-native-community/datetimepicker";
 import { useNavigation } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
 import { ref, uploadBytesResumable } from "firebase/storage";
@@ -11,6 +12,7 @@ import {
   StyleSheet,
 } from "react-native";
 import { ProgressBar, TextInput } from "react-native-paper";
+import SelectDropdown from "react-native-select-dropdown";
 import { SafeAreaView, Text, View } from "../components/Themed";
 import { auth, createBook, storage } from "../firebase";
 import { pickImage } from "../utils";
@@ -18,13 +20,21 @@ import { useStore } from "../zstore";
 
 const windowWidth = Dimensions.get("window").width;
 
+type TBookList = "Reading" | "Finished" | "Unread";
+
+const LISTS: Array<TBookList> = ["Reading", "Finished", "Unread"];
+
 export const AddBookScreen = () => {
   const [title, setTitle] = useState("");
   const [author, setAuthor] = useState("");
+  const [list, setList] = useState<TBookList | null>(null);
+  const [started, setStarted] = useState<Date | null>(null);
+  const [finished, setFinished] = useState<Date | null>(null);
   const [localImage, setLocalImage] = useState<any>(null);
   const [image, setImage] = useState<any>(null);
   const [creationProgress, setCreationProgress] = useState(0);
   const [progressText, setProgressText] = useState("");
+  const [error, setError] = useState("");
   const navigation = useNavigation();
   const setStaleBookImage = useStore((state) => state.setStaleBookImage);
 
@@ -33,14 +43,28 @@ export const AddBookScreen = () => {
       throw new Error("Cannot add book, user is not logged in.");
     }
 
+    if (!title) {
+      setError("Title field cannot be blank.");
+      return;
+    }
+
+    if (!author) {
+      setError("Author field cannot be blank.");
+      return;
+    }
+
+    if (!list) {
+      setError("Please select a list.");
+      return;
+    }
+
     try {
       setProgressText("Saving book details...");
       const book = {
         title,
         author,
-        finished: null,
-        started: new Date(),
-        userId: auth.currentUser.uid,
+        started,
+        finished,
       };
       const bookRef = await createBook(book);
       const bookId = bookRef.id;
@@ -103,6 +127,34 @@ export const AddBookScreen = () => {
     setImage(result);
   };
 
+  const isReading = (): void => {
+    setList("Reading");
+    setStarted(new Date());
+    setFinished(null);
+  };
+
+  const isFinished = (): void => {
+    setList("Finished");
+    setStarted(new Date());
+    setFinished(new Date());
+  };
+
+  const isUnread = (): void => {
+    setList("Unread");
+    setStarted(null);
+    setFinished(null);
+  };
+
+  const onStartDatePickerChange = (event, selectedDate) => {
+    const date = selectedDate;
+    setStarted(date);
+  };
+
+  const onFinishDatePickerChange = (event, selectedDate) => {
+    const date = selectedDate;
+    setFinished(date);
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <KeyboardAvoidingView
@@ -136,6 +188,73 @@ export const AddBookScreen = () => {
           mode="outlined"
           returnKeyType="done"
         />
+        <SelectDropdown
+          data={LISTS}
+          onSelect={(selectedItem) => {
+            switch (selectedItem) {
+              case "Reading":
+                isReading();
+                break;
+              case "Finished":
+                isFinished();
+                break;
+              case "Unread":
+                isUnread();
+                break;
+              default:
+                throw new Error(
+                  `Unrecognized list type selected: ${selectedItem}`
+                );
+            }
+          }}
+          buttonTextAfterSelection={(selectedItem) => selectedItem}
+          rowTextForSelection={(item) => item}
+          buttonStyle={styles.input}
+          defaultButtonText="Select a list"
+        />
+        {started && (
+          <View
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "flex-start",
+              marginVertical: 10,
+              width: "90%",
+            }}
+          >
+            <Text style={{ fontSize: 16, width: "25%" }}>Started:</Text>
+            <DateTimePicker
+              style={{ width: "40%" }}
+              value={started}
+              mode="date"
+              is24Hour={true}
+              onChange={onStartDatePickerChange}
+            />
+          </View>
+        )}
+        {finished && (
+          <View
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "flex-start",
+              marginVertical: 10,
+              width: "90%",
+            }}
+          >
+            <Text style={{ fontSize: 16, width: "25%" }}>Finished:</Text>
+            <DateTimePicker
+              style={{ width: "40%" }}
+              value={finished}
+              mode="date"
+              is24Hour={true}
+              onChange={onFinishDatePickerChange}
+            />
+          </View>
+        )}
+        {!!error && <Text style={styles.error}>{error}</Text>}
         <View style={styles.buttonContainer}>
           <Button onPress={addBook} title="Add Book" />
           <Button onPress={cancel} title="Cancel" color="gray" />
@@ -161,6 +280,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "flex-start",
     margin: 10,
+    marginTop: 20,
     width: "90%",
   },
   container: {
@@ -188,5 +308,8 @@ const styles = StyleSheet.create({
   progressContainer: {
     justifyContent: "center",
     alignItems: "center",
+  },
+  error: {
+    color: "#cc0000",
   },
 });

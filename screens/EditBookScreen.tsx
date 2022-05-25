@@ -12,6 +12,7 @@ import {
   StyleSheet,
 } from "react-native";
 import { ProgressBar, TextInput } from "react-native-paper";
+import SelectDropdown from "react-native-select-dropdown";
 import { SafeAreaView, Text, View } from "../components/Themed";
 import { auth, storage, updateBook } from "../firebase";
 import { pickImage } from "../utils";
@@ -19,32 +20,29 @@ import { useStore } from "../zstore";
 
 const windowWidth = Dimensions.get("window").width;
 
+type TBookList = "Reading" | "Finished" | "Unread";
+
+const LISTS: Array<TBookList> = ["Reading", "Finished", "Unread"];
+
 export const EditBookScreen = () => {
   const navigation = useNavigation();
   const { book } = useRoute().params;
   const [title, setTitle] = useState(book.title);
   const [author, setAuthor] = useState(book.author);
+  const [list, setList] = useState<TBookList | null>(
+    !!book.started ? (!!book.finished ? "Finished" : "Reading") : "Unread"
+  );
+  const [started, setStarted] = useState<Date | null>(book.started?.toDate());
+  const [finished, setFinished] = useState<Date | null>(
+    book.finished?.toDate()
+  );
   const [localImage, setLocalImage] = useState<any>(null);
   const [image, setImage] = useState<any>(null);
   const [imageUploadProgress, setImageUploadProgress] = useState(0);
   const [showImageUploadProgress, setShowImageUploadProgress] = useState(false);
-
-  const [startDate, setStartDate] = useState<Date>(book.started.toDate());
-  const [finishDate, setFinishDate] = useState<Date | null>(
-    book.finished?.toDate()
-  );
+  const [error, setError] = useState("");
 
   const setStaleBookImage = useStore((state) => state.setStaleBookImage);
-
-  const onStartDatePickerChange = (event, selectedDate) => {
-    const date = selectedDate;
-    setStartDate(date);
-  };
-
-  const onFinishDatePickerChange = (event, selectedDate) => {
-    const date = selectedDate;
-    setFinishDate(date);
-  };
 
   const getImage = async () => {
     if (!auth.currentUser) {
@@ -70,15 +68,28 @@ export const EditBookScreen = () => {
       throw new Error("Cannot edit book, user is not logged in.");
     }
 
+    if (!title) {
+      setError("Title field cannot be blank.");
+      return;
+    }
+
+    if (!author) {
+      setError("Author field cannot be blank.");
+      return;
+    }
+
+    if (!list) {
+      setError("Please select a list.");
+      return;
+    }
+
     try {
       let payload = {
         title,
         author,
-        started: new Date(startDate),
+        started,
+        finished,
       };
-      if (!!finishDate) {
-        payload.finished = new Date(finishDate);
-      }
       await updateBook(book.id, payload);
 
       if (!!image && !image.cancelled) {
@@ -134,6 +145,34 @@ export const EditBookScreen = () => {
     navigation.navigate("BookDetails", { book });
   };
 
+  const isReading = (): void => {
+    setList("Reading");
+    setStarted(new Date());
+    setFinished(null);
+  };
+
+  const isFinished = (): void => {
+    setList("Finished");
+    setStarted(new Date());
+    setFinished(new Date());
+  };
+
+  const isUnread = (): void => {
+    setList("Unread");
+    setStarted(null);
+    setFinished(null);
+  };
+
+  const onStartDatePickerChange = (event, selectedDate) => {
+    const date = selectedDate;
+    setStarted(date);
+  };
+
+  const onFinishDatePickerChange = (event, selectedDate) => {
+    const date = selectedDate;
+    setFinished(date);
+  };
+
   const selectImage = async () => {
     const result = await pickImage();
     setLocalImage(result.uri);
@@ -175,25 +214,32 @@ export const EditBookScreen = () => {
           onChangeText={setAuthor}
           returnKeyType="done"
         />
-        <View
-          style={{
-            display: "flex",
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "flex-start",
-            marginVertical: 10,
+        <SelectDropdown
+          data={LISTS}
+          onSelect={(selectedItem) => {
+            switch (selectedItem) {
+              case "Reading":
+                isReading();
+                break;
+              case "Finished":
+                isFinished();
+                break;
+              case "Unread":
+                isUnread();
+                break;
+              default:
+                throw new Error(
+                  `Unrecognized list type selected: ${selectedItem}`
+                );
+            }
           }}
-        >
-          <Text>Started:</Text>
-          <DateTimePicker
-            style={{ width: "40%" }}
-            value={startDate}
-            mode="date"
-            is24Hour={true}
-            onChange={onStartDatePickerChange}
-          />
-        </View>
-        {!!finishDate && (
+          buttonTextAfterSelection={(selectedItem) => selectedItem}
+          rowTextForSelection={(item) => item}
+          buttonStyle={styles.input}
+          defaultButtonText="Select a list"
+          defaultValue={list}
+        />
+        {started && (
           <View
             style={{
               display: "flex",
@@ -201,18 +247,41 @@ export const EditBookScreen = () => {
               alignItems: "center",
               justifyContent: "flex-start",
               marginVertical: 10,
+              width: "90%",
             }}
           >
-            <Text>Finished:</Text>
+            <Text style={{ fontSize: 16, width: "25%" }}>Started:</Text>
             <DateTimePicker
               style={{ width: "40%" }}
-              value={finishDate}
+              value={started}
+              mode="date"
+              is24Hour={true}
+              onChange={onStartDatePickerChange}
+            />
+          </View>
+        )}
+        {finished && (
+          <View
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "flex-start",
+              marginVertical: 10,
+              width: "90%",
+            }}
+          >
+            <Text style={{ fontSize: 16, width: "25%" }}>Finished:</Text>
+            <DateTimePicker
+              style={{ width: "40%" }}
+              value={finished}
               mode="date"
               is24Hour={true}
               onChange={onFinishDatePickerChange}
             />
           </View>
         )}
+        {!!error && <Text style={styles.error}>{error}</Text>}
         <View style={styles.buttonContainer}>
           <Button onPress={saveChanges} title="Save" />
           <Button onPress={cancel} title="Cancel" color="gray" />

@@ -1,13 +1,13 @@
-import { useEffect, useState } from "react";
-import { TBook } from "../types";
-import { auth, db } from "../firebase";
 import {
   collection,
-  where,
-  query,
-  orderBy,
   onSnapshot,
+  orderBy,
+  query,
+  where,
 } from "firebase/firestore";
+import { useEffect, useState } from "react";
+import { auth, db } from "../firebase";
+import { TBook } from "../types";
 
 export const useUnfinishedBooks = () => {
   const [books, setBooks] = useState<Array<TBook>>([]);
@@ -19,6 +19,7 @@ export const useUnfinishedBooks = () => {
 
     const booksQuery = query(
       collection(db, "users", auth.currentUser.uid, "books"),
+      where("started", "!=", null),
       where("finished", "==", null),
       orderBy("started", "desc")
     );
