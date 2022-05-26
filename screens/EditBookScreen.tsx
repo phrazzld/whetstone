@@ -276,7 +276,13 @@ export const EditBookScreen = () => {
         book: { ...book, ...payload },
       });
     } else {
-      navigation.navigate("Books");
+      let tab = 0;
+      if (!!payload.finished) {
+        tab = 1;
+      } else if (!payload.finished && !payload.started) {
+        tab = 2;
+      }
+      navigation.navigate("Books", { tab });
     }
   };
 

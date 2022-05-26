@@ -1,6 +1,6 @@
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import { Tab, TabView } from "@rneui/themed";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button, FlatList, StyleSheet } from "react-native";
 import { Book } from "../components/Book";
 import { SafeAreaView, Text, View } from "../components/Themed";
@@ -10,11 +10,19 @@ import { useUnreadBooks } from "../hooks/useUnreadBooks";
 import { TBook } from "../types";
 
 const BooksScreen = () => {
-  const [tabIndex, setTabIndex] = useState(0);
+  const route = useRoute();
+  const tab = route.params?.tab;
+  const [tabIndex, setTabIndex] = useState(tab || 0);
   const unfinishedBooks = useUnfinishedBooks();
   const finishedBooks = useFinishedBooks();
   const unreadBooks = useUnreadBooks();
   const navigation = useNavigation();
+
+  useEffect(() => {
+    if (tab !== null) {
+      setTabIndex(tab);
+    }
+  }, [tab]);
 
   const noBooks = unfinishedBooks.length === 0 && finishedBooks.length === 0;
 
