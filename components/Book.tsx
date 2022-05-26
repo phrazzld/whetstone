@@ -2,7 +2,7 @@ import { useNavigation } from "@react-navigation/native";
 import { Image, StyleSheet, TouchableOpacity } from "react-native";
 import { useBookImage } from "../hooks/useBookImage";
 import { TBook } from "../types";
-import { dateLocaleStringOptions } from "../utils";
+import { dateLocaleStringOptions, ensureDate } from "../utils";
 import { Text, View } from "./Themed";
 
 interface BookProps {
@@ -22,17 +22,17 @@ export const Book = (props: BookProps) => {
   let timeline = "";
 
   if (book.started && book.finished) {
-    timeline = book.started
-      .toDate()
+    timeline = ensureDate(book.started)
       .toLocaleString([], dateLocaleStringOptions)
       .concat(" - ")
       .concat(
-        book.finished.toDate().toLocaleString([], dateLocaleStringOptions)
+        ensureDate(book.finished).toLocaleString([], dateLocaleStringOptions)
       );
   } else if (book.started) {
-    timeline = `Started: ${book.started
-      .toDate()
-      .toLocaleString([], dateLocaleStringOptions)}`;
+    timeline = `Started: ${ensureDate(book.started).toLocaleString(
+      [],
+      dateLocaleStringOptions
+    )}`;
   }
 
   return (

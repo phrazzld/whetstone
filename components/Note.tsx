@@ -8,7 +8,7 @@ import Colors from "../constants/Colors";
 import { deleteNote } from "../firebase";
 import useColorScheme from "../hooks/useColorScheme";
 import { TNote } from "../types";
-import { dateLocaleStringOptions } from "../utils";
+import { dateLocaleStringOptions, ensureDate } from "../utils";
 import { FontAwesome, Text, View } from "./Themed";
 
 interface NoteTypeBadgeProps {
@@ -201,9 +201,10 @@ export const Note = (props: NoteProps) => {
                   style={{ marginRight: 10 }}
                 />
                 <Text style={styles.timestamp}>
-                  {note.createdAt
-                    .toDate()
-                    .toLocaleString([], dateLocaleStringOptions)}
+                  {ensureDate(note.createdAt).toLocaleString(
+                    [],
+                    dateLocaleStringOptions
+                  )}
                 </Text>
               </View>
             </View>

@@ -1,11 +1,14 @@
 import * as ImagePicker from "expo-image-picker";
 import { auth } from "./firebase";
+import { TBookList } from "./types";
 
 export const dateLocaleStringOptions = {
   year: "numeric",
   month: "long",
   day: "numeric",
 };
+
+export const LISTS: Array<TBookList> = ["Reading", "Finished", "Unread"];
 
 export const pickImage = async (): Promise<ExpandImagePickerResult> => {
   if (!auth.currentUser) {
@@ -37,4 +40,12 @@ export const pickImage = async (): Promise<ExpandImagePickerResult> => {
     console.error(err);
     throw new Error(err);
   }
+};
+
+export const ensureDate = (date: any): Date => {
+  if (date instanceof Date) {
+    return date;
+  }
+
+  return date.toDate();
 };

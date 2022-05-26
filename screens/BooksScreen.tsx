@@ -45,11 +45,7 @@ const BooksScreen = () => {
             <Tab.Item title="Unread" />
           </Tab>
 
-          <TabView
-            value={tabIndex}
-            onChange={setTabIndex}
-            animationType="timing"
-          >
+          <TabView value={tabIndex} onChange={setTabIndex}>
             <TabView.Item style={{ width: "100%" }}>
               <FlatList
                 data={unfinishedBooks}

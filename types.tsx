@@ -55,3 +55,5 @@ export type TNote = {
   definition: string;
   page: number;
 };
+
+export type TBookList = "Reading" | "Finished" | "Unread";

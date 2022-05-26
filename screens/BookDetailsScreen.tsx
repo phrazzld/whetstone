@@ -13,10 +13,10 @@ import {
 } from "react-native";
 import { Note } from "../components/Note";
 import { Text, View } from "../components/Themed";
-import { auth, deleteBook, storage, updateBook } from "../firebase";
+import { auth, deleteBook, storage } from "../firebase";
 import { useBookImage } from "../hooks/useBookImage";
 import { useNotes } from "../hooks/useNotes";
-import { dateLocaleStringOptions } from "../utils";
+import { dateLocaleStringOptions, ensureDate } from "../utils";
 import { useStore } from "../zstore";
 
 const windowWidth = Dimensions.get("window").width;
@@ -60,31 +60,22 @@ export const BookDetailsScreen = () => {
   const setShowActionMenu = useStore((state) => state.setShowActionMenu);
 
   const startDate = book.started
-    ? book.started instanceof Date
-      ? book.started.toLocaleString([], dateLocaleStringOptions)
-      : book.started.toDate().toLocaleString([], dateLocaleStringOptions)
+    ? ensureDate(book.started).toLocaleString([], dateLocaleStringOptions)
     : null;
 
   const finishDate = book.finished
-    ? book.finished instanceof Date
-      ? book.finished.toLocaleString([], dateLocaleStringOptions)
-      : book.finished.toDate().toLocaleString([], dateLocaleStringOptions)
+    ? ensureDate(book.finished).toLocaleString([], dateLocaleStringOptions)
     : null;
 
-  const timeline =
-    book.started && book.finished
-      ? book.finished
-        ? startDate.concat(" - ").concat(finishDate)
-        : `Started: ${startDate}`
-      : "";
+  let timeline = "";
 
-  const finishBook = async (): Promise<void> => {
-    setShowActionMenu(false);
-    setLoading(true);
-    await updateBook(book.id, { finished: new Date() });
-    setLoading(false);
-    navigation.goBack();
-  };
+  if (!!startDate) {
+    if (!!finishDate) {
+      timeline = startDate.concat(" - ").concat(finishDate);
+    } else {
+      timeline = `Started: ${startDate}`;
+    }
+  }
 
   const removeBook = async (): Promise<void> => {
     setShowActionMenu(false);
