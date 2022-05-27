@@ -1,14 +1,17 @@
 import { useState, useEffect } from "react";
+import { Dimensions } from "react-native";
 import { auth, storage } from "../firebase";
 import { useStore } from "../zstore";
 import { ref, getDownloadURL } from "firebase/storage";
 
-export const FALLBACK_IMAGE = "https://picsum.photos/200/300.jpg";
+const WIDTH = Dimensions.get("window").width;
 
 export const useBookImage = (bookId: string, useFallback: boolean = false) => {
   const [image, setImage] = useState("");
   const staleBookImage = useStore((state) => state.staleBookImage);
   const setStaleBookImage = useStore((state) => state.setStaleBookImage);
+
+  const FALLBACK_IMAGE = `https://picsum.photos/seed/${bookId}/${WIDTH}.jpg`;
 
   const getImage = async () => {
     try {
