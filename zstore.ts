@@ -7,7 +7,4 @@ export const useStore = create((set) => ({
       ...state,
       staleBookImage: bookId,
     })),
-  showActionMenu: false,
-  setShowActionMenu: (show: boolean) =>
-    set((state) => ({ ...state, showActionMenu: show })),
 }));

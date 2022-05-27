@@ -27,7 +27,6 @@ import { ProfileScreen } from "../screens/ProfileScreen";
 import { SignUpScreen } from "../screens/SignUpScreen";
 //import { StudyScreen } from "../screens/StudyScreen";
 import { RootStackParamList, RootTabParamList } from "../types";
-import { useStore } from "../zstore";
 import LinkingConfiguration from "./LinkingConfiguration";
 
 export default function Navigation({
@@ -157,12 +156,6 @@ const BookStack = createNativeStackNavigator();
 
 function BookStackScreen({ navigation }) {
   const colorScheme = useColorScheme();
-  const showActionMenu = useStore((state) => state.showActionMenu);
-  const setShowActionMenu = useStore((state) => state.setShowActionMenu);
-
-  const toggleActionMenu = (): void => {
-    setShowActionMenu(!showActionMenu);
-  };
 
   return (
     <BookStack.Navigator>
@@ -193,22 +186,6 @@ function BookStackScreen({ navigation }) {
         component={BookDetailsScreen}
         options={({ route }) => ({
           title: route.params.book.title,
-          headerRight: () => (
-            <Pressable
-              onPress={toggleActionMenu}
-              hitSlop={15}
-              style={({ pressed }) => ({
-                opacity: pressed ? 0.5 : 1,
-              })}
-            >
-              <FontAwesome
-                name="ellipsis-v"
-                size={25}
-                color={Colors[colorScheme].tabIconSelected}
-                style={{ marginRight: 15 }}
-              />
-            </Pressable>
-          ),
         })}
       />
     </BookStack.Navigator>

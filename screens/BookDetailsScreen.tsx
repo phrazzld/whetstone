@@ -1,5 +1,4 @@
 import { useNavigation, useRoute } from "@react-navigation/native";
-import { deleteObject, ref } from "firebase/storage";
 import { useState } from "react";
 import {
   ActivityIndicator,
@@ -13,7 +12,6 @@ import {
 } from "react-native";
 import { Note } from "../components/Note";
 import { Text, View } from "../components/Themed";
-import { auth, deleteBook, storage } from "../firebase";
 import { useBookImage } from "../hooks/useBookImage";
 import { useNotes } from "../hooks/useNotes";
 import { dateLocaleStringOptions, ensureDate } from "../utils";
@@ -21,43 +19,12 @@ import { useStore } from "../zstore";
 
 const windowWidth = Dimensions.get("window").width;
 
-interface ActionMenuItemProps {
-  text: string;
-  onPress: () => void;
-  destructive: boolean;
-}
-
-const ActionMenuItem = (props: ActionMenuItemProps) => {
-  const { text, onPress, destructive } = props;
-
-  const color = destructive ? "#cc0000" : "#147efb";
-
-  return (
-    <View
-      style={
-        destructive ? {} : { borderBottomWidth: 1, borderBottomColor: "grey" }
-      }
-    >
-      <TouchableOpacity
-        style={{ padding: 10, paddingLeft: 15, paddingRight: 15 }}
-        onPress={onPress}
-      >
-        <Text style={{ fontSize: 18, textAlign: "left", color: color }}>
-          {text}
-        </Text>
-      </TouchableOpacity>
-    </View>
-  );
-};
-
 export const BookDetailsScreen = () => {
   const { book } = useRoute().params;
   const [loading, setLoading] = useState(false);
   const navigation = useNavigation();
   const notes = useNotes(book.id);
   const image = useBookImage(book.id, true);
-  const showActionMenu = useStore((state) => state.showActionMenu);
-  const setShowActionMenu = useStore((state) => state.setShowActionMenu);
 
   const startDate = book.started
     ? ensureDate(book.started).toLocaleString([], dateLocaleStringOptions)
@@ -77,52 +44,6 @@ export const BookDetailsScreen = () => {
     }
   }
 
-  const removeBook = async (): Promise<void> => {
-    setShowActionMenu(false);
-    Alert.alert(
-      "Delete Book",
-      "Are you sure you want to delete this book?",
-      [
-        {
-          text: "Cancel",
-          style: "cancel",
-        },
-        {
-          text: "Delete",
-          style: "destructive",
-          onPress: async () => {
-            if (!auth.currentUser) {
-              throw new Error("Can't delete this book, no user is logged in.");
-            }
-
-            setLoading(true);
-            await deleteBook(book.id);
-            const bookImageRef = ref(
-              storage,
-              `${auth.currentUser.uid}/${book.id}/cover.jpg`
-            );
-            deleteObject(bookImageRef)
-              .then(() => {
-                setLoading(false);
-                navigation.goBack();
-              })
-              .catch((err) => {
-                console.log("Error deleting book image:", err);
-                setLoading(false);
-                navigation.goBack();
-              });
-          },
-        },
-      ],
-      { cancelable: false }
-    );
-  };
-
-  const editBook = (): void => {
-    setShowActionMenu(false);
-    navigation.navigate("EditBook", { book });
-  };
-
   const addNote = (): void => {
     setShowActionMenu(false);
     navigation.navigate("AddNote", { bookId: book.id });
@@ -131,24 +52,6 @@ export const BookDetailsScreen = () => {
   const addVocab = (): void => {
     setShowActionMenu(false);
     navigation.navigate("AddVocab", { bookId: book.id });
-  };
-
-  const ActionMenu = () => {
-    return (
-      <View
-        style={{
-          position: "absolute",
-          right: 30,
-          top: 0,
-          borderColor: "grey",
-          borderWidth: 2,
-          borderRadius: 5,
-        }}
-      >
-        <ActionMenuItem text="Edit" onPress={editBook} />
-        <ActionMenuItem text="Delete" onPress={removeBook} destructive />
-      </View>
-    );
   };
 
   if (loading) {
@@ -222,8 +125,6 @@ export const BookDetailsScreen = () => {
           </View>
         </View>
       </ScrollView>
-
-      {showActionMenu && <ActionMenu />}
     </View>
   );
 };

@@ -271,19 +271,13 @@ export const EditBookScreen = () => {
   }, [book]);
 
   const navToNextScreen = (payload: any): void => {
-    if (!!book) {
-      navigation.navigate("BookDetails", {
-        book: { ...book, ...payload },
-      });
-    } else {
-      let tab = 0;
-      if (!!payload.finished) {
-        tab = 1;
-      } else if (!payload.finished && !payload.started) {
-        tab = 2;
-      }
-      navigation.navigate("Books", { tab });
+    let tab = 0;
+    if (!!payload.finished) {
+      tab = 1;
+    } else if (!payload.finished && !payload.started) {
+      tab = 2;
     }
+    navigation.navigate("Books", { tab });
   };
 
   const uploadImage = async (
@@ -372,11 +366,7 @@ export const EditBookScreen = () => {
   };
 
   const cancel = () => {
-    if (!!book) {
-      navigation.navigate("BookDetails", { book });
-    } else {
-      navigation.navigate("Books");
-    }
+    navigation.navigate("Books");
   };
 
   const isReading = (): void => {

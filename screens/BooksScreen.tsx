@@ -53,7 +53,7 @@ const BooksScreen = () => {
             <Tab.Item title="Unread" />
           </Tab>
 
-          <TabView value={tabIndex} onChange={setTabIndex}>
+          <TabView value={tabIndex} onChange={setTabIndex} disableSwipe={true}>
             <TabView.Item style={{ width: "100%" }}>
               <FlatList
                 data={unfinishedBooks}
