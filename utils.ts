@@ -1,4 +1,5 @@
 import * as ImagePicker from "expo-image-picker";
+import * as admin from "firebase-admin";
 import { auth } from "./firebase";
 import { TBookList } from "./types";
 
@@ -47,7 +48,7 @@ export const pickImage = async (): Promise<
   }
 };
 
-export const ensureDate = (date: any): Date => {
+export const ensureDate = (date: Date | admin.firestore.Timestamp): Date => {
   if (date instanceof Date) {
     return date;
   }

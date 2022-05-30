@@ -17,7 +17,7 @@ import { ProgressBar, TextInput } from "react-native-paper";
 import SelectDropdown from "react-native-select-dropdown";
 import { SafeAreaView, Text, View } from "../components/Themed";
 import { auth, createBook, storage, updateBook } from "../firebase";
-import { EditBookScreenParams, TBook, TBookList } from "../types";
+import { BookPayload, EditBookScreenParams, TBook, TBookList } from "../types";
 import { ensureDate, LISTS, pickImage } from "../utils";
 import { useStore } from "../zstore";
 
@@ -278,7 +278,7 @@ export const EditBookScreen = () => {
     }
   }, [params]);
 
-  const navToNextScreen = (payload: any): void => {
+  const navToNextScreen = (payload: BookPayload): void => {
     let tab = 0;
     if (!!payload.finished) {
       tab = 1;
@@ -291,7 +291,7 @@ export const EditBookScreen = () => {
   const uploadImage = async (
     image: any,
     bookId: string,
-    payload: any
+    payload: BookPayload
   ): Promise<void> => {
     if (!auth.currentUser) {
       throw new Error("Cannot edit book, user is not logged in.");
@@ -351,15 +351,17 @@ export const EditBookScreen = () => {
     }
 
     try {
-      let payload = {
+      let payload: BookPayload = {
         title,
         author,
         started,
         finished,
+        updatedAt: new Date(),
       };
 
       let bookId: string;
       if (!params?.book) {
+        payload.createdAt = new Date();
         const bookRef = await createBook(payload);
         bookId = bookRef.id;
       } else {

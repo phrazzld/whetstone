@@ -10,6 +10,7 @@ import {
   RouteProp,
 } from "@react-navigation/native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import * as admin from "firebase-admin";
 
 declare global {
   namespace ReactNavigation {
@@ -51,11 +52,20 @@ export type TBook = {
   id: string;
   title: string;
   author: string;
-  started?: any;
-  finished?: any;
-  createdAt: any;
-  updatedAt?: any;
+  started?: admin.firestore.Timestamp | Date;
+  finished?: admin.firestore.Timestamp | Date;
+  createdAt: admin.firestore.Timestamp | Date;
+  updatedAt?: admin.firestore.Timestamp | Date;
 };
+
+export type BookPayload = {
+  title: string;
+  author: string;
+  started?: admin.firestore.Timestamp | Date | null;
+  finished?: admin.firestore.Timestamp | Date | null;
+  createdAt?: admin.firestore.Timestamp | Date | null;
+  updatedAt?: admin.firestore.Timestamp | Date | null;
+}
 
 export type NotePayload = {
   content: string;
@@ -82,8 +92,8 @@ export type TNote = {
   word?: string;
   definition?: string;
   page?: number;
-  createdAt: any;
-  updatedAt?: any;
+  createdAt: admin.firestore.Timestamp | Date;
+  updatedAt?: admin.firestore.Timestamp | Date;
 };
 
 export type TBookList = "Reading" | "Finished" | "Unread";
