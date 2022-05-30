@@ -1,27 +1,24 @@
 import { useNavigation, useRoute } from "@react-navigation/native";
-import { useState } from "react";
 import {
-  ActivityIndicator,
-  Alert,
   Button,
   Dimensions,
   Image,
   ScrollView,
   StyleSheet,
-  TouchableOpacity,
 } from "react-native";
 import { Note } from "../components/Note";
 import { Text, View } from "../components/Themed";
 import { useBookImage } from "../hooks/useBookImage";
 import { useNotes } from "../hooks/useNotes";
+import { BookDetailsScreenRouteProp } from "../types";
 import { dateLocaleStringOptions, ensureDate } from "../utils";
-import { useStore } from "../zstore";
 
 const windowWidth = Dimensions.get("window").width;
 
 export const BookDetailsScreen = () => {
-  const { book } = useRoute().params;
-  const [loading, setLoading] = useState(false);
+  const route = useRoute<BookDetailsScreenRouteProp>();
+  const params = route.params;
+  const { book } = params;
   const navigation = useNavigation();
   const notes = useNotes(book.id);
   const image = useBookImage(book.id, true);
@@ -45,22 +42,12 @@ export const BookDetailsScreen = () => {
   }
 
   const addNote = (): void => {
-    setShowActionMenu(false);
     navigation.navigate("AddNote", { bookId: book.id });
   };
 
   const addVocab = (): void => {
-    setShowActionMenu(false);
     navigation.navigate("AddVocab", { bookId: book.id });
   };
-
-  if (loading) {
-    return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <ActivityIndicator size="large" />
-      </View>
-    );
-  }
 
   return (
     <View style={{ height: "100%" }}>

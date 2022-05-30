@@ -7,12 +7,13 @@ import { SafeAreaView, Text, View } from "../components/Themed";
 import { useFinishedBooks } from "../hooks/useFinishedBooks";
 import { useUnfinishedBooks } from "../hooks/useUnfinishedBooks";
 import { useUnreadBooks } from "../hooks/useUnreadBooks";
-import { TBook } from "../types";
+import { BooksScreenParams, TBook } from "../types";
 
 const BooksScreen = () => {
   const route = useRoute();
-  const tab = route.params?.tab;
-  const [tabIndex, setTabIndex] = useState(tab || 0);
+  const params: BooksScreenParams | null = route.params || null;
+  const tab = params?.tab || 0;
+  const [tabIndex, setTabIndex] = useState(tab);
   const unfinishedBooks = useUnfinishedBooks();
   const finishedBooks = useFinishedBooks();
   const unreadBooks = useUnreadBooks();

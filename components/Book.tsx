@@ -1,14 +1,20 @@
-import { useRef } from "react";
 import { useNavigation } from "@react-navigation/native";
+import { deleteObject, ref } from "firebase/storage";
+import { useRef } from "react";
+import {
+  Alert,
+  Animated,
+  Image,
+  StyleSheet,
+  TouchableOpacity,
+} from "react-native";
+import { RectButton } from "react-native-gesture-handler";
 import Swipeable from "react-native-gesture-handler/Swipeable";
-import { Animated, Image, StyleSheet, TouchableOpacity } from "react-native";
+import { auth, deleteBook, storage } from "../firebase";
 import { useBookImage } from "../hooks/useBookImage";
 import { TBook } from "../types";
 import { dateLocaleStringOptions, ensureDate } from "../utils";
 import { FontAwesome, Text, View } from "./Themed";
-import { RectButton } from "react-native-gesture-handler";
-import { auth, deleteBook, storage } from "../firebase";
-import { deleteObject, ref } from "firebase/storage";
 
 interface BookProps {
   book: TBook;
@@ -18,7 +24,7 @@ export const Book = (props: BookProps) => {
   const { book } = props;
   const navigation = useNavigation();
   const image = useBookImage(book.id, true);
-  const swipeableRef = useRef(null);
+  const swipeableRef = useRef<Swipeable | null>(null);
 
   const truncate = (s: string): string => {
     const MAX_LENGTH = 30;
@@ -70,7 +76,6 @@ export const Book = (props: BookProps) => {
               throw new Error("Can't delete this book, no user is logged in.");
             }
 
-            setLoading(true);
             await deleteBook(book.id);
             const bookImageRef = ref(
               storage,
@@ -78,13 +83,10 @@ export const Book = (props: BookProps) => {
             );
             deleteObject(bookImageRef)
               .then(() => {
-                setLoading(false);
-                navigation.goBack();
+                console.debug("Successfully deleted book image");
               })
               .catch((err) => {
-                console.log("Error deleting book image:", err);
-                setLoading(false);
-                navigation.goBack();
+                console.debug("Error deleting book image:", err);
               });
           },
         },
@@ -96,14 +98,10 @@ export const Book = (props: BookProps) => {
   const renderRightAction = (
     text: string,
     color: string,
-    x: number,
-    progress: any,
+    _x: number,
+    _progress: any,
     pressHandler: any
   ): any => {
-    const trans = progress.interpolate({
-      inputRange: [0, 1],
-      outputRange: [x, 0],
-    });
     return (
       <Animated.View style={{ flex: 1, transform: [{ translateX: 0 }] }}>
         <RectButton

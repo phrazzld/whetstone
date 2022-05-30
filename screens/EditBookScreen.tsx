@@ -17,7 +17,7 @@ import { ProgressBar, TextInput } from "react-native-paper";
 import SelectDropdown from "react-native-select-dropdown";
 import { SafeAreaView, Text, View } from "../components/Themed";
 import { auth, createBook, storage, updateBook } from "../firebase";
-import { TBook, TBookList } from "../types";
+import { EditBookScreenParams, TBook, TBookList } from "../types";
 import { ensureDate, LISTS, pickImage } from "../utils";
 import { useStore } from "../zstore";
 
@@ -70,6 +70,7 @@ const TitleInput = (props: TitleInputProps) => {
 
   return (
     <TextInput
+      autoComplete="off"
       mode="outlined"
       label="Title"
       placeholder="Title"
@@ -91,6 +92,7 @@ const AuthorInput = (props: AuthorInputProps) => {
 
   return (
     <TextInput
+      autoComplete="off"
       mode="outlined"
       label="Author"
       placeholder="Author"
@@ -237,12 +239,18 @@ const SaveProgress = (props: SaveProgressProps) => {
 export const EditBookScreen = () => {
   const navigation = useNavigation();
   const route = useRoute();
-  const book = route.params?.book;
-  const [title, setTitle] = useState<string>(book?.title);
-  const [author, setAuthor] = useState<string>(book?.author);
-  const [list, setList] = useState<TBookList | null>(whatList(book));
-  const [started, setStarted] = useState<Date | null>(initStarted(book));
-  const [finished, setFinished] = useState<Date | null>(initFinished(book));
+  const params: EditBookScreenParams | null = route.params || null;
+  const [title, setTitle] = useState<string>(params?.book?.title || "");
+  const [author, setAuthor] = useState<string>(params?.book?.author || "");
+  const [list, setList] = useState<TBookList | null>(
+    whatList(params?.book || null)
+  );
+  const [started, setStarted] = useState<Date | null>(
+    initStarted(params?.book || null)
+  );
+  const [finished, setFinished] = useState<Date | null>(
+    initFinished(params?.book || null)
+  );
   const [localImage, setLocalImage] = useState<any>(null);
   const [image, setImage] = useState<any>(null);
   const [creationProgress, setCreationProgress] = useState(0);
@@ -256,7 +264,7 @@ export const EditBookScreen = () => {
 
     const coverRef = ref(
       storage,
-      `${auth.currentUser.uid}/${book.id}/cover.jpg`
+      `${auth.currentUser.uid}/${params?.book?.id}/cover.jpg`
     );
     const coverUrl = await getDownloadURL(coverRef);
     if (coverUrl) {
@@ -265,10 +273,10 @@ export const EditBookScreen = () => {
   };
 
   useEffect(() => {
-    if (book) {
+    if (params?.book) {
       getImage();
     }
-  }, [book]);
+  }, [params]);
 
   const navToNextScreen = (payload: any): void => {
     let tab = 0;
@@ -351,11 +359,11 @@ export const EditBookScreen = () => {
       };
 
       let bookId: string;
-      if (!book) {
+      if (!params?.book) {
         const bookRef = await createBook(payload);
         bookId = bookRef.id;
       } else {
-        bookId = book.id;
+        bookId = params.book.id;
         await updateBook(bookId, payload);
       }
       setCreationProgress(0.01);
@@ -371,14 +379,14 @@ export const EditBookScreen = () => {
 
   const isReading = (): void => {
     setList("Reading");
-    setStarted(initStarted(book) || new Date());
+    setStarted(initStarted(params?.book || null) || new Date());
     setFinished(null);
   };
 
   const isFinished = (): void => {
     setList("Finished");
-    setStarted(initStarted(book) || new Date());
-    setFinished(initFinished(book) || new Date());
+    setStarted(initStarted(params?.book || null) || new Date());
+    setFinished(initFinished(params?.book || null) || new Date());
   };
 
   const isUnread = (): void => {

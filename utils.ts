@@ -6,11 +6,15 @@ export const dateLocaleStringOptions = {
   year: "numeric",
   month: "long",
   day: "numeric",
-};
+} as const;
 
 export const LISTS: Array<TBookList> = ["Reading", "Finished", "Unread"];
 
-export const pickImage = async (): Promise<ExpandImagePickerResult> => {
+export const pickImage = async (): Promise<
+  ImagePicker.ExpandImagePickerResult<
+    ImagePicker.ImagePickerOptions | ImagePicker.OpenFileBrowserOptions
+  >
+> => {
   if (!auth.currentUser) {
     throw new Error("Cannot edit book image, user is not logged in.");
   }
@@ -21,7 +25,8 @@ export const pickImage = async (): Promise<ExpandImagePickerResult> => {
 
     // If media permissions are not granted, request permissions
     if (permissions.granted === false) {
-      const newPermissions = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      const newPermissions =
+        await ImagePicker.requestMediaLibraryPermissionsAsync();
 
       // If media permissions are still not granted, return
       if (newPermissions.granted === false) {
@@ -48,4 +53,8 @@ export const ensureDate = (date: any): Date => {
   }
 
   return date.toDate();
+};
+
+export const strToInt = (str: string): number => {
+  return parseInt(str.replace(/\s+/g, ""), 10);
 };

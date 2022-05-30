@@ -1,20 +1,20 @@
+import { deleteObject, ref } from "firebase/storage";
 import {
   Alert,
   Button,
   Linking,
-  TouchableOpacity,
   StyleSheet,
+  TouchableOpacity,
 } from "react-native";
 import { SafeAreaView, Text, View } from "../components/Themed";
 import {
   auth,
-  storage,
-  getBooks,
-  getBookNotes,
-  deleteNote,
   deleteBook,
+  deleteNote,
+  getBookNotes,
+  getBooks,
+  storage,
 } from "../firebase";
-import { ref, deleteObject } from "firebase/storage";
 
 export const ProfileScreen = () => {
   const deleteAccount = () => {

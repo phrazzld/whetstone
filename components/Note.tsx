@@ -17,7 +17,7 @@ interface NoteTypeBadgeProps {
 
 const NoteTypeBadge = (props: NoteTypeBadgeProps) => {
   const { noteType } = props;
-  let icon;
+  let icon: "bookmark" | "font" | "file-text" | "quote-left";
 
   switch (noteType) {
     case "bookmark":
@@ -56,10 +56,10 @@ interface NoteProps {
 }
 
 export const Note = (props: NoteProps) => {
-  const { note, bookId, onPress } = props;
+  const { note, bookId } = props;
   const colorScheme = useColorScheme();
   const navigation = useNavigation();
-  const swipeableRef = useRef(null);
+  const swipeableRef = useRef<Swipeable | null>(null);
 
   const editNote = (): void => {
     if (swipeableRef.current) {
@@ -98,14 +98,10 @@ export const Note = (props: NoteProps) => {
   const renderRightAction = (
     text: string,
     color: string,
-    x: number,
-    progress: any,
+    _x: number,
+    _progress: any,
     pressHandler: any
   ): any => {
-    const trans = progress.interpolate({
-      inputRange: [0, 1],
-      outputRange: [x, 0],
-    });
     return (
       <Animated.View style={{ flex: 1, transform: [{ translateX: 0 }] }}>
         <RectButton

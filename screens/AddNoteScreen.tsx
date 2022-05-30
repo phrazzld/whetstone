@@ -9,25 +9,46 @@ import {
 } from "react-native";
 import { SafeAreaView, TextInput, View } from "../components/Themed";
 import { auth, createNote, updateNote } from "../firebase";
+import { AddNoteScreenParams, NotePayload } from "../types";
+import { strToInt } from "../utils";
 
 export const AddNoteScreen = () => {
-  const { bookId, editNote } = useRoute().params;
-  const [content, setContent] = useState(editNote?.content || "");
-  const [page, setPage] = useState(editNote?.page || "");
+  const route = useRoute();
+  const params: AddNoteScreenParams | null = route.params || null;
+  const [content, setContent] = useState(params?.editNote?.content || "");
+  const [page, setPage] = useState(params?.editNote?.page?.toString() || "");
   const navigation = useNavigation();
 
   const addNote = () => {
-    const note = { type: "note", content, page, createdAt: new Date() };
+    if (!params?.bookId) {
+      throw new Error("Cannot add note, invalid route params");
+    }
+
+    const note: NotePayload = {
+      type: "note",
+      content,
+      page: strToInt(page),
+      createdAt: new Date(),
+    };
     if (!!content || !!page) {
-      createNote(bookId, note);
+      createNote(params.bookId, note);
     }
     navigation.goBack();
   };
 
   const modifyNote = () => {
-    const payload = { type: "note", content, page, updatedAt: new Date() };
+    if (!params?.bookId || !params.editNote) {
+      throw new Error("Cannot modify note, invalid route params");
+    }
+
+    const payload: NotePayload = {
+      type: "note",
+      content,
+      page: strToInt(page),
+      updatedAt: new Date(),
+    };
     if (!!content || !!page) {
-      updateNote(bookId, editNote.id, payload);
+      updateNote(params.bookId, params.editNote.id, payload);
     }
     navigation.goBack();
   };
@@ -37,7 +58,7 @@ export const AddNoteScreen = () => {
       throw new Error("Cannot save note, user is not logged in.");
     }
 
-    if (editNote) {
+    if (params?.editNote) {
       modifyNote();
     } else {
       addNote();

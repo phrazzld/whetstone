@@ -9,6 +9,8 @@ import {
 } from "react-native";
 import { SafeAreaView, TextInput, View } from "../components/Themed";
 import { auth, createNote, updateNote } from "../firebase";
+import { AddNoteScreenParams } from "../types";
+import { strToInt } from "../utils";
 
 interface DictionaryDefinition {
   definition: string;
@@ -29,33 +31,44 @@ interface DictionaryWord {
 }
 
 export const AddVocabScreen = () => {
-  const { bookId, editVocab } = useRoute().params;
-  const [word, setWord] = useState(editVocab?.word || "");
-  const [definition, setDefinition] = useState(editVocab?.definition || "");
-  const [page, setPage] = useState(editVocab?.page || "");
+  const route = useRoute();
+  const params: AddNoteScreenParams | null = route.params || null;
+  const [word, setWord] = useState(params?.editVocab?.word || "");
+  const [definition, setDefinition] = useState(
+    params?.editVocab?.definition || ""
+  );
+  const [page, setPage] = useState(params?.editVocab?.page?.toString() || "");
   const navigation = useNavigation();
 
   const addVocab = (): void => {
+    if (!params?.bookId) {
+      throw new Error("Cannot add vocab, invalid route params");
+    }
+
     const vocab = {
       type: "vocab",
       word,
       definition,
-      page,
+      page: strToInt(page),
       createdAt: new Date(),
     };
-    createNote(bookId, vocab);
+    createNote(params.bookId, vocab);
     navigation.goBack();
   };
 
   const modifyVocab = () => {
+    if (!params?.bookId || !params.editVocab) {
+      throw new Error("Cannot modify vocab, invalid route params");
+    }
+
     const payload = {
       type: "vocab",
       word,
       definition,
-      page,
+      page: strToInt(page),
       updatedAt: new Date(),
     };
-    updateNote(bookId, editVocab.id, payload);
+    updateNote(params.bookId, params.editVocab.id, payload);
     navigation.goBack();
   };
 
@@ -64,7 +77,7 @@ export const AddVocabScreen = () => {
       throw new Error("Cannot save note, user is not logged in.");
     }
 
-    if (editVocab) {
+    if (params?.editVocab) {
       modifyVocab();
     } else {
       addVocab();

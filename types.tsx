@@ -7,53 +7,106 @@ import { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
 import {
   CompositeScreenProps,
   NavigatorScreenParams,
+  RouteProp,
 } from "@react-navigation/native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 
 declare global {
   namespace ReactNavigation {
-    interface RootParamList extends RootStackParamList {}
+    interface RootParamList extends RootStackParamList { }
+    interface BookParamList extends BookStackParamList { }
   }
 }
 
 export type RootStackParamList = {
   Root: NavigatorScreenParams<RootTabParamList> | undefined;
-  AddBook: undefined;
+  AddBook: EditBookScreenParams | undefined;
+  EditBook: EditBookScreenParams;
+  AddNote: AddNoteScreenParams | undefined;
+  AddVocab: AddNoteScreenParams | undefined;
+  SignUp: undefined;
   NotFound: undefined;
 };
 
-export type RootStackScreenProps<
-  Screen extends keyof RootStackParamList
-> = NativeStackScreenProps<RootStackParamList, Screen>;
-
-export type RootTabParamList = {
-  Reading: undefined;
+export type BookStackParamList = {
+  BookDetails: BookDetailsScreenParams;
+  Books: BooksScreenParams | undefined;
 };
 
-export type RootTabScreenProps<
-  Screen extends keyof RootTabParamList
-> = CompositeScreenProps<
-  BottomTabScreenProps<RootTabParamList, Screen>,
-  NativeStackScreenProps<RootStackParamList>
->;
+export type RootStackScreenProps<Screen extends keyof RootStackParamList> =
+  NativeStackScreenProps<RootStackParamList, Screen>;
+
+export type RootTabParamList = {
+  BookStack: undefined;
+  Profile: undefined;
+};
+
+export type RootTabScreenProps<Screen extends keyof RootTabParamList> =
+  CompositeScreenProps<
+    BottomTabScreenProps<RootTabParamList, Screen>,
+    NativeStackScreenProps<RootStackParamList>
+  >;
 
 export type TBook = {
   id: string;
   title: string;
   author: string;
-  started: any;
-  finished: any;
+  started?: any;
+  finished?: any;
+  createdAt: any;
+  updatedAt?: any;
+};
+
+export type NotePayload = {
+  content: string;
+  type: "note";
+  page?: number;
+  createdAt?: Date;
+  updatedAt?: Date;
+};
+
+export type VocabPayload = {
+  type: "vocab";
+  word: string;
+  definition: string;
+  page?: number;
+  createdAt?: Date;
+  updatedAt?: Date;
 };
 
 export type TNote = {
   id: string;
-  bookId: string;
-  content: string;
+  bookId?: string;
+  content?: string;
+  type?: "note" | "vocab";
+  word?: string;
+  definition?: string;
+  page?: number;
   createdAt: any;
-  type: "note" | "vocab";
-  word: string;
-  definition: string;
-  page: number;
+  updatedAt?: any;
 };
 
 export type TBookList = "Reading" | "Finished" | "Unread";
+
+export type BooksScreenParams = {
+  tab?: number;
+};
+
+export type AddNoteScreenParams = {
+  bookId?: string;
+  editNote?: TNote;
+  editVocab?: TNote;
+};
+
+export type BookDetailsScreenParams = {
+  book: TBook;
+};
+
+export type EditBookScreenParams = {
+  book?: TBook;
+};
+
+export type BookDetailsScreenRouteProp = RouteProp<
+  BookStackParamList,
+  "BookDetails"
+>;

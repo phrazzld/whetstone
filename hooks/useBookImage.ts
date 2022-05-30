@@ -1,8 +1,8 @@
-import { useState, useEffect } from "react";
+import { getDownloadURL, ref } from "firebase/storage";
+import { useEffect, useState } from "react";
 import { Dimensions } from "react-native";
 import { auth, storage } from "../firebase";
 import { useStore } from "../zstore";
-import { ref, getDownloadURL } from "firebase/storage";
 
 const WIDTH = Dimensions.get("window").width;
 

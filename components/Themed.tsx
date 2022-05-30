@@ -36,23 +36,24 @@ export type TextProps = ThemeProps & DefaultText["props"];
 export type TextInputProps = ThemeProps & DefaultTextInput["props"];
 export type ViewProps = ThemeProps & DefaultView["props"];
 export type SafeAreaViewProps = ThemeProps & DefaultSafeAreaView["props"];
-export type FontAwesomeProps = ThemeProps & DefaultFontAwesome["props"];
+export type FontAwesomeProps = ThemeProps &
+  InstanceType<typeof DefaultFontAwesome>["props"];
 
-export function Text(props: TextProps) {
+export const Text = (props: TextProps) => {
   const { style, lightColor, darkColor, ...otherProps } = props;
   const color = useThemeColor({ light: lightColor, dark: darkColor }, "text");
 
   return <DefaultText style={[{ color }, style]} {...otherProps} />;
-}
+};
 
-export function TextInput(props: TextProps) {
+export const TextInput = (props: TextInputProps) => {
   const { style, lightColor, darkColor, ...otherProps } = props;
   const color = useThemeColor({ light: lightColor, dark: darkColor }, "text");
 
   return <DefaultTextInput style={[{ color }, style]} {...otherProps} />;
-}
+};
 
-export function View(props: ViewProps) {
+export const View = (props: ViewProps) => {
   const { style, lightColor, darkColor, ...otherProps } = props;
   const backgroundColor = useThemeColor(
     { light: lightColor, dark: darkColor },
@@ -60,9 +61,9 @@ export function View(props: ViewProps) {
   );
 
   return <DefaultView style={[{ backgroundColor }, style]} {...otherProps} />;
-}
+};
 
-export function SafeAreaView(props: SafeAreaViewProps) {
+export const SafeAreaView = (props: SafeAreaViewProps) => {
   const { style, lightColor, darkColor, ...otherProps } = props;
   const backgroundColor = useThemeColor(
     { light: lightColor, dark: darkColor },
@@ -72,9 +73,9 @@ export function SafeAreaView(props: SafeAreaViewProps) {
   return (
     <DefaultSafeAreaView style={[{ backgroundColor }, style]} {...otherProps} />
   );
-}
+};
 
-export function FontAwesome(props: FontAwesomeProps) {
+export const FontAwesome = (props: FontAwesomeProps) => {
   const { style, lightColor, darkColor, color, ...otherProps } = props;
   const themeColor =
     color ??
@@ -86,4 +87,4 @@ export function FontAwesome(props: FontAwesomeProps) {
       {...otherProps}
     />
   );
-}
+};

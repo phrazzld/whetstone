@@ -1,9 +1,14 @@
 import create from "zustand";
 
-export const useStore = create((set) => ({
+type State = {
+  staleBookImage: string;
+  setStaleBookImage: (bookId: string) => void;
+};
+
+export const useStore = create<State>((set) => ({
   staleBookImage: "",
   setStaleBookImage: (bookId: string) =>
-    set((state) => ({
+    set((state: State) => ({
       ...state,
       staleBookImage: bookId,
     })),

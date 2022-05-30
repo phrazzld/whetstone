@@ -26,7 +26,11 @@ import NotFoundScreen from "../screens/NotFoundScreen";
 import { ProfileScreen } from "../screens/ProfileScreen";
 import { SignUpScreen } from "../screens/SignUpScreen";
 //import { StudyScreen } from "../screens/StudyScreen";
-import { RootStackParamList, RootTabParamList } from "../types";
+import {
+  BookStackParamList,
+  RootStackParamList,
+  RootTabParamList,
+} from "../types";
 import LinkingConfiguration from "./LinkingConfiguration";
 
 export default function Navigation({
@@ -152,9 +156,9 @@ function BottomTabNavigator() {
   );
 }
 
-const BookStack = createNativeStackNavigator();
+const BookStack = createNativeStackNavigator<BookStackParamList>();
 
-function BookStackScreen({ navigation }) {
+function BookStackScreen({ navigation }: { navigation: any }) {
   const colorScheme = useColorScheme();
 
   return (
