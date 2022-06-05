@@ -52,8 +52,6 @@ export type TBook = {
   id: string;
   title: string;
   author: string;
-  started?: admin.firestore.Timestamp | Date;
-  finished?: admin.firestore.Timestamp | Date;
   createdAt: admin.firestore.Timestamp | Date;
   updatedAt?: admin.firestore.Timestamp | Date;
 };
@@ -61,11 +59,11 @@ export type TBook = {
 export type BookPayload = {
   title: string;
   author: string;
-  started?: admin.firestore.Timestamp | Date | null;
-  finished?: admin.firestore.Timestamp | Date | null;
+  started: Date | null;
+  finished: Date | null;
   createdAt?: admin.firestore.Timestamp | Date | null;
   updatedAt?: admin.firestore.Timestamp | Date | null;
-}
+};
 
 export type NotePayload = {
   content: string;
@@ -73,6 +71,7 @@ export type NotePayload = {
   page?: number;
   createdAt?: Date;
   updatedAt?: Date;
+  date?: Date;
 };
 
 export type VocabPayload = {
@@ -82,17 +81,26 @@ export type VocabPayload = {
   page?: number;
   createdAt?: Date;
   updatedAt?: Date;
+  date?: Date;
 };
+
+export type StatusNotePayload = {
+  type: "started" | "finished";
+  createdAt?: Date;
+  updatedAt?: Date;
+  date?: Date;
+}
 
 export type TNote = {
   id: string;
   bookId?: string;
   content?: string;
-  type?: "note" | "vocab";
+  type?: "note" | "vocab" | "started" | "finished";
   word?: string;
   definition?: string;
   page?: number;
   createdAt: admin.firestore.Timestamp | Date;
+  date?: admin.firestore.Timestamp | Date;
   updatedAt?: admin.firestore.Timestamp | Date;
 };
 

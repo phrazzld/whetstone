@@ -12,6 +12,18 @@ import { auth, createNote, updateNote } from "../firebase";
 import { AddNoteScreenParams, NotePayload } from "../types";
 import { strToInt } from "../utils";
 
+// TODO: Rename component + file to EditNoteScreen
+
+// TODO: Add edit capabilities to note.date, and use note.date instead of createdAt
+// const onStartDatePickerChange = (
+//   _event: DateTimePickerEvent,
+//   selectedDate: Date | undefined
+// ) => {
+//   if (!!selectedDate) {
+//     setStarted(selectedDate);
+//   }
+// };
+//
 export const AddNoteScreen = () => {
   const route = useRoute();
   const params: AddNoteScreenParams | null = route.params || null;

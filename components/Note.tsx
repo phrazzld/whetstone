@@ -4,20 +4,27 @@ import { useRef } from "react";
 import { Alert, Animated, StyleSheet } from "react-native";
 import { RectButton } from "react-native-gesture-handler";
 import Swipeable from "react-native-gesture-handler/Swipeable";
+import { dateLocaleStringOptions } from "../constants";
 import Colors from "../constants/Colors";
 import { deleteNote } from "../firebase";
 import useColorScheme from "../hooks/useColorScheme";
 import { TNote } from "../types";
-import { dateLocaleStringOptions, ensureDate } from "../utils";
+import { ensureDate } from "../utils";
 import { FontAwesome, Text, View } from "./Themed";
 
 interface NoteTypeBadgeProps {
-  noteType: "bookmark" | "vocab" | "note" | "quote";
+  noteType: "bookmark" | "vocab" | "note" | "quote" | "started" | "finished";
 }
 
 const NoteTypeBadge = (props: NoteTypeBadgeProps) => {
   const { noteType } = props;
-  let icon: "bookmark" | "font" | "file-text" | "quote-left";
+  let icon:
+    | "bookmark"
+    | "font"
+    | "file-text"
+    | "quote-left"
+    | "play-circle"
+    | "flag-checkered";
 
   switch (noteType) {
     case "bookmark":
@@ -28,6 +35,12 @@ const NoteTypeBadge = (props: NoteTypeBadgeProps) => {
       break;
     case "note":
       icon = "file-text";
+      break;
+    case "started":
+      icon = "play-circle";
+      break;
+    case "finished":
+      icon = "flag-checkered";
       break;
     case "quote":
       icon = "quote-left";
@@ -152,6 +165,14 @@ export const Note = (props: NoteProps) => {
               <Text style={styles.content}>{note.content}</Text>
             )}
 
+            {note.type === "started" && (
+              <Text style={styles.word}>Started reading.</Text>
+            )}
+
+            {note.type === "finished" && (
+              <Text style={styles.word}>Finished reading.</Text>
+            )}
+
             {note.type === "vocab" && (
               <>
                 <Text style={styles.word}>{note.word}</Text>
@@ -197,7 +218,7 @@ export const Note = (props: NoteProps) => {
                   style={{ marginRight: 10 }}
                 />
                 <Text style={styles.timestamp}>
-                  {ensureDate(note.createdAt).toLocaleString(
+                  {ensureDate(note.date || note.createdAt).toLocaleString(
                     [],
                     dateLocaleStringOptions
                   )}

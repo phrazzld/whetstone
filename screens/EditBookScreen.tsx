@@ -1,7 +1,5 @@
-import DateTimePicker, {
-  DateTimePickerEvent,
-} from "@react-native-community/datetimepicker";
 import { useNavigation, useRoute } from "@react-navigation/native";
+import { DateTimePickerEvent } from "@react-native-community/datetimepicker";
 import { StatusBar } from "expo-status-bar";
 import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
 import { useEffect, useState } from "react";
@@ -16,45 +14,57 @@ import {
 import { ProgressBar, TextInput } from "react-native-paper";
 import SelectDropdown from "react-native-select-dropdown";
 import { SafeAreaView, Text, View } from "../components/Themed";
-import { auth, createBook, storage, updateBook } from "../firebase";
-import { BookPayload, EditBookScreenParams, TBook, TBookList } from "../types";
-import { ensureDate, LISTS, pickImage } from "../utils";
+import {
+  auth,
+  createNote,
+  createBook,
+  storage,
+  updateBook,
+  updateNote,
+} from "../firebase";
+import {
+  BookPayload,
+  EditBookScreenParams,
+  TBook,
+  TBookList,
+  StatusNotePayload,
+  TNote,
+} from "../types";
+import { ensureDate, pickImage } from "../utils";
 import { useStore } from "../zstore";
+import { TABS, LISTS } from "../constants";
+import { DatePicker } from "../components/DatePicker";
+import { useStatusNotes } from "../hooks/useStatusNotes";
 
 const windowWidth = Dimensions.get("window").width;
 
-const whatList = (book: TBook | null): TBookList | null => {
-  if (!book) {
-    return null;
+const whatList = (statusNotes: Array<TNote>): TBookList => {
+  if (statusNotes.length === 0) {
+    return "Unread";
   }
 
-  if (book.started) {
-    if (book.finished) {
-      return "Finished";
-    }
+  if (statusNotes[0].type === "started") {
     return "Reading";
   }
 
-  return "Unread";
+  if (statusNotes[0].type === "finished") {
+    return "Finished";
+  }
+
+  throw new Error(
+    `Could not identify what list book was in based on statusNotes: ${statusNotes}`
+  );
 };
 
 // Takes input values as parameters, returns an error string
 // Error string is empty if no validation errors are found
-const validateInputs = (
-  title: string,
-  author: string,
-  list: TBookList | null
-): string => {
+const validateInputs = (title: string, author: string): string => {
   if (!title) {
     return "Title field cannot be blank.";
   }
 
   if (!author) {
     return "Author field cannot be blank.";
-  }
-
-  if (!list) {
-    return "Please select a list.";
   }
 
   return "";
@@ -124,17 +134,25 @@ const ImagePicker = (props: ImagePickerProps) => {
   );
 };
 
-const initStarted = (book: TBook | null): Date | null => {
-  if (!!book && !!book.started) {
-    return ensureDate(book.started);
+const initStarted = (statusNotes: Array<TNote>): Date | null => {
+  // Find the first started note
+  const mostRecentStartedNote = statusNotes.find(
+    (n: TNote) => n.type === "started"
+  );
+  if (mostRecentStartedNote?.date) {
+    return ensureDate(mostRecentStartedNote.date);
   }
 
   return null;
 };
 
-const initFinished = (book: TBook | null): Date | null => {
-  if (!!book && !!book.finished) {
-    return ensureDate(book.finished);
+const initFinished = (statusNotes: Array<TNote>): Date | null => {
+  // Find the first started note
+  const mostRecentFinishedNote = statusNotes.find(
+    (n: TNote) => n.type === "finished"
+  );
+  if (mostRecentFinishedNote?.date) {
+    return ensureDate(mostRecentFinishedNote.date);
   }
 
   return null;
@@ -155,40 +173,8 @@ const ListDropdown = (props: ListDropdownProps) => {
       buttonTextAfterSelection={(selectedItem) => selectedItem}
       rowTextForSelection={(item) => item}
       buttonStyle={styles.input}
-      defaultButtonText="Select a list"
       defaultValue={defaultValue}
     />
-  );
-};
-
-interface DatePickerProps {
-  label: string;
-  value: Date;
-  onChange: (event: DateTimePickerEvent, date: Date | undefined) => void;
-}
-
-const DatePicker = (props: DatePickerProps) => {
-  const { label, value, onChange } = props;
-
-  return (
-    <View
-      style={{
-        display: "flex",
-        flexDirection: "row",
-        alignItems: "center",
-        justifyContent: "flex-start",
-        marginVertical: 10,
-        width: "90%",
-      }}
-    >
-      <Text style={{ fontSize: 16, width: "25%" }}>{label}</Text>
-      <DateTimePicker
-        style={{ width: "40%" }}
-        value={value}
-        mode="date"
-        onChange={onChange}
-      />
-    </View>
   );
 };
 
@@ -242,20 +228,23 @@ export const EditBookScreen = () => {
   const params: EditBookScreenParams | null = route.params || null;
   const [title, setTitle] = useState<string>(params?.book?.title || "");
   const [author, setAuthor] = useState<string>(params?.book?.author || "");
-  const [list, setList] = useState<TBookList | null>(
-    whatList(params?.book || null)
-  );
-  const [started, setStarted] = useState<Date | null>(
-    initStarted(params?.book || null)
-  );
+  const statusNotes = useStatusNotes(params?.book?.id || "");
+  const [list, setList] = useState<TBookList>(whatList(statusNotes));
+  const [started, setStarted] = useState<Date | null>(initStarted(statusNotes));
   const [finished, setFinished] = useState<Date | null>(
-    initFinished(params?.book || null)
+    initFinished(statusNotes)
   );
   const [localImage, setLocalImage] = useState<any>(null);
   const [image, setImage] = useState<any>(null);
   const [creationProgress, setCreationProgress] = useState(0);
   const [error, setError] = useState("");
   const setStaleBookImage = useStore((state) => state.setStaleBookImage);
+
+  useEffect(() => {
+    setList(whatList(statusNotes));
+    setStarted(initStarted(statusNotes));
+    setFinished(initFinished(statusNotes));
+  }, [JSON.stringify(statusNotes)]);
 
   const getImage = async () => {
     if (!auth.currentUser) {
@@ -278,21 +267,18 @@ export const EditBookScreen = () => {
     }
   }, [params]);
 
-  const navToNextScreen = (payload: BookPayload): void => {
-    let tab = 0;
-    if (!!payload.finished) {
-      tab = 1;
-    } else if (!payload.finished && !payload.started) {
-      tab = 2;
+  const navToNextScreen = (): void => {
+    let nextTab: 0 | 1 | 2 = TABS.UNREAD;
+    if (list === "Reading") {
+      nextTab = TABS.READING;
+    } else if (list === "Finished") {
+      nextTab = TABS.FINISHED;
     }
-    navigation.navigate("Books", { tab });
+
+    navigation.navigate("Books", { tab: nextTab });
   };
 
-  const uploadImage = async (
-    image: any,
-    bookId: string,
-    payload: BookPayload
-  ): Promise<void> => {
+  const uploadImage = async (image: any, bookId: string): Promise<void> => {
     if (!auth.currentUser) {
       throw new Error("Cannot edit book, user is not logged in.");
     }
@@ -330,11 +316,11 @@ export const EditBookScreen = () => {
         },
         () => {
           setStaleBookImage(bookId);
-          navToNextScreen(payload);
+          navToNextScreen();
         }
       );
     } else {
-      navToNextScreen(payload);
+      navToNextScreen();
     }
   };
 
@@ -343,7 +329,7 @@ export const EditBookScreen = () => {
       throw new Error("Cannot edit book, user is not logged in.");
     }
 
-    const validationError = validateInputs(title, author, list);
+    const validationError = validateInputs(title, author);
 
     if (!!validationError) {
       setError(validationError);
@@ -368,8 +354,93 @@ export const EditBookScreen = () => {
         bookId = params.book.id;
         await updateBook(bookId, payload);
       }
+
+      const startedNotePayload: StatusNotePayload = {
+        type: "started",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        date: started || new Date(),
+      };
+      const finishedNotePayload: StatusNotePayload = {
+        type: "finished",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        date: finished || new Date(),
+      };
+
+      // Create status notes based on selected list
+      // TODO: Handle updating note dates
+      switch (list) {
+        case "Reading":
+          // Create a "started" note if the last status note is not "started"
+          if (
+            statusNotes.length === 0 ||
+            (statusNotes.length > 0 && statusNotes[0].type !== "started")
+          ) {
+            createNote(bookId, startedNotePayload);
+          }
+          if (
+            statusNotes.length > 0 &&
+            statusNotes[0].type === "started" &&
+            statusNotes[0].date !== started
+          ) {
+            const updateNotePayload: StatusNotePayload = {
+              type: "started",
+              updatedAt: new Date(),
+              date: started || new Date(),
+            };
+            updateNote(bookId, statusNotes[0].id, updateNotePayload);
+          }
+          break;
+        case "Finished":
+          // No status notes? Create both started and finished status notes
+          if (statusNotes.length === 0) {
+            createNote(bookId, startedNotePayload);
+            createNote(bookId, startedNotePayload);
+          } else if (statusNotes[0].type === "started") {
+            // Last status note is started? Create a finished status note
+            createNote(bookId, finishedNotePayload);
+          }
+          // Otherwise, the last status note was finished, don't create any new notes
+          // But do check if we need to update existing notes
+          if (statusNotes.length > 0) {
+            const mostRecentStartedNote = statusNotes.find(
+              (n: TNote) => n.type === "started"
+            );
+            const mostRecentFinishedNote = statusNotes.find(
+              (n: TNote) => n.type === "finished"
+            );
+            if (
+              mostRecentStartedNote?.date &&
+              mostRecentStartedNote.date !== started
+            ) {
+              updateNote(bookId, mostRecentStartedNote.id, {
+                type: "started",
+                updatedAt: new Date(),
+                date: started || new Date(),
+              });
+            }
+            if (
+              mostRecentFinishedNote?.date &&
+              mostRecentFinishedNote.date !== finished
+            ) {
+              updateNote(bookId, mostRecentFinishedNote.id, {
+                type: "finished",
+                updatedAt: new Date(),
+                date: finished || new Date(),
+              });
+            }
+          }
+
+          break;
+        case "Unread":
+          break;
+        default:
+          throw new Error(`Unrecognized list option: ${list}`);
+      }
+
       setCreationProgress(0.01);
-      uploadImage(image, bookId, payload);
+      uploadImage(image, bookId);
     } catch (error) {
       console.log("error:", error);
     }
@@ -381,14 +452,14 @@ export const EditBookScreen = () => {
 
   const isReading = (): void => {
     setList("Reading");
-    setStarted(initStarted(params?.book || null) || new Date());
+    setStarted(initStarted(statusNotes) || new Date());
     setFinished(null);
   };
 
   const isFinished = (): void => {
     setList("Finished");
-    setStarted(initStarted(params?.book || null) || new Date());
-    setFinished(initFinished(params?.book || null) || new Date());
+    setStarted(initStarted(statusNotes) || new Date());
+    setFinished(initFinished(statusNotes) || new Date());
   };
 
   const isUnread = (): void => {
@@ -452,7 +523,9 @@ export const EditBookScreen = () => {
         />
         <TitleInput title={title} onChangeTitle={setTitle} />
         <AuthorInput author={author} onChangeAuthor={setAuthor} />
+
         <ListDropdown onSelect={onListSelect} defaultValue={list} />
+
         {!!started && (
           <DatePicker
             label="Started: "

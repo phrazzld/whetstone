@@ -11,7 +11,6 @@ import { Text, View } from "../components/Themed";
 import { useBookImage } from "../hooks/useBookImage";
 import { useNotes } from "../hooks/useNotes";
 import { BookDetailsScreenRouteProp } from "../types";
-import { dateLocaleStringOptions, ensureDate } from "../utils";
 
 const windowWidth = Dimensions.get("window").width;
 
@@ -22,24 +21,6 @@ export const BookDetailsScreen = () => {
   const navigation = useNavigation();
   const notes = useNotes(book.id);
   const image = useBookImage(book.id, true);
-
-  const startDate = book.started
-    ? ensureDate(book.started).toLocaleString([], dateLocaleStringOptions)
-    : null;
-
-  const finishDate = book.finished
-    ? ensureDate(book.finished).toLocaleString([], dateLocaleStringOptions)
-    : null;
-
-  let timeline = "";
-
-  if (!!startDate) {
-    if (!!finishDate) {
-      timeline = startDate.concat(" - ").concat(finishDate);
-    } else {
-      timeline = `Started: ${startDate}`;
-    }
-  }
 
   const addNote = (): void => {
     navigation.navigate("AddNote", { bookId: book.id });
@@ -72,15 +53,12 @@ export const BookDetailsScreen = () => {
                 style={{
                   padding: 10,
                   marginBottom: 10,
-                  borderBottomColor: "grey",
+                  borderBottomColor: "#cccccc",
                   borderBottomWidth: 1,
                 }}
               >
                 <Text style={styles.title}>{book.title}</Text>
                 <Text style={styles.author}>{book.author}</Text>
-                <Text style={[styles.author, { fontSize: 12, marginTop: 10 }]}>
-                  {timeline}
-                </Text>
               </View>
             </View>
 
