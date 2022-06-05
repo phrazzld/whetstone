@@ -1,6 +1,4 @@
-import DateTimePicker, {
-  DateTimePickerEvent,
-} from "@react-native-community/datetimepicker";
+import { DateTimePickerEvent } from "@react-native-community/datetimepicker";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
 import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
@@ -15,6 +13,7 @@ import {
 } from "react-native";
 import { ProgressBar, TextInput } from "react-native-paper";
 import SelectDropdown from "react-native-select-dropdown";
+import { DatePicker } from "../components/DatePicker";
 import { SafeAreaView, Text, View } from "../components/Themed";
 import { auth, createBook, storage, updateBook } from "../firebase";
 import { BookPayload, EditBookScreenParams, TBook, TBookList } from "../types";
@@ -158,37 +157,6 @@ const ListDropdown = (props: ListDropdownProps) => {
       defaultButtonText="Select a list"
       defaultValue={defaultValue}
     />
-  );
-};
-
-interface DatePickerProps {
-  label: string;
-  value: Date;
-  onChange: (event: DateTimePickerEvent, date: Date | undefined) => void;
-}
-
-const DatePicker = (props: DatePickerProps) => {
-  const { label, value, onChange } = props;
-
-  return (
-    <View
-      style={{
-        display: "flex",
-        flexDirection: "row",
-        alignItems: "center",
-        justifyContent: "flex-start",
-        marginVertical: 10,
-        width: "90%",
-      }}
-    >
-      <Text style={{ fontSize: 16, width: "25%" }}>{label}</Text>
-      <DateTimePicker
-        style={{ width: "40%" }}
-        value={value}
-        mode="date"
-        onChange={onChange}
-      />
-    </View>
   );
 };
 
