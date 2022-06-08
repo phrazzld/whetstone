@@ -1,5 +1,5 @@
-import { useNavigation, useRoute } from "@react-navigation/native";
 import { DateTimePickerEvent } from "@react-native-community/datetimepicker";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
 import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
 import { useEffect, useState } from "react";
@@ -13,28 +13,27 @@ import {
 } from "react-native";
 import { ProgressBar, TextInput } from "react-native-paper";
 import SelectDropdown from "react-native-select-dropdown";
+import { DatePicker } from "../components/DatePicker";
 import { SafeAreaView, Text, View } from "../components/Themed";
+import { LISTS, TABS } from "../constants";
 import {
   auth,
-  createNote,
   createBook,
+  createNote,
   storage,
   updateBook,
   updateNote,
 } from "../firebase";
+import { useStatusNotes } from "../hooks/useStatusNotes";
 import {
   BookPayload,
   EditBookScreenParams,
-  TBook,
-  TBookList,
   StatusNotePayload,
+  TBookList,
   TNote,
 } from "../types";
 import { ensureDate, pickImage } from "../utils";
 import { useStore } from "../zstore";
-import { TABS, LISTS } from "../constants";
-import { DatePicker } from "../components/DatePicker";
-import { useStatusNotes } from "../hooks/useStatusNotes";
 
 const windowWidth = Dimensions.get("window").width;
 
@@ -396,7 +395,7 @@ export const EditBookScreen = () => {
           // No status notes? Create both started and finished status notes
           if (statusNotes.length === 0) {
             createNote(bookId, startedNotePayload);
-            createNote(bookId, startedNotePayload);
+            createNote(bookId, finishedNotePayload);
           } else if (statusNotes[0].type === "started") {
             // Last status note is started? Create a finished status note
             createNote(bookId, finishedNotePayload);
