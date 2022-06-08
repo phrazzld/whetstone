@@ -14,6 +14,9 @@ import { auth, updateNote } from "../firebase";
 import { AddNoteScreenParams, StatusNotePayload } from "../types";
 import { ensureDate } from "../utils";
 
+// TODO: Determine whether edited status note is most recent of its kind (pre-edit)
+//       If so, update book.started/finished accordingly
+
 export const EditStatusNoteScreen = () => {
   const route = useRoute();
   const params: AddNoteScreenParams | null = route.params || null;

@@ -53,6 +53,8 @@ export type TBook = {
   id: string;
   title: string;
   author: string;
+  started: Date | null;
+  finished: Date | null;
   createdAt: admin.firestore.Timestamp | Date;
   updatedAt?: admin.firestore.Timestamp | Date;
 };

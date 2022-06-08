@@ -1,4 +1,3 @@
-import { DateTimePickerEvent } from "@react-native-community/datetimepicker";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
 import { useState } from "react";
@@ -11,8 +10,7 @@ import {
 import { SafeAreaView, TextInput, View } from "../components/Themed";
 import { auth, createNote, updateNote } from "../firebase";
 import { AddNoteScreenParams, NotePayload } from "../types";
-import { ensureDate, strToInt } from "../utils";
-import { DatePicker } from '../components/DatePicker'
+import { strToInt } from "../utils";
 
 // TODO: Rename component + file to EditNoteScreen
 
@@ -21,7 +19,6 @@ export const AddNoteScreen = () => {
   const params: AddNoteScreenParams | null = route.params || null;
   const [content, setContent] = useState(params?.editNote?.content || "");
   const [page, setPage] = useState(params?.editNote?.page?.toString() || "");
-  const [date, setDate] = useState(ensureDate(params?.editNote?.date || params?.editNote?.createdAt || new Date()))
   const navigation = useNavigation();
 
   const addNote = () => {
@@ -56,15 +53,6 @@ export const AddNoteScreen = () => {
       updateNote(params.bookId, params.editNote.id, payload);
     }
     navigation.goBack();
-  };
-
-  const onDatePickerChange = (
-    _event: DateTimePickerEvent,
-    selectedDate: Date | undefined
-  ) => {
-    if (!!selectedDate) {
-      setDate(selectedDate);
-    }
   };
 
   const save = () => {
@@ -103,11 +91,6 @@ export const AddNoteScreen = () => {
           value={page}
           onChangeText={setPage}
           keyboardType="numeric"
-        />
-        <DatePicker
-          label="Date: "
-          value={date}
-          onChange={onDatePickerChange}
         />
         <View style={styles.buttonContainer}>
           <Button onPress={save} title="Save" />

@@ -2,6 +2,7 @@ import { collection, onSnapshot, query, where } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { auth, db } from "../firebase";
 import { TNote } from "../types";
+import { ensureDate } from "../utils";
 
 export const useStatusNotes = (bookId: string): Array<TNote> => {
   const [startedNotes, setStartedNotes] = useState<Array<TNote>>([]);
@@ -13,7 +14,7 @@ export const useStatusNotes = (bookId: string): Array<TNote> => {
     }
 
     if (bookId !== "") {
-      console.log("bookId:", bookId)
+      console.log("bookId:", bookId);
       const startedNotesQuery = query(
         collection(db, "users", auth.currentUser.uid, "books", bookId, "notes"),
         where("type", "==", "started")
@@ -51,6 +52,11 @@ export const useStatusNotes = (bookId: string): Array<TNote> => {
     }
   }, [bookId]);
 
-  // TODO: Sort notes by noteDate, with most recent note being first
-  return startedNotes.concat(...finishedNotes);
+  // Combine the started and finished status notes and sort them in descending order (most recent first)
+  return startedNotes.concat(...finishedNotes).sort((a: TNote, b: TNote) => {
+    if (!a.date || !b.date) {
+      throw new Error("Cannot sort status notes, one does not have a date");
+    }
+    return ensureDate(b.date).getTime() - ensureDate(a.date).getTime();
+  });
 };

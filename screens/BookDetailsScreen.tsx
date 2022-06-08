@@ -11,6 +11,7 @@ import { Text, View } from "../components/Themed";
 import { useBookImage } from "../hooks/useBookImage";
 import { useNotes } from "../hooks/useNotes";
 import { BookDetailsScreenRouteProp } from "../types";
+import { formattedReadDates } from "../utils";
 
 const windowWidth = Dimensions.get("window").width;
 
@@ -59,6 +60,9 @@ export const BookDetailsScreen = () => {
               >
                 <Text style={styles.title}>{book.title}</Text>
                 <Text style={styles.author}>{book.author}</Text>
+                <Text style={[styles.author, { fontSize: 12, marginTop: 10 }]}>
+                  {formattedReadDates(book)}
+                </Text>
               </View>
             </View>
 

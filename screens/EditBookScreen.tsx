@@ -1,5 +1,4 @@
 import { useNavigation, useRoute } from "@react-navigation/native";
-import { DateTimePickerEvent } from "@react-native-community/datetimepicker";
 import { StatusBar } from "expo-status-bar";
 import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
 import { useEffect, useState } from "react";
@@ -14,27 +13,25 @@ import {
 import { ProgressBar, TextInput } from "react-native-paper";
 import SelectDropdown from "react-native-select-dropdown";
 import { SafeAreaView, Text, View } from "../components/Themed";
+import { LISTS, TABS } from "../constants";
 import {
   auth,
-  createNote,
   createBook,
+  createNote,
   storage,
   updateBook,
   updateNote,
 } from "../firebase";
+import { useStatusNotes } from "../hooks/useStatusNotes";
 import {
   BookPayload,
   EditBookScreenParams,
-  TBook,
-  TBookList,
   StatusNotePayload,
+  TBookList,
   TNote,
 } from "../types";
 import { ensureDate, pickImage } from "../utils";
 import { useStore } from "../zstore";
-import { TABS, LISTS } from "../constants";
-import { DatePicker } from "../components/DatePicker";
-import { useStatusNotes } from "../hooks/useStatusNotes";
 
 const windowWidth = Dimensions.get("window").width;
 
@@ -147,7 +144,7 @@ const initStarted = (statusNotes: Array<TNote>): Date | null => {
 };
 
 const initFinished = (statusNotes: Array<TNote>): Date | null => {
-  // Find the first started note
+  // Find the first finished note
   const mostRecentFinishedNote = statusNotes.find(
     (n: TNote) => n.type === "finished"
   );
@@ -369,7 +366,6 @@ export const EditBookScreen = () => {
       };
 
       // Create status notes based on selected list
-      // TODO: Handle updating note dates
       switch (list) {
         case "Reading":
           // Create a "started" note if the last status note is not "started"
@@ -396,7 +392,7 @@ export const EditBookScreen = () => {
           // No status notes? Create both started and finished status notes
           if (statusNotes.length === 0) {
             createNote(bookId, startedNotePayload);
-            createNote(bookId, startedNotePayload);
+            createNote(bookId, finishedNotePayload);
           } else if (statusNotes[0].type === "started") {
             // Last status note is started? Create a finished status note
             createNote(bookId, finishedNotePayload);
@@ -468,24 +464,6 @@ export const EditBookScreen = () => {
     setFinished(null);
   };
 
-  const onStartDatePickerChange = (
-    _event: DateTimePickerEvent,
-    selectedDate: Date | undefined
-  ) => {
-    if (!!selectedDate) {
-      setStarted(selectedDate);
-    }
-  };
-
-  const onFinishDatePickerChange = (
-    _event: DateTimePickerEvent,
-    selectedDate: Date | undefined
-  ) => {
-    if (!!selectedDate) {
-      setFinished(selectedDate);
-    }
-  };
-
   const selectImage = async () => {
     const result = await pickImage();
     if (!result.cancelled) {
@@ -526,20 +504,6 @@ export const EditBookScreen = () => {
 
         <ListDropdown onSelect={onListSelect} defaultValue={list} />
 
-        {!!started && (
-          <DatePicker
-            label="Started: "
-            value={started}
-            onChange={onStartDatePickerChange}
-          />
-        )}
-        {!!finished && (
-          <DatePicker
-            label="Finished: "
-            value={finished}
-            onChange={onFinishDatePickerChange}
-          />
-        )}
         {!!error && <ValidationError text={error} />}
         <FormButtons save={saveChanges} cancel={cancel} />
         <SaveProgress progress={creationProgress} />

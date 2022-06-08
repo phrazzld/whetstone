@@ -13,6 +13,7 @@ import Swipeable from "react-native-gesture-handler/Swipeable";
 import { auth, deleteBook, storage } from "../firebase";
 import { useBookImage } from "../hooks/useBookImage";
 import { TBook } from "../types";
+import { formattedReadDates } from "../utils";
 import { FontAwesome, Text, View } from "./Themed";
 
 interface BookProps {
@@ -139,6 +140,7 @@ export const Book = (props: BookProps) => {
             <Text style={styles.title}>{truncate(book.title)}</Text>
             <Text style={styles.author}>{truncate(book.author)}</Text>
           </View>
+          <Text style={styles.date}>{formattedReadDates(book)}</Text>
         </View>
       </TouchableOpacity>
     </Swipeable>
@@ -185,5 +187,9 @@ const styles = StyleSheet.create({
     padding: 10,
     fontSize: 15,
     fontWeight: "500",
+  },
+  date: {
+    fontSize: 12,
+    marginBottom: 5,
   },
 });
