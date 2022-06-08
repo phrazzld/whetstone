@@ -25,6 +25,7 @@ export type RootStackParamList = {
   EditBook: EditBookScreenParams;
   AddNote: AddNoteScreenParams | undefined;
   AddVocab: AddNoteScreenParams | undefined;
+  EditStatusNote: AddNoteScreenParams | undefined;
   SignUp: undefined;
   NotFound: undefined;
 };

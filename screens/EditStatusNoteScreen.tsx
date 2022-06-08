@@ -8,51 +8,38 @@ import {
   Platform,
   StyleSheet,
 } from "react-native";
-import { SafeAreaView, TextInput, View } from "../components/Themed";
-import { auth, createNote, updateNote } from "../firebase";
-import { AddNoteScreenParams, NotePayload } from "../types";
-import { ensureDate, strToInt } from "../utils";
-import { DatePicker } from '../components/DatePicker'
+import { DatePicker } from "../components/DatePicker";
+import { SafeAreaView, View } from "../components/Themed";
+import { auth, updateNote } from "../firebase";
+import { AddNoteScreenParams, StatusNotePayload } from "../types";
+import { ensureDate } from "../utils";
 
-// TODO: Rename component + file to EditNoteScreen
-
-export const AddNoteScreen = () => {
+export const EditStatusNoteScreen = () => {
   const route = useRoute();
   const params: AddNoteScreenParams | null = route.params || null;
-  const [content, setContent] = useState(params?.editNote?.content || "");
-  const [page, setPage] = useState(params?.editNote?.page?.toString() || "");
-  const [date, setDate] = useState(ensureDate(params?.editNote?.date || params?.editNote?.createdAt || new Date()))
+  const [date, setDate] = useState(
+    ensureDate(
+      params?.editNote?.date || params?.editNote?.createdAt || new Date()
+    )
+  );
   const navigation = useNavigation();
 
-  const addNote = () => {
-    if (!params?.bookId) {
-      throw new Error("Cannot add note, invalid route params");
-    }
-
-    const note: NotePayload = {
-      type: "note",
-      content,
-      page: strToInt(page),
-      createdAt: new Date(),
-    };
-    if (!!content || !!page) {
-      createNote(params.bookId, note);
-    }
-    navigation.goBack();
-  };
-
   const modifyNote = () => {
-    if (!params?.bookId || !params.editNote) {
+    if (
+      !params?.bookId ||
+      !params.editNote ||
+      (params.editNote.type !== "started" &&
+        params.editNote.type !== "finished")
+    ) {
       throw new Error("Cannot modify note, invalid route params");
     }
 
-    const payload: NotePayload = {
-      type: "note",
-      content,
-      page: strToInt(page),
+    const payload: StatusNotePayload = {
+      type: params?.editNote?.type,
+      date: date,
       updatedAt: new Date(),
     };
-    if (!!content || !!page) {
+    if (!!date) {
       updateNote(params.bookId, params.editNote.id, payload);
     }
     navigation.goBack();
@@ -74,8 +61,6 @@ export const AddNoteScreen = () => {
 
     if (params?.editNote) {
       modifyNote();
-    } else {
-      addNote();
     }
   };
 
@@ -83,29 +68,17 @@ export const AddNoteScreen = () => {
     navigation.goBack();
   };
 
+  const dateLabel =
+    params?.editNote?.type === "started" ? "Started on: " : "Finished on: ";
+
   return (
     <SafeAreaView style={styles.container}>
       <KeyboardAvoidingView
         style={[styles.container, { width: "100%" }]}
         behavior={Platform.OS === "ios" ? "padding" : "height"}
       >
-        <TextInput
-          placeholder="Content"
-          multiline={true}
-          style={styles.multilineInput}
-          value={content}
-          onChangeText={setContent}
-          autoFocus={true}
-        />
-        <TextInput
-          placeholder="Page number"
-          style={styles.input}
-          value={page}
-          onChangeText={setPage}
-          keyboardType="numeric"
-        />
         <DatePicker
-          label="Date: "
+          label={dateLabel}
           value={date}
           onChange={onDatePickerChange}
         />

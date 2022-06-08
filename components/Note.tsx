@@ -81,6 +81,8 @@ export const Note = (props: NoteProps) => {
 
     if (note.type === "vocab") {
       navigation.navigate("AddVocab", { bookId, editVocab: note });
+    } else if (note.type === "started" || note.type === "finished") {
+      navigation.navigate("EditStatusNote", { bookId, editNote: note });
     } else {
       navigation.navigate("AddNote", { bookId, editNote: note });
     }
@@ -165,14 +167,6 @@ export const Note = (props: NoteProps) => {
               <Text style={styles.content}>{note.content}</Text>
             )}
 
-            {note.type === "started" && (
-              <Text style={styles.word}>Started reading.</Text>
-            )}
-
-            {note.type === "finished" && (
-              <Text style={styles.word}>Finished reading.</Text>
-            )}
-
             {note.type === "vocab" && (
               <>
                 <Text style={styles.word}>{note.word}</Text>
@@ -197,6 +191,22 @@ export const Note = (props: NoteProps) => {
                 <View style={{}}>
                   <Text style={[styles.timestamp, { textAlign: "left" }]}>
                     Page {note.page}
+                  </Text>
+                </View>
+              )}
+
+              {note.type === "started" && (
+                <View style={{}}>
+                  <Text style={[styles.timestamp, { textAlign: "left" }]}>
+                    Started.
+                  </Text>
+                </View>
+              )}
+
+              {note.type === "finished" && (
+                <View style={{}}>
+                  <Text style={[styles.timestamp, { textAlign: "left" }]}>
+                    Finished.
                   </Text>
                 </View>
               )}
