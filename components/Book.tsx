@@ -13,7 +13,7 @@ import Swipeable from "react-native-gesture-handler/Swipeable";
 import { auth, deleteBook, storage } from "../firebase";
 import { useBookImage } from "../hooks/useBookImage";
 import { TBook } from "../types";
-import { dateLocaleStringOptions, ensureDate } from "../utils";
+import { formattedReadDates } from "../utils";
 import { FontAwesome, Text, View } from "./Themed";
 
 interface BookProps {
@@ -30,22 +30,6 @@ export const Book = (props: BookProps) => {
     const MAX_LENGTH = 30;
     return s.length > MAX_LENGTH ? s.slice(0, MAX_LENGTH).concat("...") : s;
   };
-
-  let timeline = "";
-
-  if (book.started && book.finished) {
-    timeline = ensureDate(book.started)
-      .toLocaleString([], dateLocaleStringOptions)
-      .concat(" - ")
-      .concat(
-        ensureDate(book.finished).toLocaleString([], dateLocaleStringOptions)
-      );
-  } else if (book.started) {
-    timeline = `Started: ${ensureDate(book.started).toLocaleString(
-      [],
-      dateLocaleStringOptions
-    )}`;
-  }
 
   const editBook = (): void => {
     if (swipeableRef.current) {
@@ -109,9 +93,9 @@ export const Book = (props: BookProps) => {
           onPress={pressHandler}
         >
           {text === "Delete" ? (
-            <FontAwesome name="trash" size={25} color="white" />
+            <FontAwesome name="trash" size={25} color="#ffffff" />
           ) : (
-            <FontAwesome name="pencil" size={25} color="white" />
+            <FontAwesome name="pencil" size={25} color="#ffffff" />
           )}
         </RectButton>
       </Animated.View>
@@ -129,7 +113,7 @@ export const Book = (props: BookProps) => {
       }}
     >
       {renderRightAction("Edit", "#ffab00", 128, progress, editBook)}
-      {renderRightAction("Delete", "red", 64, progress, removeBook)}
+      {renderRightAction("Delete", "#cc0000", 64, progress, removeBook)}
     </View>
   );
 
@@ -156,7 +140,7 @@ export const Book = (props: BookProps) => {
             <Text style={styles.title}>{truncate(book.title)}</Text>
             <Text style={styles.author}>{truncate(book.author)}</Text>
           </View>
-          <Text style={styles.date}>{timeline}</Text>
+          <Text style={styles.date}>{formattedReadDates(book)}</Text>
         </View>
       </TouchableOpacity>
     </Swipeable>
@@ -167,7 +151,7 @@ const styles = StyleSheet.create({
   book: {
     flex: 1,
     flexDirection: "row",
-    borderBottomColor: "grey",
+    borderBottomColor: "#cccccc",
     borderBottomWidth: 1,
   },
   bookDetails: {
@@ -187,10 +171,6 @@ const styles = StyleSheet.create({
   author: {
     fontSize: 14,
   },
-  date: {
-    fontSize: 12,
-    marginBottom: 5,
-  },
   title: {
     fontSize: 18,
     fontWeight: "400",
@@ -202,10 +182,14 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   actionText: {
-    color: "white",
+    color: "#ffffff",
     backgroundColor: "transparent",
     padding: 10,
     fontSize: 15,
     fontWeight: "500",
+  },
+  date: {
+    fontSize: 12,
+    marginBottom: 5,
   },
 });

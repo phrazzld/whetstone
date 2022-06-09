@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import { SafeAreaView, TextInput, View } from "../components/Themed";
 import { auth, createNote, updateNote } from "../firebase";
-import { AddNoteScreenParams } from "../types";
+import { AddNoteScreenParams, VocabPayload } from "../types";
 import { strToInt } from "../utils";
 
 interface DictionaryDefinition {
@@ -45,7 +45,7 @@ export const AddVocabScreen = () => {
       throw new Error("Cannot add vocab, invalid route params");
     }
 
-    const vocab = {
+    const vocab: VocabPayload = {
       type: "vocab",
       word,
       definition,
@@ -61,7 +61,7 @@ export const AddVocabScreen = () => {
       throw new Error("Cannot modify vocab, invalid route params");
     }
 
-    const payload = {
+    const payload: VocabPayload = {
       type: "vocab",
       word,
       definition,
