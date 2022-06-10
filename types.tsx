@@ -48,10 +48,16 @@ export type RootTabScreenProps<Screen extends keyof RootTabParamList> =
     NativeStackScreenProps<RootStackParamList>
   >;
 
+export type ReadDates = {
+  started: admin.firestore.Timestamp | Date;
+  finished: admin.firestore.Timestamp | Date;
+}
+
 export type TBook = {
   id: string;
   title: string;
   author: string;
+  readingDates?: Array<ReadDates>;
   started?: admin.firestore.Timestamp | Date;
   finished?: admin.firestore.Timestamp | Date;
   createdAt: admin.firestore.Timestamp | Date;
