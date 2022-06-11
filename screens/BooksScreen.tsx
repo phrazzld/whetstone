@@ -25,7 +25,10 @@ const BooksScreen = () => {
     }
   }, [tab]);
 
-  const noBooks = unfinishedBooks.length === 0 && finishedBooks.length === 0;
+  const noBooks =
+    unreadBooks.length === 0 &&
+    unfinishedBooks.length === 0 &&
+    finishedBooks.length === 0;
 
   const renderItem = ({ item: book }: { item: TBook }) => (
     <Book key={book.id} book={book} />
