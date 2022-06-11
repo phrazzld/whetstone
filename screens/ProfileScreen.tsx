@@ -15,99 +15,9 @@ import {
   getBooks,
   storage,
 } from "../firebase";
+import { TBook } from "../types";
 
 export const ProfileScreen = () => {
-  const deleteAccount = () => {
-    // Confirm account deletion
-    Alert.alert(
-      "Delete Account",
-      "Are you sure you want to delete your account? This will delete all of your data, and cannot be undone.",
-      [
-        {
-          text: "Cancel",
-          style: "cancel",
-        },
-        {
-          text: "Delete",
-          style: "destructive",
-          onPress: async () => {
-            if (!auth.currentUser) {
-              throw new Error("Can't delete user. No user logged in.");
-            }
-
-            console.log("Deleting user...");
-
-            // Get books and notes
-            const books = await getBooks();
-            console.log("Deleting notes...");
-            for (const book of books) {
-              const bookNotes = await getBookNotes(book.id);
-              // Delete notes
-              for (const note of bookNotes) {
-                await deleteNote(book.id, note.id);
-              }
-            }
-            console.log("Notes deleted.");
-
-            // Delete images
-            console.log("Deleting images...");
-            for (const book of books) {
-              const bookImageRef = ref(
-                storage,
-                `${auth.currentUser.uid}/${book.id}/cover.jpg`
-              );
-              try {
-                await deleteObject(bookImageRef);
-              } catch (err) {
-                console.log(err);
-              }
-            }
-            console.log("Images deleted.");
-
-            // Delete books
-            console.log("Deleting books...");
-            for (const book of books) {
-              await deleteBook(book.id);
-            }
-            console.log("Books deleted.");
-
-            // Delete account
-            console.log("Deleting account...");
-            auth.currentUser
-              .delete()
-              .then(() => {
-                Alert.alert(
-                  "Account Deleted",
-                  "Your account has been deleted."
-                );
-              })
-              .catch((err) => {
-                console.log(err);
-                if (err.code.includes("requires-recent-login")) {
-                  // Reauthenticate user
-                  Alert.alert(
-                    "Reauthenticate",
-                    "You need to reauthenticate to delete your account. Please sign back in and try again.",
-                    [
-                      {
-                        text: "Cancel",
-                        style: "cancel",
-                      },
-                      {
-                        text: "Sign Out",
-                        onPress: () => auth.signOut(),
-                      },
-                    ]
-                  );
-                }
-              });
-          },
-        },
-      ],
-      { cancelable: false }
-    );
-  };
-
   return (
     <SafeAreaView style={styles.container}>
       <View style={{ margin: 20 }}>
@@ -140,12 +50,118 @@ export const ProfileScreen = () => {
           <Button title="Sign Out" onPress={() => auth.signOut()} />
           <Button
             title="Delete Account"
-            onPress={deleteAccount}
+            onPress={confirmAccountDeletion}
             color="#cc0000"
           />
         </View>
       </View>
     </SafeAreaView>
+  );
+};
+
+const deleteNotes = async (books: Array<TBook>): Promise<void> => {
+  console.log("Deleting notes...");
+  for (const book of books) {
+    const bookNotes = await getBookNotes(book.id);
+    // Delete notes
+    for (const note of bookNotes) {
+      await deleteNote(book.id, note.id);
+    }
+  }
+  console.log("Notes deleted.");
+};
+
+const deleteImages = async (books: Array<TBook>): Promise<void> => {
+  if (!auth.currentUser) {
+    throw new Error("Can't delete user. No user logged in.");
+  }
+
+  console.log("Deleting images...");
+  for (const book of books) {
+    const bookImageRef = ref(
+      storage,
+      `${auth.currentUser.uid}/${book.id}/cover.jpg`
+    );
+    try {
+      await deleteObject(bookImageRef);
+    } catch (err) {
+      console.log(err);
+    }
+  }
+  console.log("Images deleted.");
+};
+
+const deleteBooks = async (books: Array<TBook>): Promise<void> => {
+  console.log("Deleting books...");
+  for (const book of books) {
+    await deleteBook(book.id);
+  }
+  console.log("Books deleted.");
+};
+
+const deleteUser = async (): Promise<void> => {
+  if (!auth.currentUser) {
+    throw new Error("Can't delete user. No user logged in.");
+  }
+
+  console.log("Deleting account...");
+  auth.currentUser
+    .delete()
+    .then(() => {
+      Alert.alert("Account Deleted", "Your account has been deleted.");
+    })
+    .catch((err) => {
+      console.log(err);
+      if (err.code.includes("requires-recent-login")) {
+        Alert.alert(
+          "Reauthenticate",
+          "You need to reauthenticate to delete your account. Please sign back in and try again.",
+          [
+            {
+              text: "Cancel",
+              style: "cancel",
+            },
+            {
+              text: "Sign Out",
+              onPress: () => auth.signOut(),
+            },
+          ]
+        );
+      }
+    });
+};
+
+const deleteAccount = async (): Promise<void> => {
+  if (!auth.currentUser) {
+    throw new Error("Can't delete user. No user logged in.");
+  }
+
+  console.log("Deleting user...");
+
+  const books = await getBooks();
+
+  await deleteNotes(books);
+  await deleteImages(books);
+  await deleteBooks(books);
+  await deleteUser();
+};
+
+const confirmAccountDeletion = () => {
+  Alert.alert(
+    "Delete Account",
+    "Are you sure you want to delete your account? This will delete all of your data, and cannot be undone.",
+    [
+      {
+        text: "Cancel",
+        style: "cancel",
+      },
+      {
+        text: "Delete",
+        style: "destructive",
+        onPress: async () => deleteAccount(),
+      },
+    ],
+    { cancelable: false }
   );
 };
 
