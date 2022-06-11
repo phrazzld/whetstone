@@ -60,6 +60,8 @@ export const strToInt = (str: string): number => {
   return parseInt(str.replace(/\s+/g, ""), 10);
 };
 
+// TODO: Look at readingDates instead of started/finished
+// TODO: Take a param to return multiline (or extract to new function)
 export const formatReadDates = (book: TBook): string => {
   let timeline = "";
 

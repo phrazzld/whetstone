@@ -22,6 +22,7 @@ import { AddVocabScreen } from "../screens/AddVocabScreen";
 import { BookDetailsScreen } from "../screens/BookDetailsScreen";
 import BooksScreen from "../screens/BooksScreen";
 import { EditBookScreen } from "../screens/EditBookScreen";
+import { ManageReadingDatesScreen } from "../screens/ManageReadingDatesScreen";
 import NotFoundScreen from "../screens/NotFoundScreen";
 import { ProfileScreen } from "../screens/ProfileScreen";
 import { SignUpScreen } from "../screens/SignUpScreen";
@@ -95,6 +96,11 @@ function RootNavigator() {
               name="AddVocab"
               component={AddVocabScreen}
               options={{ title: "Add Vocab" }}
+            />
+            <Stack.Screen
+              name="ManageReadingDates"
+              component={ManageReadingDatesScreen}
+              options={{ title: "Manage Reading Dates" }}
             />
           </Stack.Group>
         </>

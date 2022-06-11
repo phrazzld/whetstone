@@ -31,6 +31,10 @@ export const BookDetailsScreen = () => {
     navigation.navigate("AddVocab", { bookId: book.id });
   };
 
+  const manageReadingDates = (): void => {
+    navigation.navigate("ManageReadingDates", { book })
+  }
+
   return (
     <View style={{ height: "100%" }}>
       <ScrollView>
@@ -63,6 +67,7 @@ export const BookDetailsScreen = () => {
                 <Text style={[styles.author, { fontSize: 12, marginTop: 10 }]}>
                   {formatReadDates(book)}
                 </Text>
+                <Button title="Manage dates read" onPress={manageReadingDates} />
               </View>
             </View>
 

@@ -25,6 +25,7 @@ export type RootStackParamList = {
   EditBook: EditBookScreenParams;
   AddNote: AddNoteScreenParams | undefined;
   AddVocab: AddNoteScreenParams | undefined;
+  ManageReadingDates: ManageReadingDatesScreenParams;
   SignUp: undefined;
   NotFound: undefined;
 };
@@ -121,6 +122,10 @@ export type BookDetailsScreenParams = {
 export type EditBookScreenParams = {
   book?: TBook;
 };
+
+export type ManageReadingDatesScreenParams = {
+  book: TBook;
+}
 
 export type BookDetailsScreenRouteProp = RouteProp<
   BookStackParamList,
