@@ -5,7 +5,6 @@ import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
 import { useEffect, useState } from "react";
 import {
   Button,
-  Dimensions,
   Image,
   KeyboardAvoidingView,
   Platform,
@@ -15,12 +14,11 @@ import { ProgressBar, TextInput } from "react-native-paper";
 import SelectDropdown from "react-native-select-dropdown";
 import { DatePicker } from "../components/DatePicker";
 import { SafeAreaView, Text, View } from "../components/Themed";
+import { LISTS, TABS, windowWidth } from "../constants";
 import { auth, createBook, storage, updateBook } from "../firebase";
 import { BookPayload, EditBookScreenParams, TBook, TBookList } from "../types";
-import { ensureDate, LISTS, pickImage } from "../utils";
+import { ensureDate, pickImage } from "../utils";
 import { useStore } from "../zstore";
-
-const windowWidth = Dimensions.get("window").width;
 
 const whatList = (book: TBook | null): TBookList | null => {
   if (!book) {
@@ -194,7 +192,7 @@ const SaveProgress = (props: SaveProgressProps) => {
   const { progress } = props;
 
   return (
-    <View style={styles.progressContainer}>
+    <View>
       <ProgressBar
         visible={!!progress}
         progress={progress}
@@ -247,11 +245,11 @@ export const EditBookScreen = () => {
   }, [params]);
 
   const navToNextScreen = (payload: BookPayload): void => {
-    let tab = 0;
+    let tab = TABS.READING;
     if (!!payload.finished) {
-      tab = 1;
+      tab = TABS.FINISHED;
     } else if (!payload.finished && !payload.started) {
-      tab = 2;
+      tab = TABS.UNREAD;
     }
     navigation.navigate("Books", { tab });
   };
@@ -391,7 +389,7 @@ export const EditBookScreen = () => {
     }
   };
 
-  const onListSelect = (item: any): void => {
+  const onListSelect = (item: string): void => {
     switch (item) {
       case "Reading":
         isReading();
@@ -475,7 +473,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  progressContainer: {},
   error: {
     color: "#cc0000",
   },

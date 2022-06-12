@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { Button, FlatList, StyleSheet } from "react-native";
 import { Book } from "../components/Book";
 import { SafeAreaView, Text, View } from "../components/Themed";
+import { TABS } from "../constants";
 import { useFinishedBooks } from "../hooks/useFinishedBooks";
 import { useUnfinishedBooks } from "../hooks/useUnfinishedBooks";
 import { useUnreadBooks } from "../hooks/useUnreadBooks";
@@ -12,7 +13,7 @@ import { BooksScreenParams, TBook } from "../types";
 const BooksScreen = () => {
   const route = useRoute();
   const params: BooksScreenParams | null = route.params || null;
-  const tab = params?.tab || 0;
+  const tab = params?.tab || TABS.READING;
   const [tabIndex, setTabIndex] = useState(tab);
   const unfinishedBooks = useUnfinishedBooks();
   const finishedBooks = useFinishedBooks();

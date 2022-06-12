@@ -1,15 +1,8 @@
 import * as ImagePicker from "expo-image-picker";
 import * as admin from "firebase-admin";
+import { dateLocaleStringOptions } from "./constants";
 import { auth } from "./firebase";
-import { TBook, TBookList } from "./types";
-
-export const dateLocaleStringOptions = {
-  year: "numeric",
-  month: "long",
-  day: "numeric",
-} as const;
-
-export const LISTS: Array<TBookList> = ["Reading", "Finished", "Unread"];
+import { TBook } from "./types";
 
 export const pickImage = async (): Promise<
   ImagePicker.ExpandImagePickerResult<
@@ -80,4 +73,4 @@ export const formatReadDates = (book: TBook): string => {
   }
 
   return timeline;
-}
+};
