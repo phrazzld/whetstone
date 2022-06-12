@@ -7,7 +7,8 @@ import {
   Platform,
   StyleSheet,
 } from "react-native";
-import { SafeAreaView, TextInput, View } from "../components/Themed";
+import { TextField } from "../components/TextField";
+import { SafeAreaView, View } from "../components/Themed";
 import { auth, createNote, updateNote } from "../firebase";
 import { AddNoteScreenParams, NotePayload } from "../types";
 import { strToInt } from "../utils";
@@ -75,18 +76,16 @@ export const AddNoteScreen = () => {
         style={[styles.container, { width: "100%" }]}
         behavior={Platform.OS === "ios" ? "padding" : "height"}
       >
-        <TextInput
-          placeholder="Content"
+        <TextField
+          label="Content"
           multiline={true}
-          style={styles.multilineInput}
-          value={content}
+          text={content}
           onChangeText={setContent}
-          autoFocus={true}
+          autoCapitalize="sentences"
         />
-        <TextInput
-          placeholder="Page number"
-          style={styles.input}
-          value={page}
+        <TextField
+          label="Page number"
+          text={page}
           onChangeText={setPage}
           keyboardType="numeric"
         />
@@ -114,23 +113,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: 10,
     paddingTop: 20,
-  },
-  input: {
-    padding: 10,
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 6,
-    width: "90%",
-    margin: 10,
-  },
-  multilineInput: {
-    padding: 10,
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 6,
-    height: 100,
-    width: "90%",
-    margin: 10,
   },
   separator: {
     marginVertical: 30,

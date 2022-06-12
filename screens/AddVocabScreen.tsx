@@ -7,9 +7,10 @@ import {
   Platform,
   StyleSheet,
 } from "react-native";
-import { SafeAreaView, TextInput, View } from "../components/Themed";
+import { TextField } from "../components/TextField";
+import { SafeAreaView, View } from "../components/Themed";
 import { auth, createNote, updateNote } from "../firebase";
-import { AddNoteScreenParams } from "../types";
+import { AddNoteScreenParams, VocabPayload } from "../types";
 import { strToInt } from "../utils";
 
 interface DictionaryDefinition {
@@ -45,7 +46,7 @@ export const AddVocabScreen = () => {
       throw new Error("Cannot add vocab, invalid route params");
     }
 
-    const vocab = {
+    const vocab: VocabPayload = {
       type: "vocab",
       word,
       definition,
@@ -61,7 +62,7 @@ export const AddVocabScreen = () => {
       throw new Error("Cannot modify vocab, invalid route params");
     }
 
-    const payload = {
+    const payload: VocabPayload = {
       type: "vocab",
       word,
       definition,
@@ -118,25 +119,23 @@ export const AddVocabScreen = () => {
         style={[styles.container, { width: "100%" }]}
         behavior={Platform.OS === "ios" ? "padding" : "height"}
       >
-        <TextInput
-          placeholder="Word"
-          style={styles.input}
-          value={word}
+        <TextField
+          label="Word"
+          text={word}
           onChangeText={setWord}
-          autoFocus={true}
+          autoCapitalize="none"
         />
-        <TextInput
-          placeholder="Definition"
+        <TextField
+          label="Definition"
           multiline={true}
-          style={styles.multilineInput}
-          value={definition}
+          text={definition}
           onChangeText={setDefinition}
           onFocus={getDefinition}
+          autoCapitalize="sentences"
         />
-        <TextInput
-          placeholder="Page number"
-          style={styles.input}
-          value={page}
+        <TextField
+          label="Page number"
+          text={page}
           onChangeText={setPage}
           keyboardType="numeric"
         />
@@ -164,23 +163,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: 10,
     paddingTop: 20,
-  },
-  input: {
-    padding: 10,
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 6,
-    width: "90%",
-    margin: 10,
-  },
-  multilineInput: {
-    padding: 10,
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 6,
-    height: 100,
-    width: "90%",
-    margin: 10,
   },
   separator: {
     marginVertical: 30,

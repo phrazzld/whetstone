@@ -10,9 +10,10 @@ import {
   Platform,
   StyleSheet,
 } from "react-native";
-import { ProgressBar, TextInput } from "react-native-paper";
+import { ProgressBar } from "react-native-paper";
 import SelectDropdown from "react-native-select-dropdown";
 import { DatePicker } from "../components/DatePicker";
+import { TextField } from "../components/TextField";
 import { SafeAreaView, Text, View } from "../components/Themed";
 import { LISTS, TABS, windowWidth } from "../constants";
 import { auth, createBook, storage, updateBook } from "../firebase";
@@ -55,50 +56,6 @@ const validateInputs = (
   }
 
   return "";
-};
-
-interface TitleInputProps {
-  title: string;
-  onChangeTitle: (t: string) => void;
-}
-
-const TitleInput = (props: TitleInputProps) => {
-  const { title, onChangeTitle } = props;
-
-  return (
-    <TextInput
-      autoComplete="off"
-      mode="outlined"
-      label="Title"
-      placeholder="Title"
-      style={styles.input}
-      value={title}
-      onChangeText={onChangeTitle}
-      returnKeyType="next"
-    />
-  );
-};
-
-interface AuthorInputProps {
-  author: string;
-  onChangeAuthor: (a: string) => void;
-}
-
-const AuthorInput = (props: AuthorInputProps) => {
-  const { author, onChangeAuthor } = props;
-
-  return (
-    <TextInput
-      autoComplete="off"
-      mode="outlined"
-      label="Author"
-      placeholder="Author"
-      style={styles.input}
-      value={author}
-      onChangeText={onChangeAuthor}
-      returnKeyType="done"
-    />
-  );
 };
 
 interface ImagePickerProps {
@@ -416,8 +373,20 @@ export const EditBookScreen = () => {
           title={localImage ? "Edit image" : "Pick image"}
           onPress={selectImage}
         />
-        <TitleInput title={title} onChangeTitle={setTitle} />
-        <AuthorInput author={author} onChangeAuthor={setAuthor} />
+        <TextField
+          label="Title"
+          text={title}
+          onChangeText={setTitle}
+          returnKeyType="next"
+          autoCapitalize="words"
+        />
+        <TextField
+          label="Author"
+          text={author}
+          onChangeText={setAuthor}
+          returnKeyType="done"
+          autoCapitalize="words"
+        />
         <ListDropdown onSelect={onListSelect} defaultValue={list} />
         {!!started && (
           <DatePicker

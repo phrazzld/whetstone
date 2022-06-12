@@ -9,7 +9,8 @@ import {
   Platform,
   StyleSheet,
 } from "react-native";
-import { SafeAreaView, Text, TextInput, View } from "../components/Themed";
+import { TextField } from "../components/TextField";
+import { SafeAreaView, Text, View } from "../components/Themed";
 import { auth } from "../firebase";
 
 export const SignUpScreen = () => {
@@ -55,22 +56,21 @@ export const SignUpScreen = () => {
         style={[styles.container, { width: "100%" }]}
         behavior={Platform.OS === "ios" ? "padding" : "height"}
       >
-        <TextInput
-          placeholder="Email"
-          style={styles.input}
-          value={email}
+        <TextField
+          label="Email"
+          text={email}
           onChangeText={setEmail}
           keyboardType="email-address"
           autoCapitalize="none"
           returnKeyType="next"
           testID="EmailInput"
         />
-        <TextInput
-          placeholder="Password"
-          style={styles.input}
-          value={password}
+        <TextField
+          label="Password"
+          text={password}
           onChangeText={setPassword}
           returnKeyType="done"
+          autoCapitalize="none"
           testID="PasswordInput"
           secureTextEntry
         />
