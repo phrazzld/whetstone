@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { SafeAreaView, Text, View } from "../components/Themed";
+import { palette } from "../constants/Colors";
 import {
   auth,
   deleteBook,
@@ -51,7 +52,7 @@ export const ProfileScreen = () => {
           <Button
             title="Delete Account"
             onPress={confirmAccountDeletion}
-            color="#cc0000"
+            color={palette.red}
           />
         </View>
       </View>
@@ -176,7 +177,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   link: {
-    color: "#147efb",
+    color: palette.blue,
   },
   policies: {},
   userInfo: {

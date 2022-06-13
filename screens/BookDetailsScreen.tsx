@@ -8,6 +8,7 @@ import {
 } from "react-native";
 import { Note } from "../components/Note";
 import { Text, View } from "../components/Themed";
+import { palette } from "../constants/Colors";
 import { useBookImage } from "../hooks/useBookImage";
 import { useNotes } from "../hooks/useNotes";
 import { BookDetailsScreenRouteProp } from "../types";
@@ -54,7 +55,7 @@ export const BookDetailsScreen = () => {
                 style={{
                   padding: 10,
                   marginBottom: 10,
-                  borderBottomColor: "grey",
+                  borderBottomColor: palette.grey,
                   borderBottomWidth: 1,
                 }}
               >

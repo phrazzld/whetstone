@@ -11,6 +11,7 @@ import {
 } from "react-native";
 import { TextField } from "../components/TextField";
 import { SafeAreaView, Text, View } from "../components/Themed";
+import { palette } from "../constants/Colors";
 import { auth } from "../firebase";
 
 export const SignUpScreen = () => {
@@ -95,12 +96,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   error: {
-    color: "#cc0000",
+    color: palette.red,
   },
   input: {
     padding: 10,
     borderWidth: 1,
-    borderColor: "#ccc",
+    borderColor: palette.grey,
     borderRadius: 6,
     height: 40,
     width: "75%",

@@ -5,7 +5,7 @@ import { Alert, Animated, StyleSheet } from "react-native";
 import { RectButton } from "react-native-gesture-handler";
 import Swipeable from "react-native-gesture-handler/Swipeable";
 import { dateLocaleStringOptions } from "../constants";
-import Colors from "../constants/Colors";
+import Colors, { palette } from "../constants/Colors";
 import { deleteNote } from "../firebase";
 import useColorScheme from "../hooks/useColorScheme";
 import { TNote } from "../types";
@@ -39,7 +39,7 @@ const NoteTypeBadge = (props: NoteTypeBadgeProps) => {
 
   return (
     <Badge
-      value={<FontAwesome name={icon} size={15} color="white" />}
+      value={<FontAwesome name={icon} size={15} color={palette.white} />}
       status="primary"
       containerStyle={{ marginRight: 10 }}
       badgeStyle={{
@@ -110,9 +110,9 @@ export const Note = (props: NoteProps) => {
           onPress={pressHandler}
         >
           {text === "Delete" ? (
-            <FontAwesome name="trash" size={25} color="white" />
+            <FontAwesome name="trash" size={25} color={palette.white} />
           ) : (
-            <FontAwesome name="pencil" size={25} color="white" />
+            <FontAwesome name="pencil" size={25} color={palette.white} />
           )}
         </RectButton>
       </Animated.View>
@@ -129,8 +129,8 @@ export const Note = (props: NoteProps) => {
         marginBottom: "auto",
       }}
     >
-      {renderRightAction("Edit", "#ffab00", 128, progress, editNote)}
-      {renderRightAction("Delete", "red", 64, progress, removeNote)}
+      {renderRightAction("Edit", palette.orange, 128, progress, editNote)}
+      {renderRightAction("Delete", palette.red, 64, progress, removeNote)}
     </View>
   );
 
@@ -220,7 +220,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     paddingVertical: 15,
-    borderTopColor: "grey",
+    borderTopColor: palette.grey,
     borderTopWidth: 1,
     paddingHorizontal: 10,
   },
@@ -244,7 +244,7 @@ const styles = StyleSheet.create({
     marginRight: 15,
     width: "15%",
     borderRadius: 5,
-    borderColor: "grey",
+    borderColor: palette.grey,
     borderWidth: 1,
     paddingVertical: 5,
   },
@@ -258,7 +258,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   actionText: {
-    color: "white",
+    color: palette.white,
     backgroundColor: "transparent",
     padding: 10,
     fontSize: 15,

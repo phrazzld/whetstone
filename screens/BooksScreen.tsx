@@ -5,6 +5,7 @@ import { Button, FlatList, StyleSheet } from "react-native";
 import { Book } from "../components/Book";
 import { SafeAreaView, Text, View } from "../components/Themed";
 import { TABS } from "../constants";
+import { palette } from "../constants/Colors";
 import { useFinishedBooks } from "../hooks/useFinishedBooks";
 import { useUnfinishedBooks } from "../hooks/useUnfinishedBooks";
 import { useUnreadBooks } from "../hooks/useUnreadBooks";
@@ -108,7 +109,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   sectionHeaderContainer: {
-    borderBottomColor: "grey",
+    borderBottomColor: palette.grey,
     borderBottomWidth: 1,
   },
 });

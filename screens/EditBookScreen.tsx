@@ -16,6 +16,7 @@ import { DatePicker } from "../components/DatePicker";
 import { TextField } from "../components/TextField";
 import { SafeAreaView, Text, View } from "../components/Themed";
 import { LISTS, TABS, windowWidth } from "../constants";
+import { palette } from "../constants/Colors";
 import { auth, createBook, storage, updateBook } from "../firebase";
 import { BookPayload, EditBookScreenParams, TBook, TBookList } from "../types";
 import { ensureDate, pickImage } from "../utils";
@@ -136,7 +137,7 @@ const FormButtons = (props: FormButtonsProps) => {
   return (
     <View style={styles.buttonContainer}>
       <Button onPress={save} title="Save" />
-      <Button onPress={cancel} title="Cancel" color="gray" />
+      <Button onPress={cancel} title="Cancel" color={palette.grey} />
     </View>
   );
 };
@@ -443,6 +444,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   error: {
-    color: "#cc0000",
+    color: palette.red,
   },
 });

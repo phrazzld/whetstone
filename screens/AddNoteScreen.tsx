@@ -9,6 +9,7 @@ import {
 } from "react-native";
 import { TextField } from "../components/TextField";
 import { SafeAreaView, View } from "../components/Themed";
+import { palette } from "../constants/Colors";
 import { auth, createNote, updateNote } from "../firebase";
 import { AddNoteScreenParams, NotePayload } from "../types";
 import { strToInt } from "../utils";
@@ -91,7 +92,7 @@ export const AddNoteScreen = () => {
         />
         <View style={styles.buttonContainer}>
           <Button onPress={save} title="Save" />
-          <Button onPress={cancel} title="Cancel" color="gray" />
+          <Button onPress={cancel} title="Cancel" color={palette.grey} />
         </View>
 
         {/* Use a light status bar on iOS to account for the black space above the modal */}
