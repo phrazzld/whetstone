@@ -25,7 +25,6 @@ import { EditBookScreen } from "../screens/EditBookScreen";
 import NotFoundScreen from "../screens/NotFoundScreen";
 import { ProfileScreen } from "../screens/ProfileScreen";
 import { SignUpScreen } from "../screens/SignUpScreen";
-//import { StudyScreen } from "../screens/StudyScreen";
 import {
   BookStackParamList,
   RootStackParamList,
@@ -134,15 +133,6 @@ function BottomTabNavigator() {
           tabBarIcon: ({ color }) => <TabBarIcon name="book" color={color} />,
         }}
       />
-      {/*}<BottomTab.Screen
-        name="StudyStack"
-        component={StudyScreen}
-        options={{
-          title: "Study",
-          tabBarIcon: ({ color }) => <TabBarIcon name="rocket" color={color} />,
-          headerShown: true,
-        }}
-        />*/}
       <BottomTab.Screen
         name="Profile"
         component={ProfileScreen}

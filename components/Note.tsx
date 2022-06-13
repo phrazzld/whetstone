@@ -4,11 +4,12 @@ import { useRef } from "react";
 import { Alert, Animated, StyleSheet } from "react-native";
 import { RectButton } from "react-native-gesture-handler";
 import Swipeable from "react-native-gesture-handler/Swipeable";
+import { dateLocaleStringOptions } from "../constants";
 import Colors from "../constants/Colors";
 import { deleteNote } from "../firebase";
 import useColorScheme from "../hooks/useColorScheme";
 import { TNote } from "../types";
-import { dateLocaleStringOptions, ensureDate } from "../utils";
+import { ensureDate } from "../utils";
 import { FontAwesome, Text, View } from "./Themed";
 
 interface NoteTypeBadgeProps {
