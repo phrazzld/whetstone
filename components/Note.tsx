@@ -68,9 +68,9 @@ export const Note = (props: NoteProps) => {
     }
 
     if (note.type === "vocab") {
-      navigation.navigate("AddVocab", { bookId, editVocab: note });
+      navigation.navigate("EditVocab", { bookId, editVocab: note });
     } else {
-      navigation.navigate("AddNote", { bookId, editNote: note });
+      navigation.navigate("EditNote", { bookId, editNote: note });
     }
   };
 

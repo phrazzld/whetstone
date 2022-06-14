@@ -23,8 +23,10 @@ export type RootStackParamList = {
   Root: NavigatorScreenParams<RootTabParamList> | undefined;
   AddBook: EditBookScreenParams | undefined;
   EditBook: EditBookScreenParams;
-  AddNote: AddNoteScreenParams | undefined;
-  AddVocab: AddNoteScreenParams | undefined;
+  AddNote: EditNoteScreenParams | undefined;
+  EditNote: EditNoteScreenParams | undefined;
+  AddVocab: EditNoteScreenParams | undefined;
+  EditVocab: EditNoteScreenParams | undefined;
   SignUp: undefined;
   NotFound: undefined;
 };
@@ -102,7 +104,7 @@ export type BooksScreenParams = {
   tab?: number;
 };
 
-export type AddNoteScreenParams = {
+export type EditNoteScreenParams = {
   bookId?: string;
   editNote?: TNote;
   editVocab?: TNote;

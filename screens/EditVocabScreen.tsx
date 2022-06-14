@@ -10,7 +10,7 @@ import {
 import { TextField } from "../components/TextField";
 import { SafeAreaView, View } from "../components/Themed";
 import { auth, createNote, updateNote } from "../firebase";
-import { AddNoteScreenParams, VocabPayload } from "../types";
+import { EditNoteScreenParams, VocabPayload } from "../types";
 import { strToInt } from "../utils";
 
 interface DictionaryDefinition {
@@ -31,9 +31,9 @@ interface DictionaryWord {
   meanings: Array<DictionaryMeaning>;
 }
 
-export const AddVocabScreen = () => {
+export const EditVocabScreen = () => {
   const route = useRoute();
-  const params: AddNoteScreenParams | null = route.params || null;
+  const params: EditNoteScreenParams | null = route.params || null;
   const [word, setWord] = useState(params?.editVocab?.word || "");
   const [definition, setDefinition] = useState(
     params?.editVocab?.definition || ""

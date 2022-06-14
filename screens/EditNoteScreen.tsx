@@ -11,12 +11,12 @@ import { TextField } from "../components/TextField";
 import { SafeAreaView, View } from "../components/Themed";
 import { palette } from "../constants/Colors";
 import { auth, createNote, updateNote } from "../firebase";
-import { AddNoteScreenParams, NotePayload } from "../types";
+import { EditNoteScreenParams, NotePayload } from "../types";
 import { strToInt } from "../utils";
 
-export const AddNoteScreen = () => {
+export const EditNoteScreen = () => {
   const route = useRoute();
-  const params: AddNoteScreenParams | null = route.params || null;
+  const params: EditNoteScreenParams | null = route.params || null;
   const [content, setContent] = useState(params?.editNote?.content || "");
   const [page, setPage] = useState(params?.editNote?.page?.toString() || "");
   const navigation = useNavigation();

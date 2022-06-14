@@ -17,8 +17,8 @@ import { FontAwesome } from "../components/Themed";
 import Colors from "../constants/Colors";
 import { auth } from "../firebase";
 import useColorScheme from "../hooks/useColorScheme";
-import { AddNoteScreen } from "../screens/AddNoteScreen";
-import { AddVocabScreen } from "../screens/AddVocabScreen";
+import { EditNoteScreen } from "../screens/EditNoteScreen";
+import { EditVocabScreen } from "../screens/EditVocabScreen";
 import { BookDetailsScreen } from "../screens/BookDetailsScreen";
 import BooksScreen from "../screens/BooksScreen";
 import { EditBookScreen } from "../screens/EditBookScreen";
@@ -87,13 +87,23 @@ function RootNavigator() {
             />
             <Stack.Screen
               name="AddNote"
-              component={AddNoteScreen}
+              component={EditNoteScreen}
               options={{ title: "Add Note" }}
             />
             <Stack.Screen
+              name="EditNote"
+              component={EditNoteScreen}
+              options={{ title: "Edit Note" }}
+            />
+            <Stack.Screen
               name="AddVocab"
-              component={AddVocabScreen}
+              component={EditVocabScreen}
               options={{ title: "Add Vocab" }}
+            />
+            <Stack.Screen
+              name="EditVocab"
+              component={EditVocabScreen}
+              options={{ title: "Edit Vocab" }}
             />
           </Stack.Group>
         </>
