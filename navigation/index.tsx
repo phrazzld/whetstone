@@ -11,17 +11,17 @@ import {
 } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { onAuthStateChanged } from "firebase/auth";
-import React from "react";
-import { ColorSchemeName, Pressable } from "react-native";
+import React, { useState } from "react";
+import { ActivityIndicator, ColorSchemeName, Pressable } from "react-native";
 import { FontAwesome } from "../components/Themed";
 import Colors from "../constants/Colors";
 import { auth } from "../firebase";
 import useColorScheme from "../hooks/useColorScheme";
-import { EditNoteScreen } from "../screens/EditNoteScreen";
-import { EditVocabScreen } from "../screens/EditVocabScreen";
 import { BookDetailsScreen } from "../screens/BookDetailsScreen";
 import BooksScreen from "../screens/BooksScreen";
 import { EditBookScreen } from "../screens/EditBookScreen";
+import { EditNoteScreen } from "../screens/EditNoteScreen";
+import { EditVocabScreen } from "../screens/EditVocabScreen";
 import NotFoundScreen from "../screens/NotFoundScreen";
 import { ProfileScreen } from "../screens/ProfileScreen";
 import { SignUpScreen } from "../screens/SignUpScreen";
@@ -54,11 +54,17 @@ export default function Navigation({
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 function RootNavigator() {
-  const [user, setUser] = React.useState<any>();
+  const [user, setUser] = useState<any>();
+  const [loading, setLoading] = useState(true)
 
   onAuthStateChanged(auth, (u) => {
     setUser(u);
+    setLoading(false)
   });
+
+  if (loading) {
+    return <ActivityIndicator size="large" />
+  }
 
   return (
     <Stack.Navigator>
