@@ -11,6 +11,7 @@ import { TBook } from "../types";
 
 export const useFinishedBooks = () => {
   const [books, setBooks] = useState<Array<TBook>>([]);
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     if (!auth.currentUser) {
@@ -31,9 +32,10 @@ export const useFinishedBooks = () => {
         })
       );
       setBooks(snapshotBooks);
+      setLoading(false)
     });
     return () => unsubscribe();
   }, []);
 
-  return books;
+  return { data: books, loading };
 };

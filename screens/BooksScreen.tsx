@@ -1,7 +1,7 @@
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { Tab, TabView } from "@rneui/themed";
 import React, { useEffect, useState } from "react";
-import { Button, FlatList, StyleSheet } from "react-native";
+import { ActivityIndicator, Button, FlatList, StyleSheet } from "react-native";
 import { Book } from "../components/Book";
 import { SafeAreaView, Text, View } from "../components/Themed";
 import { TABS } from "../constants";
@@ -16,9 +16,11 @@ const BooksScreen = () => {
   const params: BooksScreenParams | null = route.params || null;
   const tab = params?.tab || TABS.READING;
   const [tabIndex, setTabIndex] = useState(tab);
-  const unfinishedBooks = useUnfinishedBooks();
-  const finishedBooks = useFinishedBooks();
-  const unreadBooks = useUnreadBooks();
+  const { data: unfinishedBooks, loading: unfinishedBooksLoading } =
+    useUnfinishedBooks();
+  const { data: finishedBooks, loading: finishedBooksLoading } =
+    useFinishedBooks();
+  const { data: unreadBooks, loading: unreadBooksLoading } = useUnreadBooks();
   const navigation = useNavigation();
 
   useEffect(() => {
@@ -35,6 +37,20 @@ const BooksScreen = () => {
   const renderItem = ({ item: book }: { item: TBook }) => (
     <Book key={book.id} book={book} />
   );
+
+  if (
+    (unfinishedBooksLoading && tabIndex === TABS.READING) ||
+    (finishedBooksLoading && tabIndex === TABS.FINISHED) ||
+    (unreadBooksLoading && tabIndex === TABS.UNREAD)
+  ) {
+    return (
+      <SafeAreaView
+        style={[styles.container, { flex: 1, justifyContent: "center" }]}
+      >
+        <ActivityIndicator size="large" />
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.container}>
