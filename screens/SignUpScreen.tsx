@@ -14,6 +14,7 @@ import { SafeAreaView, Text, View } from "../components/Themed";
 import { palette } from "../constants/Colors";
 import { auth } from "../firebase";
 
+// TODO: Add loading handler
 export const SignUpScreen = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");

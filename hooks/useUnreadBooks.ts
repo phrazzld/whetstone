@@ -3,9 +3,14 @@ import { useEffect, useState } from "react";
 import { auth, db } from "../firebase";
 import { TBook } from "../types";
 
-export const useUnreadBooks = () => {
+type Signature = {
+  data: Array<TBook>;
+  loading: boolean;
+};
+
+export const useUnreadBooks = (): Signature => {
   const [books, setBooks] = useState<Array<TBook>>([]);
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!auth.currentUser) {
@@ -26,10 +31,10 @@ export const useUnreadBooks = () => {
         })
       );
       setBooks(snapshotBooks);
-      setLoading(false)
+      setLoading(false);
     });
     return () => unsubscribe();
   }, []);
 
-  return { data: books, loading }
+  return { data: books, loading };
 };

@@ -3,8 +3,14 @@ import { useEffect, useState } from "react";
 import { auth, db } from "../firebase";
 import { TNote } from "../types";
 
-export const useNotes = (bookId: string): Array<TNote> => {
+type Signature = {
+  data: Array<TNote>;
+  loading: boolean;
+};
+
+export const useNotes = (bookId: string): Signature => {
   const [notes, setNotes] = useState<Array<TNote>>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!auth.currentUser) {
@@ -21,10 +27,11 @@ export const useNotes = (bookId: string): Array<TNote> => {
         ...doc.data(),
       }));
       setNotes(snapshotNotes);
+      setLoading(false);
     });
 
     return () => unsubscribe();
   }, []);
 
-  return notes;
+  return { data: notes, loading };
 };

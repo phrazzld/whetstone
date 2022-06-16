@@ -9,7 +9,12 @@ import { useEffect, useState } from "react";
 import { auth, db } from "../firebase";
 import { TBook } from "../types";
 
-export const useUnfinishedBooks = () => {
+type Signature = {
+  data: Array<TBook>;
+  loading: boolean;
+};
+
+export const useUnfinishedBooks = (): Signature => {
   const [books, setBooks] = useState<Array<TBook>>([]);
   const [loading, setLoading] = useState(true)
 
