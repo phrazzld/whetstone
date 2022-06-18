@@ -170,7 +170,7 @@ export const createNote = async (
   const userRef = doc(db, "users", auth.currentUser.uid);
   const bookRef = doc(userRef, "books", bookId);
   const noteRef = await addDoc(collection(bookRef, "notes"), newNote);
-  return noteRef
+  return noteRef;
 };
 
 export const getBookNotes = async (bookId: string): Promise<Array<any>> => {

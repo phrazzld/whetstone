@@ -235,7 +235,6 @@ const styles = StyleSheet.create({
   timestamp: {
     fontSize: 11,
     paddingHorizontal: 10,
-    // paddingVertical: 15,
   },
   content: {
     fontSize: 14,
@@ -262,7 +261,6 @@ const styles = StyleSheet.create({
     borderColor: palette.grey,
     borderWidth: 1,
     marginHorizontal: 10,
-    // paddingVertical: 15,
   },
   noteType: {
     fontSize: 11,

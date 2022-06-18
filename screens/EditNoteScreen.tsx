@@ -1,6 +1,6 @@
-import { getDownloadURL, ref, uploadBytesResumable, uploadString } from "firebase/storage";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
+import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
 import { useEffect, useState } from "react";
 import {
   Button,
@@ -8,13 +8,16 @@ import {
   KeyboardAvoidingView,
   Platform,
   StyleSheet,
+  Text,
 } from "react-native";
+import { ProgressBar } from "react-native-paper";
 import { TextField } from "../components/TextField";
 import { SafeAreaView, View } from "../components/Themed";
+import { windowWidth } from "../constants";
 import { palette } from "../constants/Colors";
-import { auth, storage, createNote, updateNote } from "../firebase";
+import { auth, createNote, storage, updateNote } from "../firebase";
 import { EditNoteScreenParams, NotePayload } from "../types";
-import { takePhoto, strToInt } from "../utils";
+import { strToInt, takePhoto } from "../utils";
 import { useStore } from "../zstore";
 
 export const EditNoteScreen = () => {
@@ -25,8 +28,10 @@ export const EditNoteScreen = () => {
   const navigation = useNavigation();
   const [localImage, setLocalImage] = useState<any>(null);
   const [image, setImage] = useState<any>(null);
-  // const [creationProgress, setCreationProgress] = useState(0);
+  const [creationProgress, setCreationProgress] = useState(0);
   const setStaleNoteImage = useStore((state) => state.setStaleNoteImage);
+  const [saveDisabled, setSaveDisabled] = useState(false);
+  const [error, setError] = useState("");
 
   const getImage = async () => {
     if (!auth.currentUser) {
@@ -52,7 +57,7 @@ export const EditNoteScreen = () => {
   const uploadImage = async (
     image: any,
     bookId: string,
-    noteId: string,
+    noteId: string
   ): Promise<void> => {
     if (!auth.currentUser) {
       throw new Error("Cannot edit note, user is not logged in.");
@@ -74,7 +79,7 @@ export const EditNoteScreen = () => {
           const progress = Math.round(
             (snapshot.bytesTransferred / snapshot.totalBytes) * 100
           );
-          // setCreationProgress(progress * 0.01);
+          setCreationProgress(progress * 0.01);
           console.log("Upload is " + progress + "% done");
           switch (snapshot.state) {
             case "paused": // or 'paused'
@@ -84,7 +89,7 @@ export const EditNoteScreen = () => {
               console.log("Upload is running");
               break;
             default:
-              console.log(`Upload is ${snapshot.state}`)
+              console.log(`Upload is ${snapshot.state}`);
           }
         },
         (error) => {
@@ -93,11 +98,11 @@ export const EditNoteScreen = () => {
         },
         () => {
           setStaleNoteImage(noteId);
-          navigation.goBack()
+          navigation.goBack();
         }
       );
     } else {
-      navigation.goBack()
+      navigation.goBack();
     }
   };
 
@@ -120,15 +125,15 @@ export const EditNoteScreen = () => {
       page: strToInt(page),
       createdAt: new Date(),
     };
-    // TODO: Validate the form, show semantic errors
     if (!content && !page) {
-      throw new Error("Note must have content or page.")
+      setError("Note must have content or page.");
+      return;
     }
 
     const noteRef = await createNote(params.bookId, note);
-    const noteId = noteRef.id
-    // setCreationProgress(0.01)
-    uploadImage(image, params.bookId, noteId)
+    const noteId = noteRef.id;
+    setCreationProgress(0.01);
+    uploadImage(image, params.bookId, noteId);
   };
 
   const modifyNote = async (): Promise<void> => {
@@ -142,19 +147,22 @@ export const EditNoteScreen = () => {
       page: strToInt(page),
       updatedAt: new Date(),
     };
+
     if (!content && !page) {
-      throw new Error("Note must have content or page.")
+      setError("Note must have content or page.");
+      return;
     }
 
     await updateNote(params.bookId, params.editNote.id, payload);
-    uploadImage(image, params.bookId, params.editNote.id)
+    uploadImage(image, params.bookId, params.editNote.id);
   };
 
-  // TODO: Disable the button once pressed
   const save = () => {
     if (!auth.currentUser) {
       throw new Error("Cannot save note, user is not logged in.");
     }
+
+    setSaveDisabled(true);
 
     if (params?.editNote) {
       modifyNote();
@@ -164,6 +172,7 @@ export const EditNoteScreen = () => {
   };
 
   const cancel = () => {
+    setSaveDisabled(false);
     navigation.goBack();
   };
 
@@ -191,10 +200,12 @@ export const EditNoteScreen = () => {
           onChangeText={setPage}
           keyboardType="numeric"
         />
+        {!!error && <ValidationError text={error} />}
         <View style={styles.buttonContainer}>
-          <Button onPress={save} title="Save" />
+          <Button onPress={save} title="Save" disabled={saveDisabled} />
           <Button onPress={cancel} title="Cancel" color={palette.grey} />
         </View>
+        <SaveProgress progress={creationProgress} />
 
         {/* Use a light status bar on iOS to account for the black space above the modal */}
         <StatusBar style={Platform.OS === "ios" ? "light" : "auto"} />
@@ -223,6 +234,34 @@ const ImagePicker = (props: ImagePickerProps) => {
   );
 };
 
+interface SaveProgressProps {
+  progress: number;
+}
+
+const SaveProgress = (props: SaveProgressProps) => {
+  const { progress } = props;
+
+  return (
+    <View>
+      <ProgressBar
+        visible={!!progress}
+        progress={progress}
+        style={[styles.progressBar, { width: windowWidth * 0.9 }]}
+      />
+    </View>
+  );
+};
+
+interface ValidationErrorProps {
+  text: string;
+}
+
+const ValidationError = (props: ValidationErrorProps) => {
+  const { text } = props;
+
+  return <Text style={styles.error}>{text}</Text>;
+};
+
 const styles = StyleSheet.create({
   buttonContainer: {
     flexDirection: "row",
@@ -244,5 +283,13 @@ const styles = StyleSheet.create({
     marginVertical: 30,
     height: 1,
     width: "80%",
+  },
+  progressBar: {
+    margin: 10,
+    height: 10,
+    borderRadius: 10,
+  },
+  error: {
+    color: palette.red,
   },
 });
