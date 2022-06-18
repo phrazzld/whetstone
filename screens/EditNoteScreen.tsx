@@ -1,8 +1,10 @@
+import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Button,
+  Image,
   KeyboardAvoidingView,
   Platform,
   StyleSheet,
@@ -10,9 +12,10 @@ import {
 import { TextField } from "../components/TextField";
 import { SafeAreaView, View } from "../components/Themed";
 import { palette } from "../constants/Colors";
-import { auth, createNote, updateNote } from "../firebase";
+import { auth, storage, createNote, updateNote } from "../firebase";
 import { EditNoteScreenParams, NotePayload } from "../types";
-import { strToInt } from "../utils";
+import { takePhoto, strToInt } from "../utils";
+import { useStore } from "../zstore";
 
 export const EditNoteScreen = () => {
   const route = useRoute();
@@ -20,8 +23,91 @@ export const EditNoteScreen = () => {
   const [content, setContent] = useState(params?.editNote?.content || "");
   const [page, setPage] = useState(params?.editNote?.page?.toString() || "");
   const navigation = useNavigation();
+  const [localImage, setLocalImage] = useState<any>(null);
+  const [image, setImage] = useState<any>(null);
+  const [creationProgress, setCreationProgress] = useState(0);
+  const setStaleNoteImage = useStore((state) => state.setStaleNoteImage);
 
-  const addNote = () => {
+  const getImage = async () => {
+    if (!auth.currentUser) {
+      throw new Error("Not logged in");
+    }
+
+    const coverRef = ref(
+      storage,
+      `${auth.currentUser.uid}/${params?.bookId}/${params?.editNote?.id}.jpg`
+    );
+    const coverUrl = await getDownloadURL(coverRef);
+    if (coverUrl) {
+      setLocalImage(coverUrl);
+    }
+  };
+
+  useEffect(() => {
+    if (params?.editNote) {
+      getImage();
+    }
+  }, [params]);
+
+  const uploadImage = async (
+    image: any,
+    bookId: string,
+    noteId: string,
+  ): Promise<void> => {
+    if (!auth.currentUser) {
+      throw new Error("Cannot edit note, user is not logged in.");
+    }
+
+    if (!!image && !image.cancelled) {
+      const filename = `${auth.currentUser.uid}/${bookId}/${noteId}.jpg`;
+      const metadata = { contentType: "image/jpeg" };
+      const imgRef = ref(storage, filename);
+      const img = await fetch(image.uri);
+      const bytes = await img.blob();
+      const uploadTask = uploadBytesResumable(imgRef, bytes, metadata);
+
+      uploadTask.on(
+        "state_changed",
+        (snapshot) => {
+          // Observe state change events such as progress, pause, and resume
+          // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
+          const progress = Math.round(
+            (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+          );
+          setCreationProgress(progress * 0.01);
+          console.log("Upload is " + progress + "% done");
+          switch (snapshot.state) {
+            case "paused": // or 'paused'
+              console.log("Upload is paused");
+              break;
+            case "running": // or 'running'
+              console.log("Upload is running");
+              break;
+          }
+        },
+        (error) => {
+          // Handle unsuccessful uploads
+          console.log("error:", error);
+        },
+        () => {
+          setStaleNoteImage(noteId);
+          navigation.goBack()
+        }
+      );
+    } else {
+      navigation.goBack()
+    }
+  };
+
+  const selectImage = async () => {
+    const result = await takePhoto();
+    if (!result.cancelled) {
+      setLocalImage(result.uri);
+      setImage(result);
+    }
+  };
+
+  const addNote = async (): Promise<void> => {
     if (!params?.bookId) {
       throw new Error("Cannot add note, invalid route params");
     }
@@ -32,13 +118,18 @@ export const EditNoteScreen = () => {
       page: strToInt(page),
       createdAt: new Date(),
     };
-    if (!!content || !!page) {
-      createNote(params.bookId, note);
+    // TODO: Validate the form, show semantic errors
+    if (!content && !page) {
+      throw new Error("Note must have content or page.")
     }
-    navigation.goBack();
+
+    const noteRef = await createNote(params.bookId, note);
+    const noteId = noteRef.id
+    setCreationProgress(0.01)
+    uploadImage(image, params.bookId, noteId)
   };
 
-  const modifyNote = () => {
+  const modifyNote = async (): Promise<void> => {
     if (!params?.bookId || !params.editNote) {
       throw new Error("Cannot modify note, invalid route params");
     }
@@ -49,10 +140,12 @@ export const EditNoteScreen = () => {
       page: strToInt(page),
       updatedAt: new Date(),
     };
-    if (!!content || !!page) {
-      updateNote(params.bookId, params.editNote.id, payload);
+    if (!content && !page) {
+      throw new Error("Note must have content or page.")
     }
-    navigation.goBack();
+
+    await updateNote(params.bookId, params.editNote.id, payload);
+    uploadImage(image, params.bookId, params.editNote.id)
   };
 
   const save = () => {
@@ -77,6 +170,11 @@ export const EditNoteScreen = () => {
         style={[styles.container, { width: "100%" }]}
         behavior={Platform.OS === "ios" ? "padding" : "height"}
       >
+        <ImagePicker
+          uri={localImage}
+          title={localImage ? "Edit image" : "Pick image"}
+          onPress={selectImage}
+        />
         <TextField
           label="Content"
           multiline={true}
@@ -102,6 +200,26 @@ export const EditNoteScreen = () => {
   );
 };
 
+interface ImagePickerProps {
+  uri: string;
+  title: string;
+  onPress: () => void;
+}
+
+const ImagePicker = (props: ImagePickerProps) => {
+  const { uri, title, onPress } = props;
+
+  return (
+    <View style={styles.imageForm}>
+      <Image
+        source={{ uri }}
+        style={{ width: 180, height: 180, borderRadius: 5 }}
+      />
+      <Button title={title} onPress={onPress} />
+    </View>
+  );
+};
+
 const styles = StyleSheet.create({
   buttonContainer: {
     flexDirection: "row",
@@ -114,6 +232,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: 10,
     paddingTop: 20,
+  },
+  imageForm: {
+    justifyContent: "center",
+    alignItems: "center",
   },
   separator: {
     marginVertical: 30,

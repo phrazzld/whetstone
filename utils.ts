@@ -10,7 +10,7 @@ export const pickImage = async (): Promise<
   >
 > => {
   if (!auth.currentUser) {
-    throw new Error("Cannot edit book image, user is not logged in.");
+    throw new Error("Cannot pick image, user is not logged in.");
   }
 
   try {
@@ -28,18 +28,51 @@ export const pickImage = async (): Promise<
       }
     }
 
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
+    const image = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
       quality: 1,
     });
 
-    return result;
+    return image;
   } catch (err) {
     console.error(err);
     throw new Error(err);
   }
 };
+
+// TODO: Specify return signature
+export const takePhoto = async (): Promise<any> => {
+  if (!auth.currentUser) {
+    throw new Error("Cannot take photo, user is not logged in.")
+  }
+
+  try {
+    // Check camera permissions
+    const permissions = await ImagePicker.getCameraPermissionsAsync();
+
+    // If camera permissions are not granted, request permissions
+    if (permissions.granted === false) {
+      const newPermissions = await ImagePicker.requestCameraPermissionsAsync()
+
+      if (newPermissions.granted === false) {
+        throw new Error("Camera permissions not granted.")
+      }
+    }
+
+    // Launch camera
+    const photo = await ImagePicker.launchCameraAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      quality: 0
+    })
+
+    return photo;
+  } catch (err) {
+    console.error(err)
+    throw new Error(err)
+  }
+}
 
 export const ensureDate = (date: Date | admin.firestore.Timestamp): Date => {
   if (date instanceof Date) {
