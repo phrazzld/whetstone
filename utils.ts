@@ -64,7 +64,7 @@ export const takePhoto = async (): Promise<any> => {
     const photo = await ImagePicker.launchCameraAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
-      quality: 0
+      quality: 0,
     })
 
     return photo;

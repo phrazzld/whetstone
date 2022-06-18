@@ -1,14 +1,14 @@
-import { useNoteImage } from '../hooks/useNoteImage'
 import { useNavigation } from "@react-navigation/native";
 import { Badge } from "@rneui/themed";
 import { useRef } from "react";
 import { Alert, Animated, Image, StyleSheet } from "react-native";
 import { RectButton } from "react-native-gesture-handler";
 import Swipeable from "react-native-gesture-handler/Swipeable";
-import { dateLocaleStringOptions } from "../constants";
+import { dateLocaleStringOptions, windowWidth } from "../constants";
 import Colors, { palette } from "../constants/Colors";
 import { deleteNote } from "../firebase";
 import useColorScheme from "../hooks/useColorScheme";
+import { useNoteImage } from "../hooks/useNoteImage";
 import { TNote } from "../types";
 import { ensureDate } from "../utils";
 import { FontAwesome, Text, View } from "./Themed";
@@ -22,7 +22,7 @@ export const Note = (props: NoteProps) => {
   const { note, bookId } = props;
   const colorScheme = useColorScheme();
   const navigation = useNavigation();
-  const image = useNoteImage(bookId, note.id)
+  const image = useNoteImage(bookId, note.id);
   const swipeableRef = useRef<Swipeable | null>(null);
 
   const editNote = (): void => {
@@ -111,16 +111,13 @@ export const Note = (props: NoteProps) => {
         ]}
       >
         <View style={{ flex: 1, flexDirection: "row", alignItems: "center" }}>
-
-          <View style={styles.imageContainer}>
-            {!!image ? (
-              <Image style={styles.image} source={{ uri: image }} />
-            ) : (
-                <View style={styles.image}></View>
-              )}
-          </View>
-
           <View style={styles.main}>
+            <View>
+              {!!image && (
+                <Image style={styles.image} source={{ uri: image }} />
+              )}
+            </View>
+
             {!!note.content && (
               <Text style={styles.content}>{note.content}</Text>
             )}
@@ -137,6 +134,8 @@ export const Note = (props: NoteProps) => {
                 display: "flex",
                 flexDirection: "row",
                 alignItems: "center",
+                paddingHorizontal: 10,
+                paddingVertical: 10,
               }}
             >
               <NoteTypeBadge
@@ -230,26 +229,31 @@ const styles = StyleSheet.create({
   note: {
     flexDirection: "row",
     justifyContent: "space-between",
-    paddingVertical: 15,
     borderTopColor: palette.grey,
     borderTopWidth: 1,
-    paddingHorizontal: 10,
   },
   timestamp: {
     fontSize: 11,
+    paddingHorizontal: 10,
+    // paddingVertical: 15,
   },
   content: {
     fontSize: 14,
     marginBottom: 15,
+    paddingHorizontal: 10,
+    paddingTop: 10,
   },
   word: {
     fontWeight: "600",
     fontSize: 14,
     marginBottom: 5,
+    paddingHorizontal: 10,
+    paddingVertical: 10,
   },
   definition: {
     fontSize: 14,
     marginBottom: 15,
+    paddingHorizontal: 10,
   },
   noteTypeContainer: {
     marginRight: 15,
@@ -257,7 +261,8 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     borderColor: palette.grey,
     borderWidth: 1,
-    paddingVertical: 5,
+    marginHorizontal: 10,
+    // paddingVertical: 15,
   },
   noteType: {
     fontSize: 11,
@@ -276,11 +281,8 @@ const styles = StyleSheet.create({
     fontWeight: "500",
   },
   image: {
-    height: 80,
-    width: 80,
+    width: windowWidth,
+    height: windowWidth,
     resizeMode: "cover",
-  },
-  imageContainer: {
-    marginRight: 10,
   },
 });

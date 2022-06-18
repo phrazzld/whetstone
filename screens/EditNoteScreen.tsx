@@ -1,4 +1,4 @@
-import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
+import { getDownloadURL, ref, uploadBytesResumable, uploadString } from "firebase/storage";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useState } from "react";
@@ -25,7 +25,7 @@ export const EditNoteScreen = () => {
   const navigation = useNavigation();
   const [localImage, setLocalImage] = useState<any>(null);
   const [image, setImage] = useState<any>(null);
-  const [creationProgress, setCreationProgress] = useState(0);
+  // const [creationProgress, setCreationProgress] = useState(0);
   const setStaleNoteImage = useStore((state) => state.setStaleNoteImage);
 
   const getImage = async () => {
@@ -68,13 +68,13 @@ export const EditNoteScreen = () => {
 
       uploadTask.on(
         "state_changed",
-        (snapshot) => {
+        (snapshot: any) => {
           // Observe state change events such as progress, pause, and resume
           // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
           const progress = Math.round(
             (snapshot.bytesTransferred / snapshot.totalBytes) * 100
           );
-          setCreationProgress(progress * 0.01);
+          // setCreationProgress(progress * 0.01);
           console.log("Upload is " + progress + "% done");
           switch (snapshot.state) {
             case "paused": // or 'paused'
@@ -83,6 +83,8 @@ export const EditNoteScreen = () => {
             case "running": // or 'running'
               console.log("Upload is running");
               break;
+            default:
+              console.log(`Upload is ${snapshot.state}`)
           }
         },
         (error) => {
@@ -125,7 +127,7 @@ export const EditNoteScreen = () => {
 
     const noteRef = await createNote(params.bookId, note);
     const noteId = noteRef.id
-    setCreationProgress(0.01)
+    // setCreationProgress(0.01)
     uploadImage(image, params.bookId, noteId)
   };
 
@@ -148,6 +150,7 @@ export const EditNoteScreen = () => {
     uploadImage(image, params.bookId, params.editNote.id)
   };
 
+  // TODO: Disable the button once pressed
   const save = () => {
     if (!auth.currentUser) {
       throw new Error("Cannot save note, user is not logged in.");
