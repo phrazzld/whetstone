@@ -25,26 +25,7 @@ export const ProfileScreen = () => {
         <View style={styles.userInfo}>
           <Text>Email: {auth.currentUser?.email}</Text>
         </View>
-        <View style={styles.policies}>
-          <TouchableOpacity
-            onPress={() =>
-              Linking.openURL(
-                "https://pages.flycricket.io/whetstone/privacy.html"
-              )
-            }
-          >
-            <Text style={styles.link}>Privacy Policy</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() =>
-              Linking.openURL(
-                "https://pages.flycricket.io/whetstone/terms.html"
-              )
-            }
-          >
-            <Text style={styles.link}>Terms of Service</Text>
-          </TouchableOpacity>
-        </View>
+        <Policies />
       </View>
       <View style={{ margin: 20 }}>
         <View style={styles.buttons}>
@@ -59,6 +40,31 @@ export const ProfileScreen = () => {
     </SafeAreaView>
   );
 };
+
+const Policies = () => {
+  return (
+    <View style={styles.policies}>
+      <TouchableOpacity
+        onPress={() =>
+          Linking.openURL(
+            "https://pages.flycricket.io/whetstone/privacy.html"
+          )
+      }
+      >
+        <Text style={styles.link}>Privacy Policy</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        onPress={() =>
+          Linking.openURL(
+            "https://pages.flycricket.io/whetstone/terms.html"
+          )
+      }
+      >
+        <Text style={styles.link}>Terms of Service</Text>
+      </TouchableOpacity>
+    </View>
+  )
+}
 
 const deleteNotes = async (books: Array<TBook>): Promise<void> => {
   console.log("Deleting notes...");

@@ -44,9 +44,7 @@ const BooksScreen = () => {
     (unreadBooksLoading && tabIndex === TABS.UNREAD)
   ) {
     return (
-      <SafeAreaView
-        style={[styles.container, { flex: 1, justifyContent: "center" }]}
-      >
+      <SafeAreaView style={styles.loading}>
         <ActivityIndicator size="large" />
       </SafeAreaView>
     );
@@ -76,21 +74,21 @@ const BooksScreen = () => {
           </Tab>
 
           <TabView value={tabIndex} onChange={setTabIndex} disableSwipe={true}>
-            <TabView.Item style={{ width: "100%" }}>
+            <TabView.Item style={styles.tabViewItem}>
               <FlatList
                 data={unfinishedBooks}
                 renderItem={renderItem}
                 keyExtractor={(item) => item.id}
               />
             </TabView.Item>
-            <TabView.Item style={{ width: "100%" }}>
+            <TabView.Item style={styles.tabViewItem}>
               <FlatList
                 data={finishedBooks}
                 renderItem={renderItem}
                 keyExtractor={(item) => item.id}
               />
             </TabView.Item>
-            <TabView.Item style={{ width: "100%" }}>
+            <TabView.Item style={styles.tabViewItem}>
               <FlatList
                 data={unreadBooks}
                 renderItem={renderItem}
@@ -117,6 +115,10 @@ const styles = StyleSheet.create({
   emptyStateText: {
     marginVertical: 20,
   },
+  loading: {
+    flex: 1,
+    justifyContent: "center",
+  },
   sectionHeader: {
     fontSize: 20,
     fontWeight: "600",
@@ -127,6 +129,9 @@ const styles = StyleSheet.create({
   sectionHeaderContainer: {
     borderBottomColor: palette.grey,
     borderBottomWidth: 1,
+  },
+  tabViewItem: {
+    width: "100%",
   },
 });
 

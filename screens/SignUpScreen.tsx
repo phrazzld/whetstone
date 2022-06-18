@@ -55,7 +55,7 @@ export const SignUpScreen = () => {
   return (
     <SafeAreaView style={styles.container}>
       <KeyboardAvoidingView
-        style={[styles.container, { width: "100%" }]}
+        style={styles.content}
         behavior={Platform.OS === "ios" ? "padding" : "height"}
       >
         <TextField
@@ -95,6 +95,12 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+  },
+  content: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    width: "100%",
   },
   error: {
     color: palette.red,
