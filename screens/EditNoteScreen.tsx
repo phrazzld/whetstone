@@ -1,12 +1,8 @@
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
 import { useState } from "react";
-import {
-  Button,
-  KeyboardAvoidingView,
-  Platform,
-  StyleSheet,
-} from "react-native";
+import { Button, Platform, StyleSheet } from "react-native";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { TextField } from "../components/TextField";
 import { SafeAreaView, View } from "../components/Themed";
 import { palette } from "../constants/Colors";
@@ -72,10 +68,10 @@ export const EditNoteScreen = () => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <KeyboardAvoidingView
-        style={[styles.container, { width: "100%" }]}
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
+    <SafeAreaView style={{ alignItems: "center", flex: 1 }}>
+      <KeyboardAwareScrollView
+        style={{ flex: 1, width: "100%" }}
+        contentContainerStyle={{ alignItems: "center" }}
       >
         <TextField
           label="Content"
@@ -83,12 +79,14 @@ export const EditNoteScreen = () => {
           text={content}
           onChangeText={setContent}
           autoCapitalize="sentences"
+          returnKeyType="default"
         />
         <TextField
           label="Page number"
           text={page}
           onChangeText={setPage}
           keyboardType="numeric"
+          returnKeyType="done"
         />
         <View style={styles.buttonContainer}>
           <Button onPress={save} title="Save" />
@@ -97,7 +95,7 @@ export const EditNoteScreen = () => {
 
         {/* Use a light status bar on iOS to account for the black space above the modal */}
         <StatusBar style={Platform.OS === "ios" ? "light" : "auto"} />
-      </KeyboardAvoidingView>
+      </KeyboardAwareScrollView>
     </SafeAreaView>
   );
 };
@@ -108,12 +106,6 @@ const styles = StyleSheet.create({
     justifyContent: "flex-start",
     margin: 10,
     width: "90%",
-  },
-  container: {
-    flex: 1,
-    alignItems: "center",
-    padding: 10,
-    paddingTop: 20,
   },
   separator: {
     marginVertical: 30,
