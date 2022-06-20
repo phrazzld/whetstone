@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Button, Platform, StyleSheet } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { TextField } from "../components/TextField";
-import { SafeAreaView, View } from "../components/Themed";
+import { SafeAreaView, Text, View } from "../components/Themed";
 import { auth, createNote, updateNote } from "../firebase";
 import { EditNoteScreenParams, VocabPayload } from "../types";
 import { strToInt } from "../utils";
@@ -36,6 +36,7 @@ export const EditVocabScreen = () => {
   );
   const [page, setPage] = useState(params?.editVocab?.page?.toString() || "");
   const navigation = useNavigation();
+  const [defFetchMessage, setDefFetchMessage] = useState("");
 
   const addVocab = (): void => {
     if (!params?.bookId) {
@@ -86,6 +87,7 @@ export const EditVocabScreen = () => {
   };
 
   const getDefinition = async (): Promise<void> => {
+    setDefFetchMessage(`Fetching definition for ${word}...`);
     const res = await fetch(
       `https://api.dictionaryapi.dev/api/v2/entries/en/${word}`
     );
@@ -103,9 +105,11 @@ export const EditVocabScreen = () => {
             def += "\n";
           }
         }
-
         setDefinition(def);
       }
+      setDefFetchMessage("");
+    } else {
+      setDefFetchMessage("No definitions found.");
     }
   };
 
@@ -129,6 +133,19 @@ export const EditVocabScreen = () => {
           onFocus={getDefinition}
           autoCapitalize="sentences"
         />
+        {!!defFetchMessage && (
+          <Text
+            style={{
+              alignSelf: "flex-start",
+              width: "88%",
+              marginLeft: "auto",
+              marginRight: "auto",
+              marginBottom: 10,
+            }}
+          >
+            {defFetchMessage}
+          </Text>
+        )}
         <TextField
           label="Page number"
           text={page}
