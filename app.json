@@ -2,7 +2,7 @@
   "expo": {
     "name": "Whetstone",
     "slug": "whetstone",
-    "version": "1.1.2",
+    "version": "1.1.3",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "myapp",
@@ -24,7 +24,7 @@
       "infoPlist": {
         "NSPhotoLibraryUsageDescription": "Whetstone uses your photos to display book covers, and provide a better experience."
       },
-      "buildNumber": "12"
+      "buildNumber": "13"
     },
     "android": {
       "adaptiveIcon": {
