@@ -2,14 +2,8 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
 import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
 import { useEffect, useState } from "react";
-import {
-  Button,
-  Image,
-  KeyboardAvoidingView,
-  Platform,
-  StyleSheet,
-  Text,
-} from "react-native";
+import { Button, Image, Platform, StyleSheet, Text } from "react-native";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { ProgressBar } from "react-native-paper";
 import { TextField } from "../components/TextField";
 import { SafeAreaView, View } from "../components/Themed";
@@ -177,10 +171,10 @@ export const EditNoteScreen = () => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <KeyboardAvoidingView
-        style={[styles.container, { width: "100%" }]}
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
+    <SafeAreaView style={{ alignItems: "center", flex: 1 }}>
+      <KeyboardAwareScrollView
+        style={{ flex: 1, width: "100%" }}
+        contentContainerStyle={{ alignItems: "center" }}
       >
         <ImagePicker
           uri={localImage}
@@ -193,12 +187,14 @@ export const EditNoteScreen = () => {
           text={content}
           onChangeText={setContent}
           autoCapitalize="sentences"
+          returnKeyType="default"
         />
         <TextField
           label="Page number"
           text={page}
           onChangeText={setPage}
           keyboardType="numeric"
+          returnKeyType="done"
         />
         {!!error && <ValidationError text={error} />}
         <View style={styles.buttonContainer}>
@@ -209,7 +205,7 @@ export const EditNoteScreen = () => {
 
         {/* Use a light status bar on iOS to account for the black space above the modal */}
         <StatusBar style={Platform.OS === "ios" ? "light" : "auto"} />
-      </KeyboardAvoidingView>
+      </KeyboardAwareScrollView>
     </SafeAreaView>
   );
 };

@@ -1,14 +1,10 @@
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
 import { useState } from "react";
-import {
-  Button,
-  KeyboardAvoidingView,
-  Platform,
-  StyleSheet,
-} from "react-native";
+import { Button, Platform, StyleSheet } from "react-native";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { TextField } from "../components/TextField";
-import { SafeAreaView, View } from "../components/Themed";
+import { SafeAreaView, Text, View } from "../components/Themed";
 import { auth, createNote, updateNote } from "../firebase";
 import { EditNoteScreenParams, VocabPayload } from "../types";
 import { strToInt } from "../utils";
@@ -40,6 +36,7 @@ export const EditVocabScreen = () => {
   );
   const [page, setPage] = useState(params?.editVocab?.page?.toString() || "");
   const navigation = useNavigation();
+  const [defFetchMessage, setDefFetchMessage] = useState("");
 
   const addVocab = (): void => {
     if (!params?.bookId) {
@@ -90,6 +87,7 @@ export const EditVocabScreen = () => {
   };
 
   const getDefinition = async (): Promise<void> => {
+    setDefFetchMessage(`Fetching definition for ${word}...`);
     const res = await fetch(
       `https://api.dictionaryapi.dev/api/v2/entries/en/${word}`
     );
@@ -107,17 +105,19 @@ export const EditVocabScreen = () => {
             def += "\n";
           }
         }
-
         setDefinition(def);
       }
+      setDefFetchMessage("");
+    } else {
+      setDefFetchMessage("No definitions found.");
     }
   };
 
   return (
     <SafeAreaView style={styles.container}>
-      <KeyboardAvoidingView
-        style={[styles.container, { width: "100%" }]}
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
+      <KeyboardAwareScrollView
+        style={{ flex: 1, width: "100%" }}
+        contentContainerStyle={{ alignItems: "center" }}
       >
         <TextField
           label="Word"
@@ -133,6 +133,19 @@ export const EditVocabScreen = () => {
           onFocus={getDefinition}
           autoCapitalize="sentences"
         />
+        {!!defFetchMessage && (
+          <Text
+            style={{
+              alignSelf: "flex-start",
+              width: "88%",
+              marginLeft: "auto",
+              marginRight: "auto",
+              marginBottom: 10,
+            }}
+          >
+            {defFetchMessage}
+          </Text>
+        )}
         <TextField
           label="Page number"
           text={page}
@@ -146,7 +159,7 @@ export const EditVocabScreen = () => {
 
         {/* Use a light status bar on iOS to account for the black space above the modal */}
         <StatusBar style={Platform.OS === "ios" ? "light" : "auto"} />
-      </KeyboardAvoidingView>
+      </KeyboardAwareScrollView>
     </SafeAreaView>
   );
 };
