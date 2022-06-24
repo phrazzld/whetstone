@@ -1,55 +1,17 @@
 import { useNavigation } from "@react-navigation/native";
 import { Badge } from "@rneui/themed";
 import { useRef } from "react";
-import { Alert, Animated, StyleSheet } from "react-native";
+import { Alert, Animated, Image, StyleSheet } from "react-native";
 import { RectButton } from "react-native-gesture-handler";
 import Swipeable from "react-native-gesture-handler/Swipeable";
-import { dateLocaleStringOptions } from "../constants";
+import { dateLocaleStringOptions, windowWidth } from "../constants";
 import Colors, { palette } from "../constants/Colors";
 import { deleteNote } from "../firebase";
 import useColorScheme from "../hooks/useColorScheme";
+import { useNoteImage } from "../hooks/useNoteImage";
 import { TNote } from "../types";
 import { ensureDate } from "../utils";
 import { FontAwesome, Text, View } from "./Themed";
-
-interface NoteTypeBadgeProps {
-  noteType: "bookmark" | "vocab" | "note" | "quote";
-}
-
-const NoteTypeBadge = (props: NoteTypeBadgeProps) => {
-  const { noteType } = props;
-  let icon: "bookmark" | "font" | "file-text" | "quote-left";
-
-  switch (noteType) {
-    case "bookmark":
-      icon = "bookmark";
-      break;
-    case "vocab":
-      icon = "font";
-      break;
-    case "note":
-      icon = "file-text";
-      break;
-    case "quote":
-      icon = "quote-left";
-      break;
-    default:
-      throw new Error(`Unrecognized noteType: ${noteType}`);
-  }
-
-  return (
-    <Badge
-      value={<FontAwesome name={icon} size={15} color={palette.white} />}
-      status="primary"
-      containerStyle={{ marginRight: 10 }}
-      badgeStyle={{
-        height: 30,
-        borderRadius: 20,
-        width: 30,
-      }}
-    />
-  );
-};
 
 interface NoteProps {
   note: TNote;
@@ -60,6 +22,7 @@ export const Note = (props: NoteProps) => {
   const { note, bookId } = props;
   const colorScheme = useColorScheme();
   const navigation = useNavigation();
+  const image = useNoteImage(bookId, note.id);
   const swipeableRef = useRef<Swipeable | null>(null);
 
   const editNote = (): void => {
@@ -149,6 +112,12 @@ export const Note = (props: NoteProps) => {
       >
         <View style={{ flex: 1, flexDirection: "row", alignItems: "center" }}>
           <View style={styles.main}>
+            <View>
+              {!!image && (
+                <Image style={styles.image} source={{ uri: image }} />
+              )}
+            </View>
+
             {!!note.content && (
               <Text style={styles.content}>{note.content}</Text>
             )}
@@ -165,6 +134,8 @@ export const Note = (props: NoteProps) => {
                 display: "flex",
                 flexDirection: "row",
                 alignItems: "center",
+                paddingHorizontal: 10,
+                paddingVertical: 10,
               }}
             >
               <NoteTypeBadge
@@ -212,6 +183,45 @@ export const Note = (props: NoteProps) => {
   );
 };
 
+interface NoteTypeBadgeProps {
+  noteType: "bookmark" | "vocab" | "note" | "quote";
+}
+
+const NoteTypeBadge = (props: NoteTypeBadgeProps) => {
+  const { noteType } = props;
+  let icon: "bookmark" | "font" | "file-text" | "quote-left";
+
+  switch (noteType) {
+    case "bookmark":
+      icon = "bookmark";
+      break;
+    case "vocab":
+      icon = "font";
+      break;
+    case "note":
+      icon = "file-text";
+      break;
+    case "quote":
+      icon = "quote-left";
+      break;
+    default:
+      throw new Error(`Unrecognized noteType: ${noteType}`);
+  }
+
+  return (
+    <Badge
+      value={<FontAwesome name={icon} size={15} color={palette.white} />}
+      status="primary"
+      containerStyle={{ marginRight: 10 }}
+      badgeStyle={{
+        height: 30,
+        borderRadius: 20,
+        width: 30,
+      }}
+    />
+  );
+};
+
 const styles = StyleSheet.create({
   main: {
     width: "100%",
@@ -219,26 +229,30 @@ const styles = StyleSheet.create({
   note: {
     flexDirection: "row",
     justifyContent: "space-between",
-    paddingVertical: 15,
     borderTopColor: palette.grey,
     borderTopWidth: 1,
-    paddingHorizontal: 10,
   },
   timestamp: {
     fontSize: 11,
+    paddingHorizontal: 10,
   },
   content: {
     fontSize: 14,
     marginBottom: 15,
+    paddingHorizontal: 10,
+    paddingTop: 10,
   },
   word: {
     fontWeight: "600",
     fontSize: 14,
     marginBottom: 5,
+    paddingHorizontal: 10,
+    paddingVertical: 10,
   },
   definition: {
     fontSize: 14,
     marginBottom: 15,
+    paddingHorizontal: 10,
   },
   noteTypeContainer: {
     marginRight: 15,
@@ -246,7 +260,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     borderColor: palette.grey,
     borderWidth: 1,
-    paddingVertical: 5,
+    marginHorizontal: 10,
   },
   noteType: {
     fontSize: 11,
@@ -263,5 +277,10 @@ const styles = StyleSheet.create({
     padding: 10,
     fontSize: 15,
     fontWeight: "500",
+  },
+  image: {
+    width: windowWidth,
+    height: windowWidth,
+    resizeMode: "cover",
   },
 });

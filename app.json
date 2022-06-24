@@ -22,7 +22,8 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.phaedrus.whetstone",
       "infoPlist": {
-        "NSPhotoLibraryUsageDescription": "Whetstone uses your photos to display book covers, and provide a better experience."
+        "NSPhotoLibraryUsageDescription": "Whetstone uses your photos to display book covers, and provide a better experience.",
+        "NSCameraUsageDescription": "Whetstone uses your camera so you can take photos to add to your notes."
       },
       "buildNumber": "13"
     },

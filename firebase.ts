@@ -159,17 +159,18 @@ export const updateBook = async (
 
 // Notes
 
-export const createNote = (
+export const createNote = async (
   bookId: string,
   newNote: NotePayload | VocabPayload
-): void => {
+): Promise<any> => {
   if (!auth.currentUser) {
     throw new Error("Cannot create note, user is not logged in.");
   }
 
   const userRef = doc(db, "users", auth.currentUser.uid);
   const bookRef = doc(userRef, "books", bookId);
-  addDoc(collection(bookRef, "notes"), newNote);
+  const noteRef = await addDoc(collection(bookRef, "notes"), newNote);
+  return noteRef;
 };
 
 export const getBookNotes = async (bookId: string): Promise<Array<any>> => {

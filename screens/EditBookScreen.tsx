@@ -128,11 +128,22 @@ interface FormButtonsProps {
 
 const FormButtons = (props: FormButtonsProps) => {
   const { save, cancel } = props;
+  const [saveDisabled, setSaveDisabled] = useState(false);
+
+  const handleSave = (): void => {
+    setSaveDisabled(true);
+    save();
+  };
+
+  const handleCancel = (): void => {
+    setSaveDisabled(false);
+    cancel();
+  };
 
   return (
     <View style={styles.buttonContainer}>
-      <Button onPress={save} title="Save" />
-      <Button onPress={cancel} title="Cancel" color={palette.grey} />
+      <Button onPress={handleSave} title="Save" disabled={saveDisabled} />
+      <Button onPress={handleCancel} title="Cancel" color={palette.grey} />
     </View>
   );
 };
@@ -437,6 +448,7 @@ const styles = StyleSheet.create({
   imageForm: {
     justifyContent: "center",
     alignItems: "center",
+    paddingTop: 20
   },
   error: {
     color: palette.red,
