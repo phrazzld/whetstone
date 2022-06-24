@@ -274,6 +274,7 @@ const styles = StyleSheet.create({
   imageForm: {
     justifyContent: "center",
     alignItems: "center",
+    paddingTop: 20
   },
   separator: {
     marginVertical: 30,

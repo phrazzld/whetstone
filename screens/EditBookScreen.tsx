@@ -448,6 +448,7 @@ const styles = StyleSheet.create({
   imageForm: {
     justifyContent: "center",
     alignItems: "center",
+    paddingTop: 20
   },
   error: {
     color: palette.red,
