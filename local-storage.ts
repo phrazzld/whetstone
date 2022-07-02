@@ -36,16 +36,11 @@ export const clearStorage = async (): Promise<Array<void>> => {
 };
 
 export const setLocalUnfinishedBooks = async (books: Array<TBook>): Promise<void> => {
-  console.log("*** setLocalUnfinishedBooks ***")
-  console.log("books:", books)
   return await AsyncStorage.setItem(UNFINISHED_BOOKS_KEY, JSON.stringify(books))
 }
 
 export const getLocalUnfinishedBooks = async (): Promise<Array<TBook>> => {
-  console.log("*** getLocalUnfinishedBooks ***")
   const books = await AsyncStorage.getItem(UNFINISHED_BOOKS_KEY)
-  console.log("books:", books)
-  console.log("JSON.parse(books):", JSON.parse(books || ""))
   return JSON.parse(books || "")
 }
 
