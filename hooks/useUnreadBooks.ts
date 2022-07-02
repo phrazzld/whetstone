@@ -12,6 +12,7 @@ export const useUnreadBooks = (): Signature => {
   const [books, setBooks] = useState<Array<TBook>>([]);
   const [loading, setLoading] = useState(true);
 
+  // TODO: Use local storage first, then update from Firebase
   useEffect(() => {
     if (!auth.currentUser) {
       throw new Error("Cannot get books, user not logged in");

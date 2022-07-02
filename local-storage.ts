@@ -12,7 +12,9 @@ type ActionKey =
 
 type ActionPayload = BookPayload | NotePayload | VocabPayload;
 
-export const BOOKS_KEY = "books";
+export const UNFINISHED_BOOKS_KEY = "unfinished books"
+export const FINISHED_BOOKS_KEY = "finished books"
+export const UNREAD_BOOKS_KEY = "unread books"
 export const NOTES_KEY = "notes";
 
 export const ACTIONS = {
@@ -33,14 +35,37 @@ export const clearStorage = async (): Promise<Array<void>> => {
   return Promise.all(promises);
 };
 
-export const setLocalBooks = async (books: Array<TBook>): Promise<void> => {
-  return await AsyncStorage.setItem(BOOKS_KEY, JSON.stringify(books));
-};
+export const setLocalUnfinishedBooks = async (books: Array<TBook>): Promise<void> => {
+  console.log("*** setLocalUnfinishedBooks ***")
+  console.log("books:", books)
+  return await AsyncStorage.setItem(UNFINISHED_BOOKS_KEY, JSON.stringify(books))
+}
 
-export const getLocalBooks = async (): Promise<Array<TBook>> => {
-  const books = await AsyncStorage.getItem(BOOKS_KEY);
-  return JSON.parse(books);
-};
+export const getLocalUnfinishedBooks = async (): Promise<Array<TBook>> => {
+  console.log("*** getLocalUnfinishedBooks ***")
+  const books = await AsyncStorage.getItem(UNFINISHED_BOOKS_KEY)
+  console.log("books:", books)
+  console.log("JSON.parse(books):", JSON.parse(books || ""))
+  return JSON.parse(books || "")
+}
+
+export const setLocalFinishedBooks = async (books: Array<TBook>): Promise<void> => {
+  return await AsyncStorage.setItem(FINISHED_BOOKS_KEY, JSON.stringify(books))
+}
+
+export const getLocalFinishedBooks = async (): Promise<Array<TBook>> => {
+  const books = await AsyncStorage.getItem(FINISHED_BOOKS_KEY)
+  return JSON.parse(books || "")
+}
+
+export const setLocalUnreadBooks = async (books: Array<TBook>): Promise<void> => {
+  return await AsyncStorage.setItem(UNREAD_BOOKS_KEY, JSON.stringify(books))
+}
+
+export const getLocalUnreadBooks = async (): Promise<Array<TBook>> => {
+  const books = await AsyncStorage.getItem(UNREAD_BOOKS_KEY)
+  return JSON.parse(books || "")
+}
 
 export const setLocalNotes = async (notes: Array<TNote>): Promise<void> => {
   return await AsyncStorage.setItem(NOTES_KEY, JSON.stringify(notes));
@@ -48,7 +73,7 @@ export const setLocalNotes = async (notes: Array<TNote>): Promise<void> => {
 
 export const getLocalNotes = async (): Promise<Array<TNote>> => {
   const notes = await AsyncStorage.getItem(NOTES_KEY);
-  return JSON.parse(notes);
+  return JSON.parse(notes || "");
 };
 
 export const queueAction = async (

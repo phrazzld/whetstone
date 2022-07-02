@@ -12,6 +12,7 @@ export const useNotes = (bookId: string): Signature => {
   const [notes, setNotes] = useState<Array<TNote>>([]);
   const [loading, setLoading] = useState(true);
 
+  // TODO: Use local storage first, then update from Firebase
   useEffect(() => {
     if (!auth.currentUser) {
       throw new Error("Cannot get notes, user not logged in.");
