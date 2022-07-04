@@ -48,6 +48,9 @@ export const EditNoteScreen = () => {
     }
   }, [params]);
 
+  // TODO: Separate app handling logic from actual image upload logic
+  // TODO: Define offline action handler for image upload
+  // NOTE: Do we want to keep images in local storage? Or is that too heavy?
   const uploadImage = async (
     image: any,
     bookId: string,
