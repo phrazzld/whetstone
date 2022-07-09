@@ -57,7 +57,7 @@ export const useNotes = (bookId: string): Signature => {
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [bookId]);
 
   return { data: notes, loading: localLoading && firebaseLoading };
 };

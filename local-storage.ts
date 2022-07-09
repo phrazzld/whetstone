@@ -89,13 +89,20 @@ export const getLocalNotes = async (bookId: string): Promise<Array<TNote>> => {
   return JSON.parse(notes || "");
 };
 
+export const addLocalNote = async (
+  bookId: string,
+  note: TNote
+): Promise<void> => {
+  const notes = await getLocalNotes(bookId);
+  notes.push(note);
+  return await setLocalNotes(bookId, notes);
+};
+
 const getActions = async (key: ActionKey): Promise<Array<ActionPayload>> => {
   const actions = await AsyncStorage.getItem(key);
   return JSON.parse(actions || "[]");
 };
 
-// TODO: call when create note action is attempted while offline
-// TODO: create note in local storage
 // TODO: disable UI for actions without offline support
 export const queueAction = async (
   key: ActionKey,
@@ -143,9 +150,6 @@ export const processAction = async (
   return await AsyncStorage.setItem(key, JSON.stringify(actions));
 };
 
-// TODO: Define process for processing queue
-//       Perhaps useEffect with netInfo in dep array?
-//       Whenever we go from offline to online, process actions queue
 export const processActions = async (key: ActionKey): Promise<void> => {
   try {
     const actionsStr: string | null = await AsyncStorage.getItem(key);

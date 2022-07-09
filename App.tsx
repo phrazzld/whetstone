@@ -5,6 +5,7 @@ import { Provider as PaperProvider } from "react-native-paper";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import useCachedResources from "./hooks/useCachedResources";
 import useColorScheme from "./hooks/useColorScheme";
+import { processActions } from "./local-storage";
 import Navigation from "./navigation";
 
 export default function App() {
@@ -13,8 +14,11 @@ export default function App() {
 
   useEffect(() => {
     const unsubscribe = NetInfo.addEventListener((state) => {
-      console.log("Connection type:", state.type);
-      console.log("Is connected?", state.isConnected);
+      // Whenever we're reconnected to the internet, process the action queue
+      // TODO: Handle all actions, not just note creation
+      if (state.isConnected) {
+        processActions("create note");
+      }
     });
 
     return () => unsubscribe();
