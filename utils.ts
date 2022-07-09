@@ -79,6 +79,10 @@ export const ensureDate = (date: Date | admin.firestore.Timestamp): Date => {
     return date;
   }
 
+  if (typeof date === "string") {
+    return new Date(date)
+  }
+
   return date.toDate();
 };
 
