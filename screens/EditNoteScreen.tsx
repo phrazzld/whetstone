@@ -1,4 +1,3 @@
-import { useNetInfo } from "@react-native-community/netinfo";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
 import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
@@ -6,13 +5,11 @@ import { useEffect, useState } from "react";
 import { Button, Image, Platform, StyleSheet, Text } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { ProgressBar } from "react-native-paper";
-import uuid from "react-native-uuid";
 import { TextField } from "../components/TextField";
 import { SafeAreaView, View } from "../components/Themed";
 import { windowWidth } from "../constants";
 import { palette } from "../constants/Colors";
 import { auth, createNote, storage, updateNote } from "../firebase";
-import { addLocalNote, queueAction } from "../local-storage";
 import { EditNoteScreenParams, NotePayload } from "../types";
 import { strToInt, takePhoto } from "../utils";
 import { useStore } from "../zstore";
@@ -29,7 +26,6 @@ export const EditNoteScreen = () => {
   const setStaleNoteImage = useStore((state) => state.setStaleNoteImage);
   const [saveDisabled, setSaveDisabled] = useState(false);
   const [error, setError] = useState("");
-  const netInfo = useNetInfo();
 
   const getImage = async () => {
     if (!auth.currentUser) {
@@ -96,6 +92,7 @@ export const EditNoteScreen = () => {
         (error) => {
           // Handle unsuccessful uploads
           console.log("error:", error);
+          navigation.goBack();
         },
         () => {
           setStaleNoteImage(noteId);
@@ -131,24 +128,10 @@ export const EditNoteScreen = () => {
       return;
     }
 
-    if (netInfo.isConnected) {
-      const noteRef = await createNote(params.bookId, note);
-      const noteId = noteRef.id;
-      setCreationProgress(0.01);
-      uploadImage(image, params.bookId, noteId);
-    } else {
-      // If we're offline, add the note to local storage
-      await addLocalNote(params.bookId, {
-        ...note,
-        id: uuid.v4().toString(),
-        createdAt: new Date(),
-      });
-
-      // And queue a Firebase create action for when we come back online
-      await queueAction("create note", { id: params.bookId, body: note });
-
-      navigation.goBack();
-    }
+    const noteRef = await createNote(params.bookId, note);
+    const noteId = noteRef.id;
+    setCreationProgress(0.01);
+    uploadImage(image, params.bookId, noteId);
   };
 
   const modifyNote = async (): Promise<void> => {
