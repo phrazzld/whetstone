@@ -2,9 +2,10 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
 import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
 import { useEffect, useState } from "react";
-import { Button, Image, Platform, StyleSheet, Text } from "react-native";
+import { Button, Platform, StyleSheet, Text } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { ProgressBar } from "react-native-paper";
+import { ImagePicker } from "../components/ImagePicker";
 import { TextField } from "../components/TextField";
 import { SafeAreaView, View } from "../components/Themed";
 import { windowWidth } from "../constants";
@@ -180,11 +181,7 @@ export const EditNoteScreen = () => {
         style={{ flex: 1, width: "100%" }}
         contentContainerStyle={{ alignItems: "center" }}
       >
-        <ImagePicker
-          uri={localImage}
-          title={localImage ? "Edit image" : "Pick image"}
-          onPress={selectImage}
-        />
+        <ImagePicker uri={localImage} onPress={selectImage} />
         <TextField
           label="Content"
           multiline={true}
@@ -211,26 +208,6 @@ export const EditNoteScreen = () => {
         <StatusBar style={Platform.OS === "ios" ? "light" : "auto"} />
       </KeyboardAwareScrollView>
     </SafeAreaView>
-  );
-};
-
-interface ImagePickerProps {
-  uri: string;
-  title: string;
-  onPress: () => void;
-}
-
-const ImagePicker = (props: ImagePickerProps) => {
-  const { uri, title, onPress } = props;
-
-  return (
-    <View style={styles.imageForm}>
-      <Image
-        source={{ uri }}
-        style={{ width: 180, height: 180, borderRadius: 5 }}
-      />
-      <Button title={title} onPress={onPress} />
-    </View>
   );
 };
 
@@ -273,11 +250,6 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     padding: 10,
-    paddingTop: 20,
-  },
-  imageForm: {
-    justifyContent: "center",
-    alignItems: "center",
     paddingTop: 20,
   },
   separator: {

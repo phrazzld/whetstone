@@ -3,11 +3,12 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
 import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
 import { useEffect, useState } from "react";
-import { Button, Image, Platform, StyleSheet } from "react-native";
+import { Button, Platform, StyleSheet } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { ProgressBar } from "react-native-paper";
 import SelectDropdown from "react-native-select-dropdown";
 import { DatePicker } from "../components/DatePicker";
+import { ImagePicker } from "../components/ImagePicker";
 import { TextField } from "../components/TextField";
 import { SafeAreaView, Text, View } from "../components/Themed";
 import { LISTS, TABS, windowWidth } from "../constants";
@@ -52,26 +53,6 @@ const validateInputs = (
   }
 
   return "";
-};
-
-interface ImagePickerProps {
-  uri: string;
-  title: string;
-  onPress: () => void;
-}
-
-const ImagePicker = (props: ImagePickerProps) => {
-  const { uri, title, onPress } = props;
-
-  return (
-    <View style={styles.imageForm}>
-      <Image
-        source={{ uri }}
-        style={{ width: 180, height: 180, borderRadius: 5 }}
-      />
-      <Button title={title} onPress={onPress} />
-    </View>
-  );
 };
 
 const initStarted = (book: TBook | null): Date | null => {
@@ -375,11 +356,7 @@ export const EditBookScreen = () => {
         style={{ flex: 1, width: "100%" }}
         contentContainerStyle={{ alignItems: "center" }}
       >
-        <ImagePicker
-          uri={localImage}
-          title={localImage ? "Edit image" : "Pick image"}
-          onPress={selectImage}
-        />
+        <ImagePicker uri={localImage} onPress={selectImage} />
         <TextField
           label="Title"
           text={title}
@@ -444,11 +421,6 @@ const styles = StyleSheet.create({
     marginVertical: 30,
     height: 1,
     width: "80%",
-  },
-  imageForm: {
-    justifyContent: "center",
-    alignItems: "center",
-    paddingTop: 20
   },
   error: {
     color: palette.red,
