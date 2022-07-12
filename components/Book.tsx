@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import { RectButton } from "react-native-gesture-handler";
 import Swipeable from "react-native-gesture-handler/Swipeable";
+import { palette } from "../constants/Colors";
 import { auth, deleteBook, storage } from "../firebase";
 import { useBookImage } from "../hooks/useBookImage";
 import { TBook } from "../types";
@@ -93,9 +94,9 @@ export const Book = (props: BookProps) => {
           onPress={pressHandler}
         >
           {text === "Delete" ? (
-            <FontAwesome name="trash" size={25} color="white" />
+            <FontAwesome name="trash" size={25} color={palette.white} />
           ) : (
-            <FontAwesome name="pencil" size={25} color="white" />
+            <FontAwesome name="pencil" size={25} color={palette.white} />
           )}
         </RectButton>
       </Animated.View>
@@ -112,8 +113,8 @@ export const Book = (props: BookProps) => {
         marginBottom: "auto",
       }}
     >
-      {renderRightAction("Edit", "#ffab00", 128, progress, editBook)}
-      {renderRightAction("Delete", "red", 64, progress, removeBook)}
+      {renderRightAction("Edit", palette.orange, 128, progress, editBook)}
+      {renderRightAction("Delete", palette.red, 64, progress, removeBook)}
     </View>
   );
 
@@ -151,7 +152,7 @@ const styles = StyleSheet.create({
   book: {
     flex: 1,
     flexDirection: "row",
-    borderBottomColor: "grey",
+    borderBottomColor: palette.grey,
     borderBottomWidth: 1,
   },
   bookDetails: {
@@ -186,7 +187,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   actionText: {
-    color: "white",
+    color: palette.white,
     backgroundColor: "transparent",
     padding: 10,
     fontSize: 15,

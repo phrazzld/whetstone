@@ -9,9 +9,12 @@ import {
   Platform,
   StyleSheet,
 } from "react-native";
-import { SafeAreaView, Text, TextInput, View } from "../components/Themed";
+import { TextField } from "../components/TextField";
+import { SafeAreaView, Text, View } from "../components/Themed";
+import { palette } from "../constants/Colors";
 import { auth } from "../firebase";
 
+// TODO: Add loading handler
 export const SignUpScreen = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -52,25 +55,24 @@ export const SignUpScreen = () => {
   return (
     <SafeAreaView style={styles.container}>
       <KeyboardAvoidingView
-        style={[styles.container, { width: "100%" }]}
+        style={styles.content}
         behavior={Platform.OS === "ios" ? "padding" : "height"}
       >
-        <TextInput
-          placeholder="Email"
-          style={styles.input}
-          value={email}
+        <TextField
+          label="Email"
+          text={email}
           onChangeText={setEmail}
           keyboardType="email-address"
           autoCapitalize="none"
           returnKeyType="next"
           testID="EmailInput"
         />
-        <TextInput
-          placeholder="Password"
-          style={styles.input}
-          value={password}
+        <TextField
+          label="Password"
+          text={password}
           onChangeText={setPassword}
           returnKeyType="done"
+          autoCapitalize="none"
           testID="PasswordInput"
           secureTextEntry
         />
@@ -94,13 +96,19 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
+  content: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    width: "100%",
+  },
   error: {
-    color: "#cc0000",
+    color: palette.red,
   },
   input: {
     padding: 10,
     borderWidth: 1,
-    borderColor: "#ccc",
+    borderColor: palette.grey,
     borderRadius: 6,
     height: 40,
     width: "75%",

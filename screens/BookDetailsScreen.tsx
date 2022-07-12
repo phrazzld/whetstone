@@ -1,5 +1,6 @@
 import { useNavigation, useRoute } from "@react-navigation/native";
 import {
+  ActivityIndicator,
   Button,
   Dimensions,
   Image,
@@ -8,19 +9,50 @@ import {
 } from "react-native";
 import { Note } from "../components/Note";
 import { Text, View } from "../components/Themed";
+import { palette } from "../constants/Colors";
 import { useBookImage } from "../hooks/useBookImage";
 import { useNotes } from "../hooks/useNotes";
-import { BookDetailsScreenRouteProp } from "../types";
+import { BookDetailsScreenRouteProp, TNote } from "../types";
 import { formatReadDates } from "../utils";
 
 const windowWidth = Dimensions.get("window").width;
+
+type NotesProps = {
+  bookId: string;
+  notes: Array<TNote>;
+  loading: boolean;
+};
+
+const Notes = (props: NotesProps) => {
+  const { bookId, notes, loading } = props;
+
+  if (loading) {
+    return <ActivityIndicator />;
+  }
+
+  return (
+    <>
+      {notes.map((note: TNote) => (
+        <Note key={note.id} note={note} bookId={bookId} />
+      ))}
+
+      {notes.length === 0 && (
+        <View>
+          <Text style={{ marginVertical: 20, textAlign: "center" }}>
+            No notes yet.
+          </Text>
+        </View>
+      )}
+    </>
+  );
+};
 
 export const BookDetailsScreen = () => {
   const route = useRoute<BookDetailsScreenRouteProp>();
   const params = route.params;
   const { book } = params;
   const navigation = useNavigation();
-  const notes = useNotes(book.id);
+  const { data: notes, loading } = useNotes(book.id);
   const image = useBookImage(book.id, true);
 
   const addNote = (): void => {
@@ -58,7 +90,7 @@ export const BookDetailsScreen = () => {
                 style={{
                   padding: 10,
                   marginBottom: 10,
-                  borderBottomColor: "grey",
+                  borderBottomColor: palette.grey,
                   borderBottomWidth: 1,
                 }}
               >
@@ -84,18 +116,8 @@ export const BookDetailsScreen = () => {
                 <Button title="Add Note" onPress={addNote} />
                 <Button title="Add Vocab" onPress={addVocab} />
               </View>
-              {notes.map((note) => (
-                <Note key={note.id} note={note} bookId={book.id} />
-              ))}
+              <Notes bookId={book.id} notes={notes} loading={loading} />
             </View>
-
-            {notes.length === 0 && (
-              <View>
-                <Text style={{ marginVertical: 20, textAlign: "center" }}>
-                  No notes yet.
-                </Text>
-              </View>
-            )}
           </View>
         </View>
       </ScrollView>

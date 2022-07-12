@@ -13,7 +13,7 @@ import {
   where,
 } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
-import { BookPayload, NotePayload } from "./types";
+import { BookPayload, NotePayload, VocabPayload } from "./types";
 
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
@@ -159,14 +159,18 @@ export const updateBook = async (
 
 // Notes
 
-export const createNote = (bookId: string, newNote: NotePayload): void => {
+export const createNote = async (
+  bookId: string,
+  newNote: NotePayload | VocabPayload
+): Promise<any> => {
   if (!auth.currentUser) {
     throw new Error("Cannot create note, user is not logged in.");
   }
 
   const userRef = doc(db, "users", auth.currentUser.uid);
   const bookRef = doc(userRef, "books", bookId);
-  addDoc(collection(bookRef, "notes"), newNote);
+  const noteRef = await addDoc(collection(bookRef, "notes"), newNote);
+  return noteRef;
 };
 
 export const getBookNotes = async (bookId: string): Promise<Array<any>> => {
@@ -209,7 +213,7 @@ export const deleteNote = async (
 export const updateNote = async (
   bookId: string,
   noteId: string,
-  payload: NotePayload
+  payload: NotePayload | VocabPayload
 ): Promise<void> => {
   try {
     if (!auth.currentUser) {

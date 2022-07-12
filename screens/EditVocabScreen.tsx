@@ -1,15 +1,12 @@
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
 import { useState } from "react";
-import {
-  Button,
-  KeyboardAvoidingView,
-  Platform,
-  StyleSheet,
-} from "react-native";
-import { SafeAreaView, TextInput, View } from "../components/Themed";
+import { Button, Platform, StyleSheet } from "react-native";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import { TextField } from "../components/TextField";
+import { SafeAreaView, Text, View } from "../components/Themed";
 import { auth, createNote, updateNote } from "../firebase";
-import { AddNoteScreenParams } from "../types";
+import { EditNoteScreenParams, VocabPayload } from "../types";
 import { strToInt } from "../utils";
 
 interface DictionaryDefinition {
@@ -30,22 +27,23 @@ interface DictionaryWord {
   meanings: Array<DictionaryMeaning>;
 }
 
-export const AddVocabScreen = () => {
+export const EditVocabScreen = () => {
   const route = useRoute();
-  const params: AddNoteScreenParams | null = route.params || null;
+  const params: EditNoteScreenParams | null = route.params || null;
   const [word, setWord] = useState(params?.editVocab?.word || "");
   const [definition, setDefinition] = useState(
     params?.editVocab?.definition || ""
   );
   const [page, setPage] = useState(params?.editVocab?.page?.toString() || "");
   const navigation = useNavigation();
+  const [defFetchMessage, setDefFetchMessage] = useState("");
 
   const addVocab = (): void => {
     if (!params?.bookId) {
       throw new Error("Cannot add vocab, invalid route params");
     }
 
-    const vocab = {
+    const vocab: VocabPayload = {
       type: "vocab",
       word,
       definition,
@@ -61,7 +59,7 @@ export const AddVocabScreen = () => {
       throw new Error("Cannot modify vocab, invalid route params");
     }
 
-    const payload = {
+    const payload: VocabPayload = {
       type: "vocab",
       word,
       definition,
@@ -89,6 +87,7 @@ export const AddVocabScreen = () => {
   };
 
   const getDefinition = async (): Promise<void> => {
+    setDefFetchMessage(`Fetching definition for ${word}...`);
     const res = await fetch(
       `https://api.dictionaryapi.dev/api/v2/entries/en/${word}`
     );
@@ -106,37 +105,50 @@ export const AddVocabScreen = () => {
             def += "\n";
           }
         }
-
         setDefinition(def);
       }
+      setDefFetchMessage("");
+    } else {
+      setDefFetchMessage("No definitions found.");
     }
   };
 
   return (
     <SafeAreaView style={styles.container}>
-      <KeyboardAvoidingView
-        style={[styles.container, { width: "100%" }]}
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
+      <KeyboardAwareScrollView
+        style={{ flex: 1, width: "100%" }}
+        contentContainerStyle={{ alignItems: "center" }}
       >
-        <TextInput
-          placeholder="Word"
-          style={styles.input}
-          value={word}
+        <TextField
+          label="Word"
+          text={word}
           onChangeText={setWord}
-          autoFocus={true}
+          autoCapitalize="none"
         />
-        <TextInput
-          placeholder="Definition"
+        <TextField
+          label="Definition"
           multiline={true}
-          style={styles.multilineInput}
-          value={definition}
+          text={definition}
           onChangeText={setDefinition}
           onFocus={getDefinition}
+          autoCapitalize="sentences"
         />
-        <TextInput
-          placeholder="Page number"
-          style={styles.input}
-          value={page}
+        {!!defFetchMessage && (
+          <Text
+            style={{
+              alignSelf: "flex-start",
+              width: "88%",
+              marginLeft: "auto",
+              marginRight: "auto",
+              marginBottom: 10,
+            }}
+          >
+            {defFetchMessage}
+          </Text>
+        )}
+        <TextField
+          label="Page number"
+          text={page}
           onChangeText={setPage}
           keyboardType="numeric"
         />
@@ -147,7 +159,7 @@ export const AddVocabScreen = () => {
 
         {/* Use a light status bar on iOS to account for the black space above the modal */}
         <StatusBar style={Platform.OS === "ios" ? "light" : "auto"} />
-      </KeyboardAvoidingView>
+      </KeyboardAwareScrollView>
     </SafeAreaView>
   );
 };
@@ -164,23 +176,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: 10,
     paddingTop: 20,
-  },
-  input: {
-    padding: 10,
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 6,
-    width: "90%",
-    margin: 10,
-  },
-  multilineInput: {
-    padding: 10,
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 6,
-    height: 100,
-    width: "90%",
-    margin: 10,
   },
   separator: {
     marginVertical: 30,

@@ -7,7 +7,6 @@ import { FontAwesome as DefaultFontAwesome } from "@expo/vector-icons";
 import {
   SafeAreaView as DefaultSafeAreaView,
   Text as DefaultText,
-  TextInput as DefaultTextInput,
   View as DefaultView,
 } from "react-native";
 import Colors from "../constants/Colors";
@@ -33,7 +32,6 @@ type ThemeProps = {
 };
 
 export type TextProps = ThemeProps & DefaultText["props"];
-export type TextInputProps = ThemeProps & DefaultTextInput["props"];
 export type ViewProps = ThemeProps & DefaultView["props"];
 export type SafeAreaViewProps = ThemeProps & DefaultSafeAreaView["props"];
 export type FontAwesomeProps = ThemeProps &
@@ -44,13 +42,6 @@ export const Text = (props: TextProps) => {
   const color = useThemeColor({ light: lightColor, dark: darkColor }, "text");
 
   return <DefaultText style={[{ color }, style]} {...otherProps} />;
-};
-
-export const TextInput = (props: TextInputProps) => {
-  const { style, lightColor, darkColor, ...otherProps } = props;
-  const color = useThemeColor({ light: lightColor, dark: darkColor }, "text");
-
-  return <DefaultTextInput style={[{ color }, style]} {...otherProps} />;
 };
 
 export const View = (props: ViewProps) => {

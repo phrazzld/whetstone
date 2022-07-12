@@ -1,9 +1,11 @@
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { Tab, TabView } from "@rneui/themed";
 import React, { useEffect, useState } from "react";
-import { Button, FlatList, StyleSheet } from "react-native";
+import { ActivityIndicator, Button, FlatList, StyleSheet } from "react-native";
 import { Book } from "../components/Book";
 import { SafeAreaView, Text, View } from "../components/Themed";
+import { TABS } from "../constants";
+import { palette } from "../constants/Colors";
 import { useFinishedBooks } from "../hooks/useFinishedBooks";
 import { useUnfinishedBooks } from "../hooks/useUnfinishedBooks";
 import { useUnreadBooks } from "../hooks/useUnreadBooks";
@@ -12,11 +14,13 @@ import { BooksScreenParams, TBook } from "../types";
 const BooksScreen = () => {
   const route = useRoute();
   const params: BooksScreenParams | null = route.params || null;
-  const tab = params?.tab || 0;
+  const tab = params?.tab || TABS.READING;
   const [tabIndex, setTabIndex] = useState(tab);
-  const unfinishedBooks = useUnfinishedBooks();
-  const finishedBooks = useFinishedBooks();
-  const unreadBooks = useUnreadBooks();
+  const { data: unfinishedBooks, loading: unfinishedBooksLoading } =
+    useUnfinishedBooks();
+  const { data: finishedBooks, loading: finishedBooksLoading } =
+    useFinishedBooks();
+  const { data: unreadBooks, loading: unreadBooksLoading } = useUnreadBooks();
   const navigation = useNavigation();
 
   useEffect(() => {
@@ -25,11 +29,26 @@ const BooksScreen = () => {
     }
   }, [tab]);
 
-  const noBooks = unfinishedBooks.length === 0 && finishedBooks.length === 0;
+  const noBooks =
+    unreadBooks.length === 0 &&
+    unfinishedBooks.length === 0 &&
+    finishedBooks.length === 0;
 
   const renderItem = ({ item: book }: { item: TBook }) => (
     <Book key={book.id} book={book} />
   );
+
+  if (
+    (unfinishedBooksLoading && tabIndex === TABS.READING) ||
+    (finishedBooksLoading && tabIndex === TABS.FINISHED) ||
+    (unreadBooksLoading && tabIndex === TABS.UNREAD)
+  ) {
+    return (
+      <SafeAreaView style={styles.loading}>
+        <ActivityIndicator size="large" />
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -55,21 +74,21 @@ const BooksScreen = () => {
           </Tab>
 
           <TabView value={tabIndex} onChange={setTabIndex} disableSwipe={true}>
-            <TabView.Item style={{ width: "100%" }}>
+            <TabView.Item style={styles.tabViewItem}>
               <FlatList
                 data={unfinishedBooks}
                 renderItem={renderItem}
                 keyExtractor={(item) => item.id}
               />
             </TabView.Item>
-            <TabView.Item style={{ width: "100%" }}>
+            <TabView.Item style={styles.tabViewItem}>
               <FlatList
                 data={finishedBooks}
                 renderItem={renderItem}
                 keyExtractor={(item) => item.id}
               />
             </TabView.Item>
-            <TabView.Item style={{ width: "100%" }}>
+            <TabView.Item style={styles.tabViewItem}>
               <FlatList
                 data={unreadBooks}
                 renderItem={renderItem}
@@ -96,6 +115,10 @@ const styles = StyleSheet.create({
   emptyStateText: {
     marginVertical: 20,
   },
+  loading: {
+    flex: 1,
+    justifyContent: "center",
+  },
   sectionHeader: {
     fontSize: 20,
     fontWeight: "600",
@@ -104,8 +127,11 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   sectionHeaderContainer: {
-    borderBottomColor: "grey",
+    borderBottomColor: palette.grey,
     borderBottomWidth: 1,
+  },
+  tabViewItem: {
+    width: "100%",
   },
 });
 

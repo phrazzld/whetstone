@@ -11,22 +11,21 @@ import {
 } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { onAuthStateChanged } from "firebase/auth";
-import React from "react";
-import { ColorSchemeName, Pressable } from "react-native";
+import React, { useState } from "react";
+import { ActivityIndicator, ColorSchemeName, Pressable } from "react-native";
 import { FontAwesome } from "../components/Themed";
 import Colors from "../constants/Colors";
 import { auth } from "../firebase";
 import useColorScheme from "../hooks/useColorScheme";
-import { AddNoteScreen } from "../screens/AddNoteScreen";
-import { AddVocabScreen } from "../screens/AddVocabScreen";
 import { BookDetailsScreen } from "../screens/BookDetailsScreen";
 import BooksScreen from "../screens/BooksScreen";
 import { EditBookScreen } from "../screens/EditBookScreen";
+import { EditNoteScreen } from "../screens/EditNoteScreen";
+import { EditVocabScreen } from "../screens/EditVocabScreen";
 import { ManageReadingDatesScreen } from "../screens/ManageReadingDatesScreen";
 import NotFoundScreen from "../screens/NotFoundScreen";
 import { ProfileScreen } from "../screens/ProfileScreen";
 import { SignUpScreen } from "../screens/SignUpScreen";
-//import { StudyScreen } from "../screens/StudyScreen";
 import {
   BookStackParamList,
   RootStackParamList,
@@ -56,11 +55,17 @@ export default function Navigation({
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 function RootNavigator() {
-  const [user, setUser] = React.useState<any>();
+  const [user, setUser] = useState<any>();
+  const [loading, setLoading] = useState(true);
 
   onAuthStateChanged(auth, (u) => {
     setUser(u);
+    setLoading(false);
   });
+
+  if (loading) {
+    return <ActivityIndicator size="large" />;
+  }
 
   return (
     <Stack.Navigator>
@@ -89,13 +94,23 @@ function RootNavigator() {
             />
             <Stack.Screen
               name="AddNote"
-              component={AddNoteScreen}
+              component={EditNoteScreen}
               options={{ title: "Add Note" }}
             />
             <Stack.Screen
+              name="EditNote"
+              component={EditNoteScreen}
+              options={{ title: "Edit Note" }}
+            />
+            <Stack.Screen
               name="AddVocab"
-              component={AddVocabScreen}
+              component={EditVocabScreen}
               options={{ title: "Add Vocab" }}
+            />
+            <Stack.Screen
+              name="EditVocab"
+              component={EditVocabScreen}
+              options={{ title: "Edit Vocab" }}
             />
             <Stack.Screen
               name="ManageReadingDates"
@@ -140,15 +155,6 @@ function BottomTabNavigator() {
           tabBarIcon: ({ color }) => <TabBarIcon name="book" color={color} />,
         }}
       />
-      {/*}<BottomTab.Screen
-        name="StudyStack"
-        component={StudyScreen}
-        options={{
-          title: "Study",
-          tabBarIcon: ({ color }) => <TabBarIcon name="rocket" color={color} />,
-          headerShown: true,
-        }}
-        />*/}
       <BottomTab.Screen
         name="Profile"
         component={ProfileScreen}

@@ -3,24 +3,20 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
 import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
 import { useEffect, useState } from "react";
-import {
-  Button,
-  Dimensions,
-  Image,
-  KeyboardAvoidingView,
-  Platform,
-  StyleSheet,
-} from "react-native";
-import { ProgressBar, TextInput } from "react-native-paper";
+import { Button, Platform, StyleSheet } from "react-native";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import { ProgressBar } from "react-native-paper";
 import SelectDropdown from "react-native-select-dropdown";
 import { DatePicker } from "../components/DatePicker";
+import { ImagePicker } from "../components/ImagePicker";
+import { TextField } from "../components/TextField";
 import { SafeAreaView, Text, View } from "../components/Themed";
+import { LISTS, TABS, windowWidth } from "../constants";
+import { palette } from "../constants/Colors";
 import { auth, createBook, storage, updateBook } from "../firebase";
 import { BookPayload, EditBookScreenParams, TBook, TBookList } from "../types";
-import { ensureDate, LISTS, pickImage } from "../utils";
+import { ensureDate, pickImage } from "../utils";
 import { useStore } from "../zstore";
-
-const windowWidth = Dimensions.get("window").width;
 
 // TODO: Take book.readingDates into account
 const whatList = (book: TBook | null): TBookList | null => {
@@ -58,70 +54,6 @@ const validateInputs = (
   }
 
   return "";
-};
-
-interface TitleInputProps {
-  title: string;
-  onChangeTitle: (t: string) => void;
-}
-
-const TitleInput = (props: TitleInputProps) => {
-  const { title, onChangeTitle } = props;
-
-  return (
-    <TextInput
-      autoComplete="off"
-      mode="outlined"
-      label="Title"
-      placeholder="Title"
-      style={styles.input}
-      value={title}
-      onChangeText={onChangeTitle}
-      returnKeyType="next"
-    />
-  );
-};
-
-interface AuthorInputProps {
-  author: string;
-  onChangeAuthor: (a: string) => void;
-}
-
-const AuthorInput = (props: AuthorInputProps) => {
-  const { author, onChangeAuthor } = props;
-
-  return (
-    <TextInput
-      autoComplete="off"
-      mode="outlined"
-      label="Author"
-      placeholder="Author"
-      style={styles.input}
-      value={author}
-      onChangeText={onChangeAuthor}
-      returnKeyType="done"
-    />
-  );
-};
-
-interface ImagePickerProps {
-  uri: string;
-  title: string;
-  onPress: () => void;
-}
-
-const ImagePicker = (props: ImagePickerProps) => {
-  const { uri, title, onPress } = props;
-
-  return (
-    <View style={styles.imageForm}>
-      <Image
-        source={{ uri }}
-        style={{ width: 180, height: 180, borderRadius: 5 }}
-      />
-      <Button title={title} onPress={onPress} />
-    </View>
-  );
 };
 
 // TODO: Remove started/finished handlers
@@ -179,11 +111,22 @@ interface FormButtonsProps {
 
 const FormButtons = (props: FormButtonsProps) => {
   const { save, cancel } = props;
+  const [saveDisabled, setSaveDisabled] = useState(false);
+
+  const handleSave = (): void => {
+    setSaveDisabled(true);
+    save();
+  };
+
+  const handleCancel = (): void => {
+    setSaveDisabled(false);
+    cancel();
+  };
 
   return (
     <View style={styles.buttonContainer}>
-      <Button onPress={save} title="Save" />
-      <Button onPress={cancel} title="Cancel" color="gray" />
+      <Button onPress={handleSave} title="Save" disabled={saveDisabled} />
+      <Button onPress={handleCancel} title="Cancel" color={palette.grey} />
     </View>
   );
 };
@@ -196,7 +139,7 @@ const SaveProgress = (props: SaveProgressProps) => {
   const { progress } = props;
 
   return (
-    <View style={styles.progressContainer}>
+    <View>
       <ProgressBar
         visible={!!progress}
         progress={progress}
@@ -250,12 +193,11 @@ export const EditBookScreen = () => {
   }, [params]);
 
   const navToNextScreen = (payload: BookPayload): void => {
-    let tab = 0;
-    // TODO: Use a different flag to determine nav tab
+    let tab = TABS.READING;
     if (!!payload.finished) {
-      tab = 1;
+      tab = TABS.FINISHED;
     } else if (!payload.finished && !payload.started) {
-      tab = 2;
+      tab = TABS.UNREAD;
     }
     navigation.navigate("Books", { tab });
   };
@@ -400,7 +342,7 @@ export const EditBookScreen = () => {
     }
   };
 
-  const onListSelect = (item: any): void => {
+  const onListSelect = (item: string): void => {
     switch (item) {
       case "Reading":
         isReading();
@@ -418,17 +360,25 @@ export const EditBookScreen = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <KeyboardAvoidingView
-        style={[styles.container, { width: "100%", paddingTop: 20 }]}
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
+      <KeyboardAwareScrollView
+        style={{ flex: 1, width: "100%" }}
+        contentContainerStyle={{ alignItems: "center" }}
       >
-        <ImagePicker
-          uri={localImage}
-          title={localImage ? "Edit image" : "Pick image"}
-          onPress={selectImage}
+        <ImagePicker uri={localImage} onPress={selectImage} />
+        <TextField
+          label="Title"
+          text={title}
+          onChangeText={setTitle}
+          returnKeyType="next"
+          autoCapitalize="words"
         />
-        <TitleInput title={title} onChangeTitle={setTitle} />
-        <AuthorInput author={author} onChangeAuthor={setAuthor} />
+        <TextField
+          label="Author"
+          text={author}
+          onChangeText={setAuthor}
+          returnKeyType="done"
+          autoCapitalize="words"
+        />
         <ListDropdown onSelect={onListSelect} defaultValue={list} />
         {/* TODO: Remove datepickers */}
         {!!started && (
@@ -451,7 +401,7 @@ export const EditBookScreen = () => {
 
         {/* Use a light status bar on iOS to account for the black space above the modal */}
         <StatusBar style={Platform.OS === "ios" ? "light" : "auto"} />
-      </KeyboardAvoidingView>
+      </KeyboardAwareScrollView>
     </SafeAreaView>
   );
 };
@@ -481,12 +431,7 @@ const styles = StyleSheet.create({
     height: 1,
     width: "80%",
   },
-  imageForm: {
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  progressContainer: {},
   error: {
-    color: "#cc0000",
+    color: palette.red,
   },
 });

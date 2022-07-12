@@ -1,5 +1,6 @@
 import { StyleSheet, TouchableOpacity } from "react-native";
 import { Text, View } from "../components/Themed";
+import { palette } from "../constants/Colors";
 import { RootStackScreenProps } from "../types";
 
 export default function NotFoundScreen({
@@ -35,6 +36,6 @@ const styles = StyleSheet.create({
   },
   linkText: {
     fontSize: 14,
-    color: "#2e78b7",
+    color: palette.darkBlue,
   },
 });

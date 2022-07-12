@@ -2,7 +2,7 @@
   "expo": {
     "name": "Whetstone",
     "slug": "whetstone",
-    "version": "1.1.0",
+    "version": "1.1.4",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "myapp",
@@ -22,9 +22,10 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.phaedrus.whetstone",
       "infoPlist": {
-        "NSPhotoLibraryUsageDescription": "Whetstone uses your photos to display book covers, and provide a better experience."
+        "NSPhotoLibraryUsageDescription": "Whetstone uses your photos to display book covers, and provide a better experience.",
+        "NSCameraUsageDescription": "Whetstone uses your camera so you can take photos to add to your notes."
       },
-      "buildNumber": "10"
+      "buildNumber": "14"
     },
     "android": {
       "adaptiveIcon": {
