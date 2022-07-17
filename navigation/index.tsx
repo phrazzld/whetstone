@@ -22,6 +22,7 @@ import BooksScreen from "../screens/BooksScreen";
 import { EditBookScreen } from "../screens/EditBookScreen";
 import { EditNoteScreen } from "../screens/EditNoteScreen";
 import { EditVocabScreen } from "../screens/EditVocabScreen";
+import { ManageReadingDatesScreen } from "../screens/ManageReadingDatesScreen";
 import NotFoundScreen from "../screens/NotFoundScreen";
 import { ProfileScreen } from "../screens/ProfileScreen";
 import { SignUpScreen } from "../screens/SignUpScreen";
@@ -55,15 +56,15 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 
 function RootNavigator() {
   const [user, setUser] = useState<any>();
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(true);
 
   onAuthStateChanged(auth, (u) => {
     setUser(u);
-    setLoading(false)
+    setLoading(false);
   });
 
   if (loading) {
-    return <ActivityIndicator size="large" />
+    return <ActivityIndicator size="large" />;
   }
 
   return (
@@ -110,6 +111,11 @@ function RootNavigator() {
               name="EditVocab"
               component={EditVocabScreen}
               options={{ title: "Edit Vocab" }}
+            />
+            <Stack.Screen
+              name="ManageReadingDates"
+              component={ManageReadingDatesScreen}
+              options={{ title: "Manage Reading Dates" }}
             />
           </Stack.Group>
         </>

@@ -18,6 +18,7 @@ import { BookPayload, EditBookScreenParams, TBook, TBookList } from "../types";
 import { ensureDate, pickImage } from "../utils";
 import { useStore } from "../zstore";
 
+// TODO: Take book.readingDates into account
 const whatList = (book: TBook | null): TBookList | null => {
   if (!book) {
     return null;
@@ -55,6 +56,7 @@ const validateInputs = (
   return "";
 };
 
+// TODO: Remove started/finished handlers
 const initStarted = (book: TBook | null): Date | null => {
   if (!!book && !!book.started) {
     return ensureDate(book.started);
@@ -156,6 +158,7 @@ export const EditBookScreen = () => {
   const [list, setList] = useState<TBookList | null>(
     whatList(params?.book || null)
   );
+  // TODO: Remove, extract handlers to ManageReadingDatesScreen
   const [started, setStarted] = useState<Date | null>(
     initStarted(params?.book || null)
   );
@@ -261,6 +264,11 @@ export const EditBookScreen = () => {
       return;
     }
 
+    // TODO: Stop updating started/finished, start modifying readingDates
+    // TODO: Only modify readingDates if list changed
+    //       => Unread: confirmation alert if any readingDates, delete started + finished + all readingDates
+    //       => Finished: if no readingDates, create one w/started+finished. If started, create finished. If finished, do nothing.
+    //       => Reading: if no readingDates or finished, create one w/started. If started, do nothing.
     try {
       let payload: BookPayload = {
         title,
@@ -372,6 +380,7 @@ export const EditBookScreen = () => {
           autoCapitalize="words"
         />
         <ListDropdown onSelect={onListSelect} defaultValue={list} />
+        {/* TODO: Remove datepickers */}
         {!!started && (
           <DatePicker
             label="Started: "

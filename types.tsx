@@ -23,6 +23,7 @@ export type RootStackParamList = {
   Root: NavigatorScreenParams<RootTabParamList> | undefined;
   AddBook: EditBookScreenParams | undefined;
   EditBook: EditBookScreenParams;
+  ManageReadingDates: ManageReadingDatesScreenParams;
   AddNote: EditNoteScreenParams | undefined;
   EditNote: EditNoteScreenParams | undefined;
   AddVocab: EditNoteScreenParams | undefined;
@@ -50,10 +51,16 @@ export type RootTabScreenProps<Screen extends keyof RootTabParamList> =
     NativeStackScreenProps<RootStackParamList>
   >;
 
+export type ReadDates = {
+  started: admin.firestore.Timestamp | Date;
+  finished: admin.firestore.Timestamp | Date | null;
+};
+
 export type TBook = {
   id: string;
   title: string;
   author: string;
+  readingDates?: Array<ReadDates>;
   started?: admin.firestore.Timestamp | Date;
   finished?: admin.firestore.Timestamp | Date;
   createdAt: admin.firestore.Timestamp | Date;
@@ -67,7 +74,7 @@ export type BookPayload = {
   finished?: admin.firestore.Timestamp | Date | null;
   createdAt?: admin.firestore.Timestamp | Date | null;
   updatedAt?: admin.firestore.Timestamp | Date | null;
-}
+};
 
 export type NotePayload = {
   content: string;
@@ -116,6 +123,10 @@ export type BookDetailsScreenParams = {
 
 export type EditBookScreenParams = {
   book?: TBook;
+};
+
+export type ManageReadingDatesScreenParams = {
+  book: TBook;
 };
 
 export type BookDetailsScreenRouteProp = RouteProp<
