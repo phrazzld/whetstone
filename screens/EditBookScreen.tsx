@@ -287,7 +287,7 @@ export const EditBookScreen = () => {
   };
 
   const cancel = () => {
-    navigation.navigate("Books");
+    navigation.goBack()
   };
 
   const isReading = (): void => {

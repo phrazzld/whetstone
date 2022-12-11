@@ -196,6 +196,21 @@ function BookStackScreen({ navigation }: { navigation: any }) {
         component={BookDetailsScreen}
         options={({ route }) => ({
           title: route.params.book.title,
+          headerRight: () => (
+            <Pressable
+              onPress={() => navigation.navigate("EditBook", { book: route.params.book })}
+              style={({ pressed }) => ({
+                opacity: pressed ? 0.5 : 1,
+              })}
+            >
+              <FontAwesome
+                name="edit"
+                size={25}
+                color={Colors[colorScheme].tabIconSelected}
+                style={{ marginRight: 15 }}
+              />
+            </Pressable>
+          ),
         })}
       />
     </BookStack.Navigator>
