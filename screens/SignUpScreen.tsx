@@ -29,6 +29,8 @@ export const SignUpScreen = () => {
       setError("Wrong password. Try again.");
     } else if (err.message.includes("invalid-email")) {
       setError("Invalid email. Try again.");
+    } else if (err.message.includes("auth/user-not-found")) {
+      setError("User not found. Try signing up.");
     } else {
       setError(err.message);
     }

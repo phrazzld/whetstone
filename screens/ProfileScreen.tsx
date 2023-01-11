@@ -25,21 +25,27 @@ export const ProfileScreen = () => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={{ margin: 20 }}>
-        <View style={styles.userInfo}>
-          <Text>Email: {auth.currentUser?.email}</Text>
+        <View style={styles.section}>
+          <Text style={styles.heading}>EMAIL</Text>
+          <Text style={styles.text}>{auth.currentUser?.email}</Text>
         </View>
         <FinishedBookCounts />
-        <Policies />
       </View>
-      <View style={{ margin: 20 }}>
-        <View style={styles.buttons}>
-          <Button title="Sign Out" onPress={() => auth.signOut()} />
+      <View style={{ margin: 20, flex: 1, justifyContent: "space-between" }}>
+        <View>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => auth.signOut()}
+          >
+            <Text style={styles.buttonText}>Sign Out</Text>
+          </TouchableOpacity>
           <Button
             title="Delete Account"
             onPress={confirmAccountDeletion}
             color={palette.red}
           />
         </View>
+        <Policies />
       </View>
     </SafeAreaView>
   );
@@ -83,15 +89,17 @@ const FinishedBookCounts = () => {
   }, [JSON.stringify(finishedBooks), finishedBooksLoading]);
 
   return (
-    <View style={styles.finishedBookCounts}>
-      <Text style={{ marginBottom: 5 }}>Books Read</Text>
+    <View style={styles.section}>
+      <Text style={styles.heading}>BOOKS READ</Text>
       {counts.map((count) => (
         <View
           key={count.year}
           style={{ display: "flex", flexDirection: "row" }}
         >
-          <Text style={{ width: "15%" }}>{count.year}: </Text>
-          <Text style={{ width: "5%", textAlign: "right" }}>{count.num}</Text>
+          <Text style={[styles.text, { width: "15%" }]}>{count.year}: </Text>
+          <Text style={[styles.text, { width: "10%", textAlign: "right" }]}>
+            {count.num}
+          </Text>
         </View>
       ))}
     </View>
@@ -100,20 +108,20 @@ const FinishedBookCounts = () => {
 
 const Policies = () => {
   return (
-    <View style={styles.policies}>
+    <View style={styles.section}>
       <TouchableOpacity
         onPress={() =>
           Linking.openURL("https://pages.flycricket.io/whetstone/privacy.html")
         }
       >
-        <Text style={styles.link}>Privacy Policy</Text>
+        <Text style={styles.policy}>Privacy Policy</Text>
       </TouchableOpacity>
       <TouchableOpacity
         onPress={() =>
           Linking.openURL("https://pages.flycricket.io/whetstone/terms.html")
         }
       >
-        <Text style={styles.link}>Terms of Service</Text>
+        <Text style={styles.policy}>Terms of Service</Text>
       </TouchableOpacity>
     </View>
   );
@@ -226,27 +234,44 @@ const confirmAccountDeletion = () => {
 };
 
 const styles = StyleSheet.create({
-  buttons: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    margin: 20,
-  },
   container: {
     flex: 1,
-    justifyContent: "space-between",
+    padding: 24,
+    textAlign: "left",
+    backgroundColor: palette.white,
+    paddingTop: 80,
   },
-  link: {
+  header: {
+    fontSize: 28,
+    marginBottom: 16,
+    fontWeight: "bold",
+  },
+  heading: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#777",
+  },
+  text: {
+    fontSize: 18,
+  },
+  policy: {
+    fontSize: 13,
     color: palette.blue,
   },
-  finishedBookCounts: {
-    marginBottom: 20,
+  section: {
+    marginBottom: 15,
   },
-  policies: {
-    marginBottom: 20,
+  buttonText: {
+    color: "#fff",
+    fontWeight: "600",
+    fontSize: 18,
   },
-  userInfo: {
-    flexDirection: "column",
-    justifyContent: "space-between",
-    marginBottom: 20,
+  button: {
+    backgroundColor: palette.blue,
+    borderRadius: 4,
+    paddingVertical: 18,
+    marginTop: 12,
+    alignItems: "center",
+    marginBottom: 24,
   },
 });
