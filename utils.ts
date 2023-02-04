@@ -80,7 +80,7 @@ export const ensureDate = (date: Date | admin.firestore.Timestamp): Date => {
   }
 
   if (typeof date === "string") {
-    return new Date(date)
+    return new Date(date);
   }
 
   return date.toDate();
@@ -93,12 +93,12 @@ export const strToInt = (str: string): number => {
 export const formatReadDates = (book: TBook): string => {
   let timeline = "";
 
-  const startDate = book.started
-    ? ensureDate(book.started).toLocaleString([], dateLocaleStringOptions)
+  const startDate = book.lastStarted
+    ? ensureDate(book.lastStarted).toLocaleString([], dateLocaleStringOptions)
     : null;
 
-  const finishDate = book.finished
-    ? ensureDate(book.finished).toLocaleString([], dateLocaleStringOptions)
+  const finishDate = book.lastFinished
+    ? ensureDate(book.lastFinished).toLocaleString([], dateLocaleStringOptions)
     : null;
 
   if (!!startDate) {
