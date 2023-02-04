@@ -14,8 +14,8 @@ import * as admin from "firebase-admin";
 
 declare global {
   namespace ReactNavigation {
-    interface RootParamList extends RootStackParamList { }
-    interface BookParamList extends BookStackParamList { }
+    interface RootParamList extends RootStackParamList {}
+    interface BookParamList extends BookStackParamList {}
   }
 }
 
@@ -54,6 +54,10 @@ export type TBook = {
   id: string;
   title: string;
   author: string;
+  list: "reading" | "finished" | "unread";
+  migrated?: boolean;
+  lastStarted?: admin.firestore.Timestamp | null;
+  lastFinished?: admin.firestore.Timestamp | null;
   started?: admin.firestore.Timestamp | Date;
   finished?: admin.firestore.Timestamp | Date;
   createdAt: admin.firestore.Timestamp | Date;
@@ -63,11 +67,14 @@ export type TBook = {
 export type BookPayload = {
   title: string;
   author: string;
+  list: "reading" | "finished" | "unread";
+  lastStarted?: admin.firestore.Timestamp | null;
+  lastFinished?: admin.firestore.Timestamp | null;
   started?: admin.firestore.Timestamp | Date | null;
   finished?: admin.firestore.Timestamp | Date | null;
   createdAt?: admin.firestore.Timestamp | Date | null;
   updatedAt?: admin.firestore.Timestamp | Date | null;
-}
+};
 
 export type NotePayload = {
   content: string;
@@ -90,7 +97,7 @@ export type TNote = {
   id: string;
   bookId?: string;
   content?: string;
-  type?: "note" | "vocab";
+  type?: "note" | "vocab" | "started" | "finished" | "shelved";
   word?: string;
   definition?: string;
   page?: number;

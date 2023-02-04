@@ -41,9 +41,8 @@ export const useUnfinishedBooks = (): Signature => {
 
     const booksQuery = query(
       collection(db, "users", auth.currentUser.uid, "books"),
-      where("started", "!=", null),
-      where("finished", "==", null),
-      orderBy("started", "desc")
+      where("list", "==", "reading"),
+      orderBy("lastStarted", "desc")
     );
 
     const unsubscribe = onSnapshot(booksQuery, (snapshot) => {
