@@ -16,4 +16,4 @@ export const dateLocaleStringOptions = {
   day: "numeric",
 } as const;
 
-export const LISTS: Array<TBookList> = ["Reading", "Finished", "Unread"];
+export const LISTS: Array<TBookList> = ["reading", "finished", "unread"];

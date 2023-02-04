@@ -18,6 +18,15 @@ interface NoteProps {
   bookId: string;
 }
 
+const getNoteType = (
+  note: TNote
+): "bookmark" | "note" | "vocab" | "started" | "finished" | "shelved" => {
+  if (note.type === "note" && !note.content) {
+    return "bookmark";
+  }
+  return note.type;
+};
+
 export const Note = (props: NoteProps) => {
   const { note, bookId } = props;
   const colorScheme = useColorScheme();
@@ -32,6 +41,8 @@ export const Note = (props: NoteProps) => {
 
     if (note.type === "vocab") {
       navigation.navigate("EditVocab", { bookId, editVocab: note });
+    } else if (["started", "finished", "shelved"].includes(note.type)) {
+      navigation.navigate("EditDateNote", { bookId, editNote: note })
     } else {
       navigation.navigate("EditNote", { bookId, editNote: note });
     }
@@ -97,6 +108,8 @@ export const Note = (props: NoteProps) => {
     </View>
   );
 
+  // TODO: Refactor this to be more readable
+  // Each note type should really be handled on its own
   return (
     <Swipeable
       renderRightActions={renderRightActions}
@@ -138,11 +151,7 @@ export const Note = (props: NoteProps) => {
                 paddingVertical: 10,
               }}
             >
-              <NoteTypeBadge
-                noteType={
-                  !note.content && !note.word ? "bookmark" : note.type || "note"
-                }
-              />
+              <NoteTypeBadge noteType={getNoteType(note)} />
 
               {!!note.page && (
                 <View style={{}}>
@@ -168,12 +177,23 @@ export const Note = (props: NoteProps) => {
                   color={Colors[colorScheme].text}
                   style={{ marginRight: 10 }}
                 />
-                <Text style={styles.timestamp}>
-                  {ensureDate(note.createdAt).toLocaleString(
-                    [],
-                    dateLocaleStringOptions
-                  )}
-                </Text>
+                {["started", "finished", "shelved"].includes(
+                  note.type || ""
+                ) ? (
+                  <Text style={styles.timestamp}>
+                    {ensureDate(note.date ?? note.createdAt).toLocaleString(
+                      [],
+                      dateLocaleStringOptions
+                    )}
+                  </Text>
+                ) : (
+                  <Text style={styles.timestamp}>
+                    {ensureDate(note.createdAt).toLocaleString(
+                      [],
+                      dateLocaleStringOptions
+                    )}
+                  </Text>
+                )}
               </View>
             </View>
           </View>
@@ -184,12 +204,26 @@ export const Note = (props: NoteProps) => {
 };
 
 interface NoteTypeBadgeProps {
-  noteType: "bookmark" | "vocab" | "note" | "quote";
+  noteType:
+    | "bookmark"
+    | "vocab"
+    | "note"
+    | "quote"
+    | "started"
+    | "finished"
+    | "shelved";
 }
 
 const NoteTypeBadge = (props: NoteTypeBadgeProps) => {
   const { noteType } = props;
-  let icon: "bookmark" | "font" | "file-text" | "quote-left";
+  let icon:
+    | "bookmark"
+    | "font"
+    | "file-text"
+    | "quote-left"
+    | "play-circle"
+    | "check"
+    | "pause";
 
   switch (noteType) {
     case "bookmark":
@@ -203,6 +237,15 @@ const NoteTypeBadge = (props: NoteTypeBadgeProps) => {
       break;
     case "quote":
       icon = "quote-left";
+      break;
+    case "started":
+      icon = "play-circle";
+      break;
+    case "finished":
+      icon = "check";
+      break;
+    case "shelved":
+      icon = "pause";
       break;
     default:
       throw new Error(`Unrecognized noteType: ${noteType}`);

@@ -27,6 +27,8 @@ export type RootStackParamList = {
   EditNote: EditNoteScreenParams | undefined;
   AddVocab: EditNoteScreenParams | undefined;
   EditVocab: EditNoteScreenParams | undefined;
+  AddDateNote: EditNoteScreenParams | undefined;
+  EditDateNote: EditNoteScreenParams | undefined;
   SignUp: undefined;
   NotFound: undefined;
 };
@@ -56,10 +58,8 @@ export type TBook = {
   author: string;
   list: "reading" | "finished" | "unread";
   migrated?: boolean;
-  lastStarted?: admin.firestore.Timestamp | null;
-  lastFinished?: admin.firestore.Timestamp | null;
-  started?: admin.firestore.Timestamp | Date;
-  finished?: admin.firestore.Timestamp | Date;
+  lastStarted?: admin.firestore.Timestamp | Date | null;
+  lastFinished?: admin.firestore.Timestamp | Date | null;
   createdAt: admin.firestore.Timestamp | Date;
   updatedAt?: admin.firestore.Timestamp | Date;
 };
@@ -68,10 +68,8 @@ export type BookPayload = {
   title: string;
   author: string;
   list: "reading" | "finished" | "unread";
-  lastStarted?: admin.firestore.Timestamp | null;
-  lastFinished?: admin.firestore.Timestamp | null;
-  started?: admin.firestore.Timestamp | Date | null;
-  finished?: admin.firestore.Timestamp | Date | null;
+  lastStarted?: admin.firestore.Timestamp | Date | null;
+  lastFinished?: admin.firestore.Timestamp | Date | null;
   createdAt?: admin.firestore.Timestamp | Date | null;
   updatedAt?: admin.firestore.Timestamp | Date | null;
 };
@@ -93,11 +91,19 @@ export type VocabPayload = {
   updatedAt?: Date;
 };
 
+export type DateNotePayload = {
+  type: "started" | "finished" | "shelved";
+  date: Date;
+  createdAt?: Date;
+  updatedAt?: Date;
+};
+
 export type TNote = {
   id: string;
   bookId?: string;
   content?: string;
-  type?: "note" | "vocab" | "started" | "finished" | "shelved";
+  date?: admin.firestore.Timestamp | Date;
+  type: "note" | "vocab" | "started" | "finished" | "shelved";
   word?: string;
   definition?: string;
   page?: number;
@@ -105,7 +111,7 @@ export type TNote = {
   updatedAt?: admin.firestore.Timestamp | Date;
 };
 
-export type TBookList = "Reading" | "Finished" | "Unread";
+export type TBookList = "reading" | "finished" | "unread";
 
 export type BooksScreenParams = {
   tab?: number;
