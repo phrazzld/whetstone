@@ -30,10 +30,15 @@ export const useNotes = (bookId: string): Signature => {
 
     fetchLocalNotes();
 
+    // Build notes query
+    // Order notes by createdAt unless they have a "date" field
+    // In which case, order those by the date field
     const notesQuery = query(
       collection(db, "users", auth.currentUser.uid, "books", bookId, "notes"),
+      orderBy("date", "desc"),
       orderBy("createdAt", "desc")
     );
+
     const unsubscribe = onSnapshot(notesQuery, (snapshot) => {
       const snapshotNotes = snapshot.docs.map((doc: any) => ({
         id: doc.id,
@@ -49,6 +54,9 @@ export const useNotes = (bookId: string): Signature => {
         }
         if (!!n.updatedAt) {
           n.updatedAt = ensureDate(n.updatedAt);
+        }
+        if (!!n.date) {
+          n.date = ensureDate(n.date);
         }
 
         return n;

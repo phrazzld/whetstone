@@ -21,6 +21,7 @@ import { BookDetailsScreen } from "../screens/BookDetailsScreen";
 import BooksScreen from "../screens/BooksScreen";
 import { EditBookScreen } from "../screens/EditBookScreen";
 import { EditNoteScreen } from "../screens/EditNoteScreen";
+import { EditDateNoteScreen } from "../screens/EditDateNoteScreen";
 import { EditVocabScreen } from "../screens/EditVocabScreen";
 import NotFoundScreen from "../screens/NotFoundScreen";
 import { ProfileScreen } from "../screens/ProfileScreen";
@@ -110,6 +111,16 @@ function RootNavigator() {
               name="EditVocab"
               component={EditVocabScreen}
               options={{ title: "Edit Vocab" }}
+            />
+            <Stack.Screen
+              name="AddDateNote"
+              component={EditDateNoteScreen}
+              options={{ title: "Add Date Note" }}
+            />
+            <Stack.Screen
+              name="EditDateNote"
+              component={EditDateNoteScreen}
+              options={{ title: "Edit Date Note" }}
             />
           </Stack.Group>
         </>

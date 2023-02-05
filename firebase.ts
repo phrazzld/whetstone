@@ -5,6 +5,7 @@ import {
   collection,
   deleteDoc,
   doc,
+  getDoc,
   getDocs,
   getFirestore,
   orderBy,
@@ -13,7 +14,12 @@ import {
   where,
 } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
-import { BookPayload, NotePayload, VocabPayload } from "./types";
+import {
+  BookPayload,
+  DateNotePayload,
+  NotePayload,
+  VocabPayload,
+} from "./types";
 
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
@@ -59,6 +65,29 @@ export const createBook = async (newBook: BookPayload): Promise<any> => {
 
   const userRef = doc(db, "users", auth.currentUser.uid);
   const bookRef = await addDoc(collection(userRef, "books"), newBook);
+
+  // Create started/finished notes depending on payload
+  switch (newBook.list) {
+    case "reading":
+      await addDoc(collection(bookRef, "notes"), {
+        type: "started",
+        date: new Date(),
+        createdAt: new Date(),
+      });
+      break;
+    case "finished":
+      await addDoc(collection(bookRef, "notes"), {
+        type: "finished",
+        date: new Date(),
+        createdAt: new Date(),
+      });
+      break;
+    case "unread":
+      break;
+    default:
+      throw new Error("Invalid list type");
+  }
+
   return bookRef;
 };
 
@@ -150,8 +179,32 @@ export const updateBook = async (
     }
 
     const userRef = doc(db, "users", auth.currentUser.uid);
-    const bookRef = doc(userRef, "books", bookId);
-    await setDoc(bookRef, payload, { merge: true });
+    const bookDoc = doc(userRef, "books", bookId);
+    const bookRef = await getDoc(bookDoc);
+    const bookData = bookRef.data();
+
+    // Create notes based on current book list and whether payload changes it
+    if (payload.list === "finished" && bookData?.list !== "finished") {
+      await addDoc(collection(bookDoc, "notes"), {
+        type: "finished",
+        date: new Date(),
+        createdAt: new Date(),
+      });
+    } else if (payload.list === "reading" && bookData?.list !== "reading") {
+      await addDoc(collection(bookDoc, "notes"), {
+        type: "started",
+        date: new Date(),
+        createdAt: new Date(),
+      });
+    } else if (payload.list === "unread" && bookData?.list !== "unread") {
+      await addDoc(collection(bookDoc, "notes"), {
+        type: "shelved",
+        date: new Date(),
+        createdAt: new Date(),
+      });
+    }
+
+    await setDoc(bookDoc, payload, { merge: true });
   } catch (err) {
     console.error("error updating book:", err);
   }
@@ -161,7 +214,7 @@ export const updateBook = async (
 
 export const createNote = async (
   bookId: string,
-  newNote: NotePayload | VocabPayload
+  newNote: NotePayload | VocabPayload | DateNotePayload
 ): Promise<any> => {
   if (!auth.currentUser) {
     throw new Error("Cannot create note, user is not logged in.");
@@ -213,7 +266,7 @@ export const deleteNote = async (
 export const updateNote = async (
   bookId: string,
   noteId: string,
-  payload: NotePayload | VocabPayload
+  payload: NotePayload | VocabPayload | DateNotePayload
 ): Promise<void> => {
   try {
     if (!auth.currentUser) {

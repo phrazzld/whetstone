@@ -22,15 +22,7 @@ const whatList = (book: TBook | null): TBookList | null => {
   if (!book) {
     return null;
   }
-
-  if (book.started) {
-    if (book.finished) {
-      return "Finished";
-    }
-    return "Reading";
-  }
-
-  return "Unread";
+  return book.list;
 };
 
 // Takes input values as parameters, returns an error string
@@ -56,16 +48,16 @@ const validateInputs = (
 };
 
 const initStarted = (book: TBook | null): Date | null => {
-  if (!!book && !!book.started) {
-    return ensureDate(book.started);
+  if (!!book && !!book.lastStarted) {
+    return ensureDate(book.lastStarted);
   }
 
   return null;
 };
 
 const initFinished = (book: TBook | null): Date | null => {
-  if (!!book && !!book.finished) {
-    return ensureDate(book.finished);
+  if (!!book && !!book.lastFinished) {
+    return ensureDate(book.lastFinished);
   }
 
   return null;
@@ -98,7 +90,6 @@ interface ValidationErrorProps {
 
 const ValidationError = (props: ValidationErrorProps) => {
   const { text } = props;
-
   return <Text style={styles.error}>{text}</Text>;
 };
 
@@ -191,9 +182,9 @@ export const EditBookScreen = () => {
 
   const navToNextScreen = (payload: BookPayload): void => {
     let tab = TABS.READING;
-    if (!!payload.finished) {
+    if (!!payload.lastFinished) {
       tab = TABS.FINISHED;
-    } else if (!payload.finished && !payload.started) {
+    } else if (!payload.lastFinished && !payload.lastStarted) {
       tab = TABS.UNREAD;
     }
     navigation.navigate("Books", { tab });
@@ -262,11 +253,16 @@ export const EditBookScreen = () => {
     }
 
     try {
+      if (!list) {
+        throw new Error("Cannot edit book, list is not set.");
+      }
+
       let payload: BookPayload = {
         title,
         author,
-        started,
-        finished,
+        list,
+        lastStarted: started,
+        lastFinished: finished,
         updatedAt: new Date(),
       };
 
@@ -287,23 +283,23 @@ export const EditBookScreen = () => {
   };
 
   const cancel = () => {
-    navigation.goBack()
+    navigation.goBack();
   };
 
   const isReading = (): void => {
-    setList("Reading");
+    setList("reading");
     setStarted(initStarted(params?.book || null) || new Date());
     setFinished(null);
   };
 
   const isFinished = (): void => {
-    setList("Finished");
+    setList("finished");
     setStarted(initStarted(params?.book || null) || new Date());
     setFinished(initFinished(params?.book || null) || new Date());
   };
 
   const isUnread = (): void => {
-    setList("Unread");
+    setList("unread");
     setStarted(null);
     setFinished(null);
   };
@@ -334,15 +330,15 @@ export const EditBookScreen = () => {
     }
   };
 
-  const onListSelect = (item: string): void => {
+  const onListSelect = (item: TBookList): void => {
     switch (item) {
-      case "Reading":
+      case "reading":
         isReading();
         break;
-      case "Finished":
+      case "finished":
         isFinished();
         break;
-      case "Unread":
+      case "unread":
         isUnread();
         break;
       default:

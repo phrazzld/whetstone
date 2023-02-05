@@ -65,3 +65,12 @@ export const getLocalNotes = async (bookId: string): Promise<Array<TNote>> => {
   const notes = await AsyncStorage.getItem(`${bookId} ${NOTES_KEY}`);
   return JSON.parse(notes || "");
 };
+
+export const setAllLocalNotes = async (notes: Array<TNote>): Promise<void> => {
+  return await AsyncStorage.setItem(NOTES_KEY, JSON.stringify(notes));
+};
+
+export const getAllLocalNotes = async (): Promise<Array<TNote>> => {
+  const notes = await AsyncStorage.getItem(NOTES_KEY);
+  return JSON.parse(notes || "");
+};

@@ -38,8 +38,8 @@ export const useFinishedBooks = (): Signature => {
 
     const booksQuery = query(
       collection(db, "users", auth.currentUser.uid, "books"),
-      where("finished", "!=", null),
-      orderBy("finished", "desc")
+      where("list", "==", "finished"),
+      orderBy("lastFinished", "desc")
     );
 
     const unsubscribe = onSnapshot(booksQuery, (snapshot) => {

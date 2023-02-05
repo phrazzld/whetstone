@@ -63,6 +63,10 @@ export const BookDetailsScreen = () => {
     navigation.navigate("AddVocab", { bookId: book.id });
   };
 
+  const addDateNote = (): void => {
+    navigation.navigate("AddDateNote", { bookId: book.id });
+  };
+
   return (
     <View style={{ height: "100%" }}>
       <ScrollView>
@@ -110,6 +114,7 @@ export const BookDetailsScreen = () => {
               >
                 <Button title="Add Note" onPress={addNote} />
                 <Button title="Add Vocab" onPress={addVocab} />
+                <Button title="Add Date" onPress={addDateNote} />
               </View>
               <Notes bookId={book.id} notes={notes} loading={loading} />
             </View>

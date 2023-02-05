@@ -32,8 +32,7 @@ export const useUnreadBooks = (): Signature => {
 
     const booksQuery = query(
       collection(db, "users", auth.currentUser.uid, "books"),
-      where("started", "==", null),
-      where("finished", "==", null)
+      where("list", "==", "unread")
     );
 
     const unsubscribe = onSnapshot(booksQuery, (snapshot) => {
@@ -43,7 +42,10 @@ export const useUnreadBooks = (): Signature => {
           ...doc.data(),
         })
       );
-      setBooks(snapshotBooks);
+
+      // Shuffle the books
+      const shuffledBooks = snapshotBooks.sort(() => Math.random() - 0.5);
+      setBooks(shuffledBooks);
       setFirebaseLoading(false);
 
       const localBooks = snapshotBooks.map((book: TBook) => {
