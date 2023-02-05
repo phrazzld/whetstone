@@ -75,12 +75,6 @@ export const takePhoto = async (): Promise<any> => {
 };
 
 export const ensureDate = (date: Date | Timestamp): Date => {
-  console.log("ensureDate :: date:", date);
-  /* return new Date(); */
-  /* if (!date) { */
-  /*   return new Date(); */
-  /* } */
-  /**/
   if (date instanceof Date) {
     return date;
   }
@@ -94,8 +88,6 @@ export const ensureDate = (date: Date | Timestamp): Date => {
   }
 
   return new Date();
-  /**/
-  /* return date.toDate(); */
 };
 
 export const strToInt = (str: string): number => {
@@ -104,8 +96,6 @@ export const strToInt = (str: string): number => {
 
 export const formatReadDates = (book: TBook): string => {
   let timeline = "";
-
-  console.log("formatReadDates :: book:", book);
 
   const startDate = !!book.lastStarted
     ? ensureDate(book.lastStarted).toLocaleString([], dateLocaleStringOptions)
