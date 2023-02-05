@@ -42,7 +42,7 @@ export const Note = (props: NoteProps) => {
     if (note.type === "vocab") {
       navigation.navigate("EditVocab", { bookId, editVocab: note });
     } else if (["started", "finished", "shelved"].includes(note.type)) {
-      navigation.navigate("EditDateNote", { bookId, editNote: note })
+      navigation.navigate("EditDateNote", { bookId, editNote: note });
     } else {
       navigation.navigate("EditNote", { bookId, editNote: note });
     }
@@ -181,10 +181,13 @@ export const Note = (props: NoteProps) => {
                   note.type || ""
                 ) ? (
                   <Text style={styles.timestamp}>
-                    {ensureDate(note.date ?? note.createdAt).toLocaleString(
-                      [],
-                      dateLocaleStringOptions
-                    )}
+                    {ensureDate(
+                      !!note.date
+                        ? note.date
+                        : !!note.createdAt
+                        ? note.createdAt
+                        : new Date()
+                    ).toLocaleString([], dateLocaleStringOptions)}
                   </Text>
                 ) : (
                   <Text style={styles.timestamp}>

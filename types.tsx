@@ -3,6 +3,7 @@
  * https://reactnavigation.org/docs/typescript/
  */
 
+import { Timestamp } from "@firebase/firestore";
 import { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
 import {
   CompositeScreenProps,
@@ -10,7 +11,6 @@ import {
   RouteProp,
 } from "@react-navigation/native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import * as admin from "firebase-admin";
 
 declare global {
   namespace ReactNavigation {
@@ -58,20 +58,20 @@ export type TBook = {
   author: string;
   list: "reading" | "finished" | "unread";
   migrated?: boolean;
-  lastStarted?: admin.firestore.Timestamp | Date | null;
-  lastFinished?: admin.firestore.Timestamp | Date | null;
-  createdAt: admin.firestore.Timestamp | Date;
-  updatedAt?: admin.firestore.Timestamp | Date;
+  lastStarted?: Timestamp | Date | null;
+  lastFinished?: Timestamp | Date | null;
+  createdAt: Timestamp | Date;
+  updatedAt?: Timestamp | Date;
 };
 
 export type BookPayload = {
   title: string;
   author: string;
   list: "reading" | "finished" | "unread";
-  lastStarted?: admin.firestore.Timestamp | Date | null;
-  lastFinished?: admin.firestore.Timestamp | Date | null;
-  createdAt?: admin.firestore.Timestamp | Date | null;
-  updatedAt?: admin.firestore.Timestamp | Date | null;
+  lastStarted?: Timestamp | Date | null;
+  lastFinished?: Timestamp | Date | null;
+  createdAt?: Timestamp | Date | null;
+  updatedAt?: Timestamp | Date | null;
 };
 
 export type NotePayload = {
@@ -102,13 +102,13 @@ export type TNote = {
   id: string;
   bookId?: string;
   content?: string;
-  date?: admin.firestore.Timestamp | Date;
+  date?: Timestamp | Date;
   type: "note" | "vocab" | "started" | "finished" | "shelved";
   word?: string;
   definition?: string;
   page?: number;
-  createdAt: admin.firestore.Timestamp | Date;
-  updatedAt?: admin.firestore.Timestamp | Date;
+  createdAt: Timestamp | Date;
+  updatedAt?: Timestamp | Date;
 };
 
 export type TBookList = "reading" | "finished" | "unread";

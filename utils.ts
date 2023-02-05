@@ -1,5 +1,5 @@
+import { Timestamp } from "@firebase/firestore";
 import * as ImagePicker from "expo-image-picker";
-import * as admin from "firebase-admin";
 import { dateLocaleStringOptions } from "./constants";
 import { auth } from "./firebase";
 import { TBook } from "./types";
@@ -74,7 +74,13 @@ export const takePhoto = async (): Promise<any> => {
   }
 };
 
-export const ensureDate = (date: Date | admin.firestore.Timestamp): Date => {
+export const ensureDate = (date: Date | Timestamp): Date => {
+  console.log("ensureDate :: date:", date);
+  /* return new Date(); */
+  /* if (!date) { */
+  /*   return new Date(); */
+  /* } */
+  /**/
   if (date instanceof Date) {
     return date;
   }
@@ -83,7 +89,13 @@ export const ensureDate = (date: Date | admin.firestore.Timestamp): Date => {
     return new Date(date);
   }
 
-  return date.toDate();
+  if (date instanceof Timestamp) {
+    return date.toDate();
+  }
+
+  return new Date();
+  /**/
+  /* return date.toDate(); */
 };
 
 export const strToInt = (str: string): number => {
@@ -93,11 +105,13 @@ export const strToInt = (str: string): number => {
 export const formatReadDates = (book: TBook): string => {
   let timeline = "";
 
-  const startDate = book.lastStarted
+  console.log("formatReadDates :: book:", book);
+
+  const startDate = !!book.lastStarted
     ? ensureDate(book.lastStarted).toLocaleString([], dateLocaleStringOptions)
     : null;
 
-  const finishDate = book.lastFinished
+  const finishDate = !!book.lastFinished
     ? ensureDate(book.lastFinished).toLocaleString([], dateLocaleStringOptions)
     : null;
 

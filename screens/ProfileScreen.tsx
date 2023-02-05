@@ -64,12 +64,14 @@ const FinishedBookCounts = () => {
   useEffect(() => {
     if (!finishedBooksLoading) {
       const yearCounts = new Map();
+      // TODO: Rewrite to count finished notes for each book
+      // Current implementation will not count rereads
       finishedBooks.forEach((book: TBook) => {
-        if (!book.finished) {
+        if (!book.lastFinished) {
           console.error(book);
           throw new Error("Finished book does not have finished date");
         }
-        const finishedDate = ensureDate(book.finished);
+        const finishedDate = ensureDate(book.lastFinished);
         const year = finishedDate.getFullYear();
 
         if (yearCounts.has(year)) {

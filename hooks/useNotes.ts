@@ -50,6 +50,9 @@ export const useNotes = (bookId: string): Signature => {
         if (!!n.updatedAt) {
           n.updatedAt = ensureDate(n.updatedAt);
         }
+        if (!!n.date) {
+          n.date = ensureDate(n.date);
+        }
 
         return n;
       });
