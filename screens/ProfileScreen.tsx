@@ -18,8 +18,9 @@ import {
   storage,
 } from "../firebase";
 import { useFinishedBooks } from "../hooks/useFinishedBooks";
-import { TBook } from "../types";
+import { TBook, TNote } from "../types";
 import { ensureDate } from "../utils";
+import { useAllFinishedNotes } from "../hooks/useAllFinishedNotes";
 
 export const ProfileScreen = () => {
   return (
@@ -58,20 +59,24 @@ type BookCount = {
 
 const FinishedBookCounts = () => {
   const [counts, setCounts] = useState<Array<BookCount>>([]);
-  const { data: finishedBooks, loading: finishedBooksLoading } =
-    useFinishedBooks();
+  const { data: finishedNotes, loading: finishedBooksLoading } =
+    useAllFinishedNotes();
 
   useEffect(() => {
     if (!finishedBooksLoading) {
       const yearCounts = new Map();
       // TODO: Rewrite to count finished notes for each book
       // Current implementation will not count rereads
-      finishedBooks.forEach((book: TBook) => {
-        if (!book.lastFinished) {
-          console.error(book);
-          throw new Error("Finished book does not have finished date");
+      finishedNotes.forEach((note: TNote) => {
+        if (note.type !== "finished") {
+          console.error(note);
+          throw new Error("Note is not a finished note");
         }
-        const finishedDate = ensureDate(book.lastFinished);
+        if (!note.date) {
+          console.error(note);
+          throw new Error("Note does not have a date");
+        }
+        const finishedDate = ensureDate(note.date);
         const year = finishedDate.getFullYear();
 
         if (yearCounts.has(year)) {
@@ -88,7 +93,7 @@ const FinishedBookCounts = () => {
       );
       setCounts(countsArr);
     }
-  }, [JSON.stringify(finishedBooks), finishedBooksLoading]);
+  }, [JSON.stringify(finishedNotes), finishedBooksLoading]);
 
   return (
     <View style={styles.section}>
