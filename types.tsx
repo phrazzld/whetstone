@@ -77,6 +77,7 @@ export type BookPayload = {
 export type NotePayload = {
   content: string;
   type: "note";
+  date?: Date;
   page?: number;
   createdAt?: Date;
   updatedAt?: Date;
@@ -86,6 +87,7 @@ export type VocabPayload = {
   type: "vocab";
   word: string;
   definition: string;
+  date?: Date;
   page?: number;
   createdAt?: Date;
   updatedAt?: Date;

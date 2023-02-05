@@ -222,6 +222,12 @@ export const createNote = async (
 
   const userRef = doc(db, "users", auth.currentUser.uid);
   const bookRef = doc(userRef, "books", bookId);
+
+  // Set newNote.date = newNote.createdAt if it doesn't exist
+  if (!newNote.date) {
+    newNote.date = newNote.createdAt;
+  }
+
   const noteRef = await addDoc(collection(bookRef, "notes"), newNote);
   return noteRef;
 };

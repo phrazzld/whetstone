@@ -20,6 +20,56 @@ export default function App() {
   const isLoadingComplete = useCachedResources();
   const colorScheme = useColorScheme();
 
+  // For the current user, and for each book, get the notes
+  // Update each note without a date field to have a date field equal to the note's createdAt
+  useEffect(() => {
+    const updateNoteDates = async () => {
+      console.log("Updating note dates...");
+      const user = auth.currentUser;
+      console.log("user", user);
+
+      if (user) {
+        console.log("user exists");
+        const userRef = doc(db, "users", user.uid);
+        const bookRefs = await getDocs(query(collection(userRef, "books")));
+
+        console.log("bookRefs.size:", bookRefs.size);
+        bookRefs.forEach(async (bookRef) => {
+          const noteRefs = await getDocs(
+            query(collection(userRef, "books", bookRef.id, "notes"))
+          );
+          console.log("noteRefs.size:", noteRefs.size);
+          noteRefs.forEach(async (noteRef) => {
+            const note = noteRef.data();
+            if (note.createdAt && !note.date) {
+              console.log("Updating note", noteRef.id);
+              await setDoc(
+                doc(
+                  db,
+                  "users",
+                  user.uid,
+                  "books",
+                  bookRef.id,
+                  "notes",
+                  noteRef.id
+                ),
+                {
+                  ...note,
+                  date: note.createdAt,
+                }
+              );
+              console.log("Updated note", noteRef.id);
+            }
+          });
+        });
+
+        console.log("Done updating note dates.");
+      }
+    };
+
+    updateNoteDates();
+  }, [JSON.stringify(auth.currentUser)]);
+
   // Update all books in the current user's books subcollection with the following:
   // - New "list" field that is either "reading", "finished", or "unread"
   // - New "lastFinished" field that is a date or null, initialized with current value for "finished"
