@@ -6,6 +6,7 @@
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "myapp",
+    "owner": "sisyphus-labs",
     "userInterfaceStyle": "automatic",
     "splash": {
       "image": "./assets/images/splash.png",
