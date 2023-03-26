@@ -71,14 +71,19 @@ export const createBook = async (newBook: BookPayload): Promise<any> => {
     case "reading":
       await addDoc(collection(bookRef, "notes"), {
         type: "started",
-        date: new Date(),
+        date: newBook.lastStarted,
         createdAt: new Date(),
       });
       break;
     case "finished":
       await addDoc(collection(bookRef, "notes"), {
+        type: "started",
+        date: newBook.lastStarted,
+        createdAt: new Date(),
+      });
+      await addDoc(collection(bookRef, "notes"), {
         type: "finished",
-        date: new Date(),
+        date: newBook.lastFinished,
         createdAt: new Date(),
       });
       break;
