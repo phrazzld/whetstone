@@ -1,13 +1,41 @@
-# Whetstone
+# Whetstone 📚📝
 
-Whetstone is a mobile app for tracking your reading. It's like a trimmed down, open-source Goodreads with a focus on notes, and none of the ads or social features.
+Whetstone is a mobile app designed to track your reading progress and take notes on your reading material, making it easier to remember key insights and stay engaged with the content. It's the perfect companion for avid readers, students, and lifelong learners.
 
-[![GitHub license](https://img.shields.io/github/license/phrazzld/whetstone)](https://github.com/phrazzld/whetstone/blob/master/LICENSE)
+## Features ✨
 
-## Technology
+- Log your reading progress
+- Take notes, add highlights, and create bookmarks
+- Organize your reading materials in a user-friendly interface
+- Sync your reading progress and notes across devices
 
-The Whetstone codebase is built with React Native, Expo, and TypeScript. Whetstone uses [Firebase Authentication](https://firebase.google.com/products/auth) for user authentication, [Firebase Firestore](https://firebase.google.com/products/firestore) as a database, and [Firebase Storage](https://firebase.google.com/products/storage) to host user-uploaded images for their books.
+## Technologies 💻
 
-## Usage
+Whetstone is built using the following technologies:
 
-Whetstone is currently available for free in the App Store on iOS. An Android release is in the works.
+- TypeScript
+- Expo
+- React Native
+- Firebase
+
+## Availability 📱
+
+Whetstone is currently available for iOS. You can download it from the App Store.
+
+## Getting Started 🚀
+
+To run Whetstone locally for development:
+
+1. Clone this repository: `git clone https://github.com/your_username/whetstone.git`
+2. Change to the project directory: `cd whetstone`
+3. Install dependencies: `yarn install`
+4. Start the Expo development server: `yarn start`
+5. Open the Expo app on your iOS device and scan the QR code to launch Whetstone.
+
+## Contributing 🤝
+
+Contributions to Whetstone are welcome! If you have ideas for new features, bug fixes, or other improvements, please feel free to submit a pull request or create an issue. Your input and collaboration are highly appreciated.
+
+## License ⚖️
+
+Whetstone is available under the MIT License. For more details, see the [LICENSE](LICENSE) file.
