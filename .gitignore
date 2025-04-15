@@ -14,3 +14,14 @@ web-build/
 
 # macOS
 .DS_Store
+
+# Editor specific files
+.vscode/
+.idea/
+*.swp
+*~
+
+# Claude Code specific files
+*-TASK.md
+*-PLAN.md
+architect_output/
